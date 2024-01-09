@@ -1,17 +1,19 @@
-import './App.css'
-import { useWalletContext } from './store/walletProvider'
+import { BrowserRouter as Router,Routes,Route } from 'react-router-dom'
+import {Login,Signup,Home} from './components'
+import './index.css'
 
 
 function App() {
-  const {wallet,hasProvider,networkId} = useWalletContext()
-                                                                            
   return (
-    <div className="App">
-      <h2>Injected Provider { hasProvider ? 'DOES' : 'DOES NOT'} Exist</h2>
-        <div>Wallet Accounts: { wallet.accounts[0] }</div>
-        <div>ChainId: { wallet.chainId }</div>
-        <div>NetworkId: { networkId }</div>
-    </div>
+    <Router>
+      <div className="App">
+        <Routes>
+          <Route element={<Home/>} path='/'/>
+          <Route element={<Login/>} path='/login'/>
+          <Route element={<Signup/>} path='/signup'/>
+        </Routes>
+      </div>
+    </Router>
   )
 }
 

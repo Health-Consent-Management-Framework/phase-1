@@ -9,3 +9,4 @@ const Store:React.FC<{children:React.ReactNode}> = ({children}) =>{
 }
 
 export default Store
+export * from './walletProvider'

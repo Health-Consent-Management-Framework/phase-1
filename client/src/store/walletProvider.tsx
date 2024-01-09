@@ -39,9 +39,11 @@ export const WalletProvider:React.FC<{children:React.ReactNode}> = (props)=>{
                       const chainId = await web3.eth.getChainId();
                       setWallet({ accounts: [accounts[0]],chainId:chainId.toString() });
                       const netId = await web3.eth.net.getId(); 
-                      setNetworkId(netId.toString())
+                      console.log(netId)
+                      setNetworkId(netId?netId.toString():"start ganache")
                     } catch (error) {
                       console.error('Error connecting to Ganache:', error);
+                      alert("error cpnnecting to ganache")
                     }
                   } else {
                     console.error('No Ethereum provider found. Please install MetaMask or use a browser with Ethereum support.');
