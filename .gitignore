@@ -37,3 +37,4 @@ build/*
 build
 client/src/contracts
 client/src/contracts/*
+.vscode

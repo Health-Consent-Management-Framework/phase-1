@@ -1,9 +1,12 @@
+import { NotifcationProvider } from "./notificationProvider"
 import { WalletProvider } from "./walletProvider"
 
 const Store:React.FC<{children:React.ReactNode}> = ({children}) =>{
     return(
         <WalletProvider>
-            {children}
+            <NotifcationProvider>
+                {children}
+            </NotifcationProvider>
         </WalletProvider>
     )
 }

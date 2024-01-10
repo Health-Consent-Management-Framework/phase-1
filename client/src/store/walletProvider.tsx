@@ -24,6 +24,9 @@ export const WalletProvider:React.FC<{children:React.ReactNode}> = (props)=>{
 
 
     useEffect(() => {
+        const checkProvider = async ()=>{
+          
+        }
         const loadAccounts = async () => {
             try {
                 if (window.ethereum) {
@@ -55,10 +58,8 @@ export const WalletProvider:React.FC<{children:React.ReactNode}> = (props)=>{
               console.error('Error loading accounts:', error);
             }
           };
-          
         loadAccounts();
-      }, []);
-      
+    }, []);
 
     return(
         <WalletContext.Provider value={{hasProvider,wallet,networkId}}>
