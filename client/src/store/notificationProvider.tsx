@@ -23,7 +23,7 @@ export const NotifcationProvider:React.FC<{children:React.ReactNode}> = ({childr
     useEffect(()=>{
         const timer = setTimeout(()=>{
             setShowNotification(false)  
-        },1000) 
+        },2000) 
         return ()=> clearTimeout(timer)
     },[shownNotification])
 

@@ -1,11 +1,25 @@
 import { LabeledInput,Button } from "./ui"
 import {useNavigate } from "react-router-dom"
+import useAuth from "../hooks/useAuth"
+import { useEffect, useState } from "react"
 
 export const Login:React.FC = ()=>{
     const navigate = useNavigate()
-    const handleSubmit = ()=>{
+    const [userDetails,setUserDetails] = useState<{username:string,password:string}|null>(null)
+    const {response:loginResponse} = useAuth<{username:string,password:string}|null>("login",userDetails)
 
+    const handleSubmit = (e)=>{
+        console.log(e)
+        e.preventDefault();
+        const userName = e.target.userName;
+        const password = e.target.password;
+        setUserDetails({username:userName,password})
     }
+
+    useEffect(()=>{
+        console.log(loginResponse)
+    },[loginResponse])
+
     return(
         <section className="w-screen min-h-screen h-dvh flex items-center justify-center">
             <div className="left-side hidden sm:flex sm:w-1/2 bg-red-300 items-center justify-center h-full">
@@ -17,7 +31,7 @@ export const Login:React.FC = ()=>{
                     <LabeledInput label="UserName"/>
                     <LabeledInput label="password"/>
                     <div className={`flex gap-3 pt-3`}>
-                        <Button type="primary">Connect</Button>
+                        <Button buttonType="submit" type="primary">Connect</Button>
                         <Button onClick={()=>navigate('/')}>Home</Button>
                     </div>
                 </form>
