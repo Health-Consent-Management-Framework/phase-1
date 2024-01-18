@@ -10,7 +10,7 @@ function App() {
       <div className="App">
         <Routes>
           <Route element={wallet&&wallet.accounts?.length?<Home/>:<Navigate to={'/login'}/>} path='/'/>
-          <Route element={<Login/>} path='/login'/>
+          <Route element={wallet&&wallet.accounts?.length?<Navigate to={"/"}/>:<Login/>} path='/login'/>
           <Route element={<Signup/>} path='/signup'/>
           <Route element={<DashBoard/>} path='/patient'/>
           <Route element={<Facilities/>} path='/facilities'/>

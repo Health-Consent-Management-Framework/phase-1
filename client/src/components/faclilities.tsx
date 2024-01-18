@@ -1,4 +1,40 @@
-import { LabeledInput, LabeledSelect } from "./ui"
+import { LabeledInput, LabeledSelect,Button } from "./ui"
+
+const AddFacility = ()=>{
+    const handleSubmit = (e)=>{
+        e.preventDefault();
+    }
+    return(
+        <section>
+            <form onSubmit={handleSubmit} className="bg-blue-300 inline-block m-auto p-3 rounded-lg">
+                <h1 className="text-center font-bold">Create Facility</h1>
+                <div className="flex gap-1 flex-wrap justify-between">
+                    <div className="max-w-sm">
+                        <LabeledInput name="name" label="name"/>
+                    </div>
+                    <div>
+                        <LabeledSelect label="type" options={[{value:"local",name:"local"}]}/>
+                    </div>
+                </div>
+                <div className="max-w-sm">
+                    <LabeledInput label="street" name="street"/>
+                </div>
+                <div className="flex gap-1 flex-wrap" id="Address">
+                    <LabeledSelect label="state" options={[{value:"AP",name:"Andhra Pradesh,AP"}]}/>
+                    <LabeledSelect label="district" options={[{value:"AP",name:"Andhra Pradesh,AP"}]}/>
+                </div>
+                <div className="mt-2 flex justify-center">
+                    <textarea>
+                        workers details
+                    </textarea>
+                </div>
+                <div className="mt-2 flex justify-center items-center">
+                    <Button className="bg-blue-800 text-white border-blue-200 shadow-blue-400">Submit</Button>
+                </div>
+            </form>
+        </section>
+    )
+}
 
 export const Facilities:React.FC = ()=>{
     return(
@@ -17,11 +53,7 @@ export const Facilities:React.FC = ()=>{
                     </div>
                 </article>
             </div>
-            <form>
-                <LabeledInput label="name"/>
-                <LabeledInput label="type"/>
-                <LabeledSelect label="state" options={[{value:"AP",name:"Andhra Pradesh,AP"}]}/>
-            </form>
+            <AddFacility/>
         </section>
     )
 }

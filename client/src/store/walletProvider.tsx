@@ -57,7 +57,7 @@ export const WalletProvider:React.FC<{children:React.ReactNode}> = (props)=>{
               console.error('Error loading accounts:', error);
             }
           };
-        // loadAccounts();
+        loadAccounts();
     }, []);
 
     return(
