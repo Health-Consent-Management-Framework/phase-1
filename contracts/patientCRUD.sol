@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 contract PatientRecordSystem {
+
     address public owner;
 
     struct Patient {
@@ -32,6 +33,7 @@ contract PatientRecordSystem {
     event PatientDeleted(uint256 patientId);
 
     constructor() {
+        require(msg.sender != address(0), "Null address not allowed");
         owner = msg.sender;
     }
 

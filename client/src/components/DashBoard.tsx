@@ -1,8 +1,11 @@
+import PatientFrom from './patientForm'
+import { NameForm } from './nameForm'
 export const DashBoard:React.FC = ()=>{
     return(
         <section className="">
             <div className="">
-                this is dashboard
+                <PatientFrom/>
+                <NameForm/>
             </div>
         </section>
     )
