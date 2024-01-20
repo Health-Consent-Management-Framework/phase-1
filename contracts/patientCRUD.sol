@@ -45,7 +45,6 @@ contract PatientRecordSystem {
             patientId: totalPatients,
             doctorAccess: address(0)
         });
-
         emit PatientCreated(totalPatients, _name, _age);
     }
 
@@ -57,7 +56,6 @@ contract PatientRecordSystem {
         Patient storage patient = patients[_patientId];
         patient.name = _newName;
         patient.age = _newAge;
-
         emit PatientUpdated(_patientId, _newName, _newAge);
     }
 

@@ -9,6 +9,7 @@ export function NameForm(){
     const [contract,setContract] = useState<Contract<ABI>|null>(null)
     const {web3,wallet,networkId} = useWalletContext()
     const [transactionHash,setTransactionHash] = useState<string>()
+    const [names,setName] = useState<string[]>([])
 
     useEffect(()=>{
         const initContract = ()=>{
@@ -32,13 +33,22 @@ export function NameForm(){
     },[web3])
 
     async function handleSubmit(e){
-        if(contract)
-            e.preventDefault();
-            const {name} = e.target
-            console.log(name.value)
-            const transaction = await contract?.methods.addName(name.value).send({ from: wallet.accounts[0] });
-            setTransactionHash(transaction?.blockHash.toString()||"failed")
+        e.preventDefault();
+        const {name} = e.target
+        console.log(name.value)
+        const transaction = await contract?.methods.addName(name.value).send({ from: wallet.accounts[0] });
+        console.log(transaction)
+        setTransactionHash(transaction?.blockHash.toString()||"failed")
+    }
+
+    async function getAllName() {
+        if(contract){
+            console.log("called")
+            const contractNames = await contract?.methods.getAllNames().call({from:wallet.accounts[0]})
+            console.log(contractNames)
+            setName(contractNames as string[])
         }
+    }
 
     return(
         <form onSubmit={handleSubmit} className="bg-blue-300 inline-block m-auto p-3 rounded-lg">
@@ -52,6 +62,10 @@ export function NameForm(){
                 <p>
                     {transactionHash}
                 </p>
+                <div className='flex items-center justify-center'>
+                    <Button type='button' onClick={()=>getAllName()}>Get all names</Button>
+                </div>
+                {JSON.stringify(names)}
             </form>
     )
 }

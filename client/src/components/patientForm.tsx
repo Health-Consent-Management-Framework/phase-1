@@ -39,11 +39,11 @@ const PatientForm = () => {
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
-      if(wallet&&contract) {
+      if(contract) {
         console.log("inside")
-        const transaction = await contract.methods.createPatient(name, age).send({ from: wallet.accounts[0] });
+        const transaction = await contract?.methods.createPatient(name, age).send({ from: wallet.accounts[0] });
         console.log(transaction)
-        setTransactionHash(transaction.blockHash)
+        setTransactionHash(transaction?.blockHash||"")
       }
     } catch (error) {
       console.error('Error submitting transaction', error);
