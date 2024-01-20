@@ -1,6 +1,6 @@
 import Web3 from "web3";
 import { createContext, useContext, useEffect, useState } from "react";
-// import  '@metamask/detect-provider'
+import detectEthereumProvider from '@metamask/detect-provider'
 
 type walletType = {
     accounts:string[],
@@ -27,23 +27,23 @@ export const WalletProvider:React.FC<{children:React.ReactNode}> = (props)=>{
 
     useEffect(() => {
         const checkProvider = async ()=>{
-          
+          const provider = await detectEthereumProvider()
+          const chainId = await provider.request({
+            method: 'eth_chainId'
+          })
+          if(chainId) setHasProvider(true)
         }
         const initWeb3 = async () => {
           try {
-            const devMode = Boolean(import.meta.env.VITE_DEV_MODE)
-              let web3;
-              if (typeof web3 !== 'undefined') {
-                web3 = new Web3(web3.currentProvider); 
-                } else {
-                  const provider = !devMode?window.ethereum:new Web3.providers.HttpProvider('http://localhost:7545')
-                  web3 = new Web3(provider);
-              } 
+              const devMode = Boolean(import.meta.env.VITE_DEV_MODE)
+              const provider = !devMode?window.ethereum:new Web3.providers.HttpProvider('http://localhost:7545')
+              const web3 = new Web3(provider);
               setWeb3(web3)
             } catch (error) {
               console.error('Error loading accounts:', error);
             }
           };
+          checkProvider();
         initWeb3();
     }, []);
 
