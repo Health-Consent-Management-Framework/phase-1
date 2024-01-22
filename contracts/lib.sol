@@ -20,7 +20,7 @@ library Utils{
     }
     
     struct Facility{
-        string name;
+        string facilityName;
         string facilityId;
         Location location;
         accessType facilityType;

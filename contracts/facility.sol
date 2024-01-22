@@ -6,40 +6,43 @@ import {Utils} from "./lib.sol";
 contract Facility {
     Utils.accessType public defaultAccessType = Utils.accessType.local;
     // mapping(address => Utils.Worker) public workers;
-    mapping(string => Utils.Facility) public facilityData;
+    mapping(string => Utils.Facility) public facilityRegister;
+    string[] facilityIds;
     //check mapping to store only address if possible
-    // Facility[] facilityData;
+    // Facility[] facilityRegister;
     //send faciltydata to new contract facilityregister
-    function createFacility(string memory facilityName,string memory state,string memory district,string memory street,Utils.accessType facilityType) external returns(bool){
+    function createFacility(string memory facilityName,string memory state,string memory district,string memory street,string memory pincode,Utils.accessType facilityType) external returns(bool){
         require(bytes(facilityName).length > 0, "name cannot be empty");
         require(bytes(state).length > 0, "state cannot be empty");
         require(bytes(district).length > 0, "state cannot be empty");
         require(bytes(street).length>0 , "street must be given");
+        require(bytes(pincode).length>0 , "street must be given");
         string memory randomIdentifer = Utils.generateRandomString(4);
         Utils.Location memory facilityLocation = Utils.Location(state, district, street);
         string memory facilityId = string(abi.encodePacked(facilityName,state,Utils.substring(street,0,4),'-',randomIdentifer));
         Utils.Facility memory newFacility = Utils.Facility(facilityId,facilityName, facilityLocation, facilityType);
-        // facilityData.push(newFacility);
-        facilityData[facilityId] = newFacility;
+        // facilityRegister.push(newFacility);
+        facilityRegister[facilityId] = newFacility;
+        facilityIds.push(facilityId);
         return true;
     }
 
     function getLocation(string calldata facilityId) public view returns(Utils.Location memory){
-        return facilityData[facilityId].location;
+        return facilityRegister[facilityId].location;
     }
 
     // function getWorkers(string calldata facilityId) public view returns(Utils.Worker[] memory){
-    //     return facilityData[facilityId].facilityWorkers;
+    //     return facilityRegister[facilityId].facilityWorkers;
     // }
 
     function getFacilty(string memory facilityId) internal view returns(Utils.Facility memory){
-        // for (uint256 i = 0; i < facilityData.length; i++) {
-        //     if (keccak256(abi.encodePacked(facilityId)) == keccak256(abi.encodePacked(facilityData[i].id))) {
+        // for (uint256 i = 0; i < facilityRegister.length; i++) {
+        //     if (keccak256(abi.encodePacked(facilityId)) == keccak256(abi.encodePacked(facilityRegister[i].id))) {
         //         return i;
         //     }
         // }
         // revert("Facility not found");
-        return facilityData[facilityId];
+        return facilityRegister[facilityId];
     }
 
     function editFacility(string calldata facilityId) public returns(Utils.Facility memory){
@@ -48,25 +51,37 @@ contract Facility {
 
     function removeFacility(string memory facilityId) public returns(bool){
         // bool found = false;
-        // for (uint256 i = 0; i < facilityData.length-1; i++) {
-        //     if (keccak256(abi.encodePacked(facilityId)) == keccak256(abi.encodePacked(facilityData[i].id));) found = true;
+        // for (uint256 i = 0; i < facilityRegister.length-1; i++) {
+        //     if (keccak256(abi.encodePacked(facilityId)) == keccak256(abi.encodePacked(facilityRegister[i].id));) found = true;
         //     if(found){
-        //         facilityData[i] = facilityData[i+1]
+        //         facilityRegister[i] = facilityRegister[i+1]
         //     }
         // }
-        // delete facilityData[facilityId];
-        require(bytes(facilityData[facilityId].facilityId).length!=0, "Facility not found");
-        facilityData[facilityId].name = "";
-        facilityData[facilityId].facilityId = "";
-        facilityData[facilityId].location = Utils.Location("", "", "");
-        facilityData[facilityId].facilityType = Utils.accessType.local;
-        // facilityData[facilityId].facilityWorkers = new Utils.Worker[](0);
+        // delete facilityRegister[facilityId];
+        require(bytes(facilityRegister[facilityId].facilityId).length!=0, "Facility not found");
+        facilityRegister[facilityId].name = "";
+        facilityRegister[facilityId].facilityId = "";
+        facilityRegister[facilityId].location = Utils.Location("", "", "");
+        facilityRegister[facilityId].facilityType = Utils.accessType.local;
+        // facilityRegister[facilityId].facilityWorkers = new Utils.Worker[](0);
         return true;
     }
 
+        function getFacilities() public view returns (Utils.Facility[] memory) {
+            uint256 length = facilityIds.length;
+
+            Utils.Facility[] memory facilites = new Utils.Facility[](length);
+
+            for (uint256 i = 0; i < length; i++) {
+                facilites[i] = facilityRegister[facilityIds[i]];
+            }
+
+            return facilites;
+    }
 
     // function updateWorkers(string calldata facilityId,Utils.Worker[] memory workers) public returns(Utils.Worker[] memory){
-    //     facilityData[facilityId].facilityWorkers = workers;
-    //     return facilityData[facilityId].facilityWorkers;
+    //     facilityRegister[facilityId].facilityWorkers = workers;
+    //     return facilityRegister[facilityId].facilityWorkers;
     // }
 }
+
