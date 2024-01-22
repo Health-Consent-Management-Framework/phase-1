@@ -25,8 +25,34 @@ library Utils{
         Location location;
         accessType facilityType;
         // Worker[] facilityWorkers;
+        // string[] services;
     }
 
+    struct Patient{
+        address walletId;
+        string fname;
+        string lname;
+        string aadharId;
+        Location residence;
+    }
+
+    struct EHR{
+        address claimId;
+        string date;
+        address[] doctor;
+        address patient;
+        string[] IdentifiedProblems;
+        string[] symptops;
+    }
+
+    struct Doctor{
+        address doctorId;
+        string fname;
+        string lname;
+        string designation;
+        string profilePic;
+        string uniqueId;
+    }
         
     function generateRandomString(uint256 length) public view returns (string memory) {
         bytes memory characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

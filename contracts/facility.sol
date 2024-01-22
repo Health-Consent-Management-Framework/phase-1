@@ -4,13 +4,17 @@ pragma solidity 0.8.21;
 import {Utils} from "./lib.sol";
 
 contract Facility {
+    
     Utils.accessType public defaultAccessType = Utils.accessType.local;
-    // mapping(address => Utils.Worker) public workers;
     mapping(string => Utils.Facility) public facilityRegister;
     string[] facilityIds;
-    //check mapping to store only address if possible
-    // Facility[] facilityRegister;
-    //send faciltydata to new contract facilityregister
+
+    event PatientCreated(uint256 patientId,string message);
+    event PatientUpdated(uint256 patientId,string message);
+    event PatientDeleted(uint256 patientId,string message);
+
+
+    // mapping(address => Utils.Worker) public workers;
     function createFacility(string memory facilityName,string memory state,string memory district,string memory street,string memory pincode,Utils.accessType facilityType) external returns(bool){
         require(bytes(facilityName).length > 0, "name cannot be empty");
         require(bytes(state).length > 0, "state cannot be empty");
@@ -59,7 +63,7 @@ contract Facility {
         // }
         // delete facilityRegister[facilityId];
         require(bytes(facilityRegister[facilityId].facilityId).length!=0, "Facility not found");
-        facilityRegister[facilityId].name = "";
+        facilityRegister[facilityId].facilityName = "";
         facilityRegister[facilityId].facilityId = "";
         facilityRegister[facilityId].location = Utils.Location("", "", "");
         facilityRegister[facilityId].facilityType = Utils.accessType.local;
