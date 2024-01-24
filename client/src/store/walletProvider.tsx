@@ -43,7 +43,7 @@ export const WalletProvider:React.FC<{children:React.ReactNode}> = (props)=>{
               console.error('Error loading accounts:', error);
             }
           };
-          checkProvider();
+        checkProvider();
         initWeb3();
     }, []);
 
@@ -53,7 +53,6 @@ export const WalletProvider:React.FC<{children:React.ReactNode}> = (props)=>{
           const devMode = Boolean(import.meta.env.VITE_DEV_MODE)
           const accounts = devMode? await web3.eth.getAccounts() : await web3.eth.requestAccounts();
           console.log(accounts)
-          // const accounts = [`0x7B1f13Bd2859434524f1B502378AC88AD5c49f68`,`0x0c061A398De40fbA85Cb7A45d2C8EcA147b2e0AD`]
           const chainId = await web3.eth.getChainId();
           setWallet({ accounts: accounts,chainId:chainId.toString() });
           const netId = await web3.eth.net.getId(); 

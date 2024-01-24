@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { LabeledInput, LabeledSelect,Button } from "./ui"
-import {abi,networks} from '../contracts/Facility.json'
-import { useWalletContext } from "../store";
+import {abi ,networks} from '../contracts/Facility.json'
+import { useWalletContext } from "../store/walletProvider";
 import { Contract } from "web3";
 import { useNotificationContext } from "../store/notificationProvider";
 
@@ -79,10 +79,10 @@ export const AddFacility:React.FC = ()=>{
     
     useEffect(()=>{
         if(web3&&networkId) initContract()
-    },[web3,networkId])
+    },[web3, networkId])
 
         return(
-            <section className="w-full h-full items-center justify-center flex min-h-screen">
+            <section className="w-full h-full items-center justify-center flex mt-16">
             <form onSubmit={handleSubmit} className="bg-blue-300 inline-block max-w-[500px] w-full m-auto shadow-md shadow-black p-3 pt-5 px-5 rounded-lg">
                 <h1 className="text-center font-bold text-2xl pb-4">Create Facility</h1>
                 <div className="flex gap-1 flex-wrap justify-between">
@@ -90,7 +90,7 @@ export const AddFacility:React.FC = ()=>{
                         <LabeledInput placeholder={`Enter facility name`} name="name" label="name"/>
                     </div>
                     <div>
-                        <LabeledSelect placeholder={`Enter facility Type`} name="type" label="type" options={[{value:0,name:"local"}]}/>
+                        <LabeledSelect placeholder={`Enter facility Type`} name="type" label="type" options={[{value:0,name:"local"},{value:1,name:"state"},{name:"national",value:2}]}/>
                     </div>
                 </div>
                 <div className="flex justify-between">
@@ -164,7 +164,7 @@ export const Facilities:React.FC = ()=>{
             <div className="p-3" id="facilities-wrapper">
                 these are facilities
                 {facilties.map((ele,index)=>(                    
-                    <article className="border-[1px] cursor-pointer border-black p-2 hover:border-red-200  duration-300 rounded-lg w-[200px] shadow-lg flex flex-col">
+                    <article key={index} className="border-[1px] cursor-pointer border-black p-2 hover:border-red-200  duration-300 rounded-lg w-[200px] shadow-lg flex flex-col">
                         <img className="bg-red-200 h-24 rounded-lg w-full mb-2" />
                         <div className="flex flex-col">
                             <span className="uppercase font-bold text-sm">{ele.name}</span>

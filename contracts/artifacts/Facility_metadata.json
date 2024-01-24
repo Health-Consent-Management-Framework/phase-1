@@ -1,0 +1,434 @@
+{
+	"compiler": {
+		"version": "0.8.22+commit.4fc1097e"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "patientId",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "string",
+						"name": "message",
+						"type": "string"
+					}
+				],
+				"name": "FacilityCreated",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "patientId",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "string",
+						"name": "message",
+						"type": "string"
+					}
+				],
+				"name": "FacilityUpdated",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "patientId",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "string",
+						"name": "message",
+						"type": "string"
+					}
+				],
+				"name": "PatientRemoved",
+				"type": "event"
+			},
+			{
+				"inputs": [],
+				"name": "adminContract",
+				"outputs": [
+					{
+						"internalType": "contract Admin",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "facilityName",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "state",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "district",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "street",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "pincode",
+						"type": "string"
+					},
+					{
+						"internalType": "enum Utils.accessType",
+						"name": "facilityType",
+						"type": "uint8"
+					}
+				],
+				"name": "createFacility",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "defaultAccessType",
+				"outputs": [
+					{
+						"internalType": "enum Utils.accessType",
+						"name": "",
+						"type": "uint8"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "doctorContract",
+				"outputs": [
+					{
+						"internalType": "contract Doctor",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "facilityId",
+						"type": "string"
+					}
+				],
+				"name": "editFacility",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "string",
+								"name": "facilityName",
+								"type": "string"
+							},
+							{
+								"internalType": "string",
+								"name": "facilityId",
+								"type": "string"
+							},
+							{
+								"components": [
+									{
+										"internalType": "string",
+										"name": "state",
+										"type": "string"
+									},
+									{
+										"internalType": "string",
+										"name": "district",
+										"type": "string"
+									},
+									{
+										"internalType": "string",
+										"name": "street",
+										"type": "string"
+									}
+								],
+								"internalType": "struct Utils.Location",
+								"name": "location",
+								"type": "tuple"
+							},
+							{
+								"internalType": "enum Utils.accessType",
+								"name": "facilityType",
+								"type": "uint8"
+							}
+						],
+						"internalType": "struct Utils.Facility",
+						"name": "",
+						"type": "tuple"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"name": "facilityRegister",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "facilityName",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "facilityId",
+						"type": "string"
+					},
+					{
+						"components": [
+							{
+								"internalType": "string",
+								"name": "state",
+								"type": "string"
+							},
+							{
+								"internalType": "string",
+								"name": "district",
+								"type": "string"
+							},
+							{
+								"internalType": "string",
+								"name": "street",
+								"type": "string"
+							}
+						],
+						"internalType": "struct Utils.Location",
+						"name": "location",
+						"type": "tuple"
+					},
+					{
+						"internalType": "enum Utils.accessType",
+						"name": "facilityType",
+						"type": "uint8"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getFacilities",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "string",
+								"name": "facilityName",
+								"type": "string"
+							},
+							{
+								"internalType": "string",
+								"name": "facilityId",
+								"type": "string"
+							},
+							{
+								"components": [
+									{
+										"internalType": "string",
+										"name": "state",
+										"type": "string"
+									},
+									{
+										"internalType": "string",
+										"name": "district",
+										"type": "string"
+									},
+									{
+										"internalType": "string",
+										"name": "street",
+										"type": "string"
+									}
+								],
+								"internalType": "struct Utils.Location",
+								"name": "location",
+								"type": "tuple"
+							},
+							{
+								"internalType": "enum Utils.accessType",
+								"name": "facilityType",
+								"type": "uint8"
+							}
+						],
+						"internalType": "struct Utils.Facility[]",
+						"name": "",
+						"type": "tuple[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "facilityId",
+						"type": "string"
+					}
+				],
+				"name": "getLocation",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "string",
+								"name": "state",
+								"type": "string"
+							},
+							{
+								"internalType": "string",
+								"name": "district",
+								"type": "string"
+							},
+							{
+								"internalType": "string",
+								"name": "street",
+								"type": "string"
+							}
+						],
+						"internalType": "struct Utils.Location",
+						"name": "",
+						"type": "tuple"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "facilityId",
+						"type": "string"
+					}
+				],
+				"name": "removeFacility",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"facility.sol": "Facility"
+		},
+		"evmVersion": "shanghai",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"admin.sol": {
+			"keccak256": "0x234ae5f0f4dfcedc36eecddb44f1d3cdaa23a682534f39dfe75bf5ee3771d619",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://dceb3ad2c327d7a6171d965a7339a89933ebb94ae3c4ec7abfabf58e758577f4",
+				"dweb:/ipfs/QmNsSqjJHsfjSASAJSUqujBxSopyBCMpqyBpNraGF9krAk"
+			]
+		},
+		"doctor.sol": {
+			"keccak256": "0xa1a6f611299ee2d37c422ccdd23e5d91dcd2e14838a3df2bf752ba0d6a894dae",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://340b2d204d5500d04e1a62cfcebeff37b84544c64a22a6cee65533816542d3f5",
+				"dweb:/ipfs/QmcQkXiTiNkLYvRMznDv1hoa79fzn6vEb85PcF2P7mykYQ"
+			]
+		},
+		"facility.sol": {
+			"keccak256": "0xe51db7f81004109d3bb4cd20189aa3131eafd8233121264b832963ee38f1413f",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://981e8b90157627e8307a549925f7d930016dbd018889531b766ebdf0cb20d011",
+				"dweb:/ipfs/QmZ9jmUzpAcfdGePyutHwSyQ5HJFi3ty3trhc13v17wjnA"
+			]
+		},
+		"lib.sol": {
+			"keccak256": "0x7441f2a6eec892b4a52daea331f11279090a429ecc7fc78c88e1ace7038bab80",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://6f17647296ddc722728fcb3626519781f40d9f18d7b5ba4c53b554483229098b",
+				"dweb:/ipfs/QmYEdkgAjVBLqKwhnnEUB1Ncj9ytCABJgkTda2dH2KdtLi"
+			]
+		},
+		"owner.sol": {
+			"keccak256": "0x06afa2efc61d6c816ae781478df35c04a65a53fe854722162e4d80ad3f27ec65",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://b0747bd9016a4068ea43246483eb9fef58b6a02fc544bc586ef935d7336ec254",
+				"dweb:/ipfs/QmSrgLV3BcenQc5E5X7pXbwsxeoooN9gEjskLUfq6sygb8"
+			]
+		}
+	},
+	"version": 1
+}

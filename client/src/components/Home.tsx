@@ -1,4 +1,5 @@
-import { useWalletContext } from '../store'
+import { useWalletContext } from '../store/walletProvider'
+import { Header } from './ui'
 
 export const Home:React.FC = ()=>{
     const {wallet,hasProvider,networkId} = useWalletContext()

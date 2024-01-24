@@ -19,7 +19,7 @@ export const LabeledInput:React.FC<LabeledInputProps> = (props)=>{
 }
 
 interface LabeledSelectProps extends LabeledInputProps{
-    options:{name:string|number,value:string,optionStyle?:string}[],
+    options:{name:string,value:string|number,optionStyle?:string}[],
     selectedStyle?:string,
     mutiple?:boolean,
     selectType?:"white",

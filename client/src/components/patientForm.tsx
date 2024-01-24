@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import {abi,networks} from '../contracts/PatientRecordSystem.json';
-import { useWalletContext } from '../store';
+import { useWalletContext } from '../store/walletProvider';
 import { Contract } from "web3-eth-contract"
 import { LabeledInput, Button } from './ui';
 
@@ -9,8 +9,6 @@ type ABI = typeof abi
 const PatientForm = () => {
   const {web3,networkId,wallet} = useWalletContext();
   const [contract, setContract] = useState<Contract<ABI>|null>(null);
-  const [name, setName] = useState('');
-  const [age, setAge] = useState('');
   const [transactionHash, setTransactionHash] = useState('');
 
   useEffect(() => {
@@ -41,7 +39,8 @@ const PatientForm = () => {
     try {
       e.preventDefault();
       if(contract) {
-        const transaction = await contract?.methods.createPatient(name, age).send({ from: wallet.accounts[0] });
+        const {fname,lname,age} = e.target
+        const transaction = await contract?.methods.createPatient(fname.value, Number(age.value)).send({ from: wallet.accounts[0],gas:"30000" });
         setTransactionHash(transaction?.blockHash||"")
       }
     } catch (error) {
@@ -64,6 +63,9 @@ const PatientForm = () => {
                   </div>
                 </div>
                 <div>
+                  <div className='w-20'>
+                    <LabeledInput label="age" name="age"/>
+                  </div>
                   <LabeledInput label='address' />
                 </div>
                 <div className="mt-2 flex justify-center items-center">

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.21;
 
 contract PatientRecordSystem {
 
@@ -38,7 +38,7 @@ contract PatientRecordSystem {
     }
 
     function createPatient(string memory _name, uint256 _age) external onlyOwner {
-        totalPatients++;
+        totalPatients = totalPatients+1;
         patients[totalPatients] = Patient({
             name: _name,
             age: _age,

@@ -14,14 +14,6 @@ export const Button:React.FC<ButtonProps> = (props)=>{
     return(
         <button type={props.type} onClick={props.onClick||undefined} className={` focus-within:border-red-500 rounded-lg  p-2 px-3 font-medium text-sm duration-300 border-[1px] border-black ${color} hover:border-red-500 ${props.className} `}>
             {props.children}
-            {props.loader?(<ProgressBar
-  visible={true}
-  height="80"
-  width="80"
-  ariaLabel="progress-bar-loading"
-  wrapperStyle={{}}
-  wrapperClass=""
-  />):""}
         </button>
     )
 }

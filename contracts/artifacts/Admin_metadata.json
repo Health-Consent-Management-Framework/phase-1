@@ -1,0 +1,117 @@
+{
+	"compiler": {
+		"version": "0.8.22+commit.4fc1097e"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"name": "adminAddresses",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "newAdmin",
+						"type": "address"
+					}
+				],
+				"name": "createAdmin",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getAdmins",
+				"outputs": [
+					{
+						"internalType": "address[]",
+						"name": "",
+						"type": "address[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "totalAdminCount",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"admin.sol": "Admin"
+		},
+		"evmVersion": "shanghai",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"admin.sol": {
+			"keccak256": "0x16a4b88467cecd2424573e09af2dcf6977767beede95848e56400cb75288000f",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://92ca247f4abc2a2376ae7b533179d9770b1a37d3d803c50a4ca30ae35bee42bd",
+				"dweb:/ipfs/Qmf7T8tjc563DGj1ym1Hyf6UGKbfahaR4E2YvUnySetRu8"
+			]
+		},
+		"owner.sol": {
+			"keccak256": "0x06afa2efc61d6c816ae781478df35c04a65a53fe854722162e4d80ad3f27ec65",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://b0747bd9016a4068ea43246483eb9fef58b6a02fc544bc586ef935d7336ec254",
+				"dweb:/ipfs/QmSrgLV3BcenQc5E5X7pXbwsxeoooN9gEjskLUfq6sygb8"
+			]
+		}
+	},
+	"version": 1
+}

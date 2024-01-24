@@ -1,21 +1,29 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity 0.8.21;
+pragma solidity ^0.8.21;
 
 import {Utils} from "./lib.sol";
+import {Admin} from "./admin.sol";
+import {Doctor} from './doctor.sol';
 
 contract Facility {
-    
+    Admin public adminContract;
+    Doctor public doctorContract;
     Utils.accessType public defaultAccessType = Utils.accessType.local;
     mapping(string => Utils.Facility) public facilityRegister;
     string[] facilityIds;
 
-    event PatientCreated(uint256 patientId,string message);
-    event PatientUpdated(uint256 patientId,string message);
-    event PatientDeleted(uint256 patientId,string message);
+    event FacilityCreated(uint256 patientId,string message);
+    event FacilityUpdated(uint256 patientId,string message);
+    event PatientRemoved(uint256 patientId,string message);
+
+    modifier isAdmin() {
+        require(adminContract.adminAddresses(msg.sender), "Only admin can access the feature");
+        _;
+    }
 
 
     // mapping(address => Utils.Worker) public workers;
-    function createFacility(string memory facilityName,string memory state,string memory district,string memory street,string memory pincode,Utils.accessType facilityType) external returns(bool){
+    function createFacility(string memory facilityName,string memory state,string memory district,string memory street,string memory pincode,Utils.accessType facilityType) public isAdmin returns(bool){
         require(bytes(facilityName).length > 0, "name cannot be empty");
         require(bytes(state).length > 0, "state cannot be empty");
         require(bytes(district).length > 0, "state cannot be empty");
@@ -49,7 +57,7 @@ contract Facility {
         return facilityRegister[facilityId];
     }
 
-    function editFacility(string calldata facilityId) public returns(Utils.Facility memory){
+    function editFacility(string calldata facilityId) public isAdmin returns(Utils.Facility memory){
         // good way of editing parameters even one or two are null
     }
 

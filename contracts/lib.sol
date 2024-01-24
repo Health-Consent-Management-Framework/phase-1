@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT 
 //lib.sol
 
-pragma solidity 0.8.21;
+pragma solidity ^0.8.21;
 
 library Utils{
     enum accessType {local,national,international}
