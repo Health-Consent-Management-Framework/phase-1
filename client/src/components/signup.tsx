@@ -41,6 +41,7 @@ export const Signup:React.FC = ()=>{
             setLoading(false)
             if(res.status==200){
                 updateNotification({type:"success",message:"User created successfully"})
+                if(res.data.type=="Admin")
                 navigate("/login")
             }else updateNotification({type:"error",message:res.data.message})
             console.log(res)

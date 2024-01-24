@@ -63,7 +63,7 @@ export const AddFacility:React.FC = ()=>{
                 
                 const transaction = await contract?.methods.createFacility(
                     facilty.facilityName,facilty.state,
-                    facilty.district,facilty.street,facilty.pincode,Number(facilty.facilityType)
+                    facilty.district,facilty.street,facilty.pincode,facilty.facilityType
                 ).send({from:wallet.accounts[0],gas:"5000000"})
                 if(transaction?.status==1){
                     updateNotification({type:"success",message:"Facilty Created"})

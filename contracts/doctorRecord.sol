@@ -20,6 +20,7 @@ contract DoctorsRecord{
     function addDoctorRecord(Doctor doctor) public isAdmin returns(bool){
         records[address(doctor)] = doctor; 
         totalDoctors += 1;
+        return true;
     }
 
     function getDoctorRecord() public view returns(Doctor) {

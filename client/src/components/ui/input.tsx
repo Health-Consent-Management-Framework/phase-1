@@ -29,9 +29,9 @@ interface LabeledSelectProps extends LabeledInputProps{
 export const LabeledSelect:React.FC<LabeledSelectProps> =(props)=>{
     const color = props.selectType=="white"?"":"p-1 bg-white p-2 border-black focus:border-red-600 focus:outline-red-600 text-black"
     return(
-        <div className="flex flex-col items-center w-fit">
+        <div className="flex flex-col items-center max-w-sm w-fit">
             <label htmlFor={props.inputId} className="pb-1 text-sm self-start">{props.label}</label>
-            <select onChange={props.onChange} name={props.name} multiple={props?.mutiple} defaultValue={""} className={`${color} rounded-md text-md border-[1px]`}> 
+            <select onChange={props.onChange} name={props.name} multiple={props?.mutiple} defaultValue={""} className={`${color} rounded-md text-md max-w-[275px] border-[1px]`}> 
                 <option  value={""}>-</option>
                 {props?.options.map(ele=>{
                     return(
