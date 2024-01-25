@@ -52,7 +52,6 @@ export const WalletProvider:React.FC<{children:React.ReactNode}> = (props)=>{
         if(web3){
           const devMode = Boolean(import.meta.env.VITE_DEV_MODE)
           const accounts = devMode? await web3.eth.getAccounts() : await web3.eth.requestAccounts();
-          console.log(accounts)
           const chainId = await web3.eth.getChainId();
           setWallet({ accounts: accounts,chainId:chainId.toString() });
           const netId = await web3.eth.net.getId(); 

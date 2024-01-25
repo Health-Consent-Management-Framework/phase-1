@@ -1,7 +1,14 @@
+import { useState } from "react"
 import { Link, useLocation } from "react-router-dom"
 
 export const Header:React.FC = ()=>{
     const location = useLocation()
+    const [expand,setExpand] = useState(false)
+    const options = (
+        <div className="">
+
+        </div>
+    )
     return(
         <section className="w-full p-1 m-0 bg-red-200 shadow-lg pb-2 border-b-2 border-red-400 h-20" id="header-wrapper">
             <div className="max-w-[1200px] m-auto h-full px-10 flex items-center justify-between">
@@ -17,6 +24,7 @@ export const Header:React.FC = ()=>{
                 </ul>
                 <article className="profile-pic flex items-center gap-2">
                     <img src="login.png" className="w-10 h-10 rounded-full border-1 border-black hover:border-red-600 duration-300"/>
+                    {expand&&options}
                 </article>
             </div>
         </section>

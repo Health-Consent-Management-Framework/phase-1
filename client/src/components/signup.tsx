@@ -1,21 +1,50 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { LabeledInput,Button, LabeledSelect } from "./ui"
 import {useNavigate } from "react-router-dom"
 import axios from "axios"
 import { useNotificationContext } from "../store/notificationProvider"
 import { useWalletContext } from "../store/walletProvider"
+import {abi,networks} from '../contracts/Admin.json'
+import { Contract } from "web3"
+
+type ABI = typeof abi;
 
 export const Signup:React.FC = ()=>{
     const navigate = useNavigate()
     const [loading,setLoading] = useState(false)
     const [isDoctor,setIsDoctor] = useState(false)
-    const {web3,wallet} = useWalletContext();
+    const {web3,wallet,networkId} = useWalletContext();
     const {updateNotification} = useNotificationContext()
     const isDev = import.meta.env.VITE_DEV_MODE
+    const [contract,setContract] = useState<Contract<ABI>>() 
+
+    useEffect(()=>{
+        if(web3&&networkId) initContract()
+    },[web3,networkId])
 
     async function generateSignature(data){  
        return await web3?.eth.personal.sign(JSON.stringify(data),wallet.accounts[0],'')
     }
+
+    const initContract = async () => {
+        try {
+          if(web3&&networkId){
+            const deployedNetwork = networks[networkId];
+            if(!deployedNetwork.address){
+                throw new Error("Deploy the contract")
+            }
+            const instance = new web3.eth.Contract(
+              abi,
+              deployedNetwork.address
+              );
+              setContract(instance);
+            }
+        } catch (error) {
+            updateNotification({type:"error",message:"contract not deployed"})
+            console.error('Error initializing contract', error);
+        }
+    }
+
 
     const handleSubmit = async(e)=>{
         try{
@@ -41,7 +70,6 @@ export const Signup:React.FC = ()=>{
             setLoading(false)
             if(res.status==200){
                 updateNotification({type:"success",message:"User created successfully"})
-                if(res.data.type=="Admin")
                 navigate("/login")
             }else updateNotification({type:"error",message:res.data.message})
             console.log(res)

@@ -5,9 +5,7 @@ import {Ownable} from "./owner.sol";
 import {Utils} from "./lib.sol";
 
 contract Doctor is Ownable{
-    Utils.Doctor self;
-    constructor(Utils.Doctor memory doctor){
-        self = doctor;
+    constructor(){
         super;
     }   
 
@@ -23,4 +21,7 @@ contract Doctor is Ownable{
 
     }
 
+    function sendReportRequest() public isOwner returns (bool){
+
+    }
 }

@@ -4,6 +4,7 @@ import {abi ,networks} from '../contracts/Facility.json'
 import { useWalletContext } from "../store/walletProvider";
 import { Contract } from "web3";
 import { useNotificationContext } from "../store/notificationProvider";
+import useContract from "../hooks/useContract";
 
 interface facility{
     facilityName:string,
@@ -18,8 +19,8 @@ type ABI = typeof abi;
 
 export const AddFacility:React.FC = ()=>{
     const [facilty,setFacility] = useState<facility|null>()
-    const {web3,networkId,wallet} = useWalletContext();
-    const [contract,setContract] = useState<Contract<ABI>|null>()
+    const {wallet} = useWalletContext();
+    const contract = useContract(abi,networks)
     const {updateNotification} = useNotificationContext()
 
     const handleSubmit = (e)=>{
@@ -36,50 +37,26 @@ export const AddFacility:React.FC = ()=>{
         })
     }
     
-    const initContract = async () => {
-        try {
-          if(web3&&networkId){
-            const deployedNetwork = networks[networkId];
-            if(!deployedNetwork.address){
-                throw new Error("Deploy the contract")
-            }
-            const instance = new web3.eth.Contract(
-              abi,
-              deployedNetwork.address
-              );
-              setContract(instance);
-            }
-        } catch (error) {
-            updateNotification({type:"error",message:"contract not deployed"})
-            console.error('Error initializing contract', error);
-        }
-    }
 
     
     useEffect(()=>{
         async function createFacility(){
             if(facilty){
                 console.log(facilty)
-                
                 const transaction = await contract?.methods.createFacility(
                     facilty.facilityName,facilty.state,
                     facilty.district,facilty.street,facilty.pincode,facilty.facilityType
                 ).send({from:wallet.accounts[0],gas:"5000000"})
-                if(transaction?.status==1){
-                    updateNotification({type:"success",message:"Facilty Created"})
-                }
-                if(Number(transaction?.status)===0){
+                
+                if(Number(transaction?.status)===0)
                     updateNotification({type:"success",message:"Failed to create facility"})
-                }
+                else updateNotification({type:"success",message:"Facilty Created"})
             }
         }
         createFacility()
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[facilty])
     
-    useEffect(()=>{
-        if(web3&&networkId) initContract()
-    },[web3, networkId])
 
         return(
             <section className="w-full h-full items-center justify-center flex mt-16">
@@ -158,24 +135,37 @@ export const Facilities:React.FC = ()=>{
         getFacilites()
     },[contract])
 
+    function getAccessType(type){
+        switch(type){
+            case '0':
+                return 'local'
+            case '1':
+                return 'state'
+            case '2':
+                return 'national'
+        }
+    }
+
 
     return(
         <section>
             <div className="p-3" id="facilities-wrapper">
-                these are facilities
+                <p className="text-center pb-4">These are facilities</p>
+                <div className="flex justify-evenly">
                 {facilties.map((ele,index)=>(                    
                     <article key={index} className="border-[1px] cursor-pointer border-black p-2 hover:border-red-200  duration-300 rounded-lg w-[200px] shadow-lg flex flex-col">
                         <img className="bg-red-200 h-24 rounded-lg w-full mb-2" />
                         <div className="flex flex-col">
-                            <span className="uppercase font-bold text-sm">{ele.name}</span>
+                            <span className="uppercase font-bold text-sm">{ele.facilityName}</span>
                             <span className="w-full flex justify-between">
-                            <span className="text-sm ">facility type</span>
+                            <span className="text-sm ">{getAccessType(ele.facilityType.toString())}</span>
                             <span className="text-xs font-bold inline-block ms-auto bg-red-200 rounded-md px-1 pt-[2px] uppercase">{`${ele.location.state}-${ele.location.district}`}</span>
                             </span>
                             <span className="text-xs text-justify px-2">this is some information about the facility on how it is to be made in the canopy and all</span>
                         </div>
                     </article>
                 ))}
+                </div>
             </div>
         </section>
     )
