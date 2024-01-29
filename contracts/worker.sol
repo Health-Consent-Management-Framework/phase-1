@@ -4,8 +4,6 @@ pragma solidity ^0.8.21;
 
 contract Worker{
 
-    enum type_of_user{admin,worker,doctor,patient}
-
     struct Date{
         uint16 date;
         uint16 month;
@@ -27,7 +25,7 @@ contract Worker{
         Date DoB;
     }
 
-    mapping(uint=>address) public workersKeys;
+    mapping(uint=>address) private workersKeys;
     mapping (address=>UserType) workerData;
     uint totalWorkers;
 
@@ -35,25 +33,29 @@ contract Worker{
         totalWorkers = 0;
     }
 
-    function createWorker(
-        address workerAddress,
-        string memory fname,
-        string memory lname,
-        string memory username,
-        string memory password,
-        uint16 day,uint16 month,uint256 year
-        ) public returns (bool){
-        Date memory date = Date(day,month,year); 
-        UserType memory user = UserType(fname,lname,username,password,workerAddress,date); 
-        workersKeys[totalWorkers] = workerAddress;
-        workerData[workersKeys[totalWorkers]] = user;
-        totalWorkers+=1;
-        return true;
+    function checkIfWorker(address senderAddress) public view returns(bool){
+        return workerData[senderAddress].walletAddress == senderAddress;
     }
-    function removeWorker() public view returns (bool){
-        return true;
-    }
-    function updateWorker() public view returns (bool){
-        return true;
-    }
+
+    // function createWorker(
+    //     address workerAddress,
+    //     string memory fname,
+    //     string memory lname,
+    //     string memory username,
+    //     string memory password,
+    //     uint16 day,uint16 month,uint256 year
+    //     ) public returns (bool){
+    //     Date memory date = Date(day,month,year); 
+    //     UserType memory user = UserType(fname,lname,username,password,workerAddress,date); 
+    //     workersKeys[totalWorkers] = workerAddress;
+    //     workerData[workersKeys[totalWorkers]] = user;
+    //     totalWorkers+=1;
+    //     return true;
+    // }
+    // function removeWorker() public pure returns (bool){
+    //     return true;
+    // }
+    // function updateWorker() public pure returns (bool){
+    //     return true;
+    // }
 }

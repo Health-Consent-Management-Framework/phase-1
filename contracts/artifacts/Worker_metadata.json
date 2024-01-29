@@ -1,0 +1,70 @@
+{
+	"compiler": {
+		"version": "0.8.22+commit.4fc1097e"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "workersKeys",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"worker.sol": "Worker"
+		},
+		"evmVersion": "shanghai",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"worker.sol": {
+			"keccak256": "0x7ea279f7accf5800542d6f71ba162893f03ba6c49d32f6110a357247d99c59fb",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://370f8c6b836da7b0a9c6be7188f62c9ebae067e6730f1c818725384206c8eb5d",
+				"dweb:/ipfs/QmWX8gnKnRucZHTwkAEF8oMCzdMcbe6xaCuiCGEFYS8mFx"
+			]
+		}
+	},
+	"version": 1
+}

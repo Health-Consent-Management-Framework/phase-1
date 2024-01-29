@@ -1,48 +1,24 @@
-import { useEffect, useState } from "react"
+import {  useState } from "react"
 import { LabeledInput,Button, LabeledSelect } from "./ui"
 import {useNavigate } from "react-router-dom"
-import axios from "axios"
 import { useNotificationContext } from "../store/notificationProvider"
 import { useWalletContext } from "../store/walletProvider"
-import {abi,networks} from '../contracts/Admin.json'
-import { Contract } from "web3"
+import {abi,networks} from '../contracts/User.json'
+import {abi as AdminAbi,networks as AdminNetwork} from '../contracts/Admin.json'
+import useContract from "../hooks/useContract"
 
-type ABI = typeof abi;
 
 export const Signup:React.FC = ()=>{
     const navigate = useNavigate()
     const [loading,setLoading] = useState(false)
     const [isDoctor,setIsDoctor] = useState(false)
-    const {web3,wallet,networkId} = useWalletContext();
+    const {web3,wallet} = useWalletContext();
     const {updateNotification} = useNotificationContext()
     const isDev = import.meta.env.VITE_DEV_MODE
-    const [contract,setContract] = useState<Contract<ABI>>() 
-
-    useEffect(()=>{
-        if(web3&&networkId) initContract()
-    },[web3,networkId])
+    const contract = useContract(AdminAbi,AdminNetwork) 
 
     async function generateSignature(data){  
        return await web3?.eth.personal.sign(JSON.stringify(data),wallet.accounts[0],'')
-    }
-
-    const initContract = async () => {
-        try {
-          if(web3&&networkId){
-            const deployedNetwork = networks[networkId];
-            if(!deployedNetwork.address){
-                throw new Error("Deploy the contract")
-            }
-            const instance = new web3.eth.Contract(
-              abi,
-              deployedNetwork.address
-              );
-              setContract(instance);
-            }
-        } catch (error) {
-            updateNotification({type:"error",message:"contract not deployed"})
-            console.error('Error initializing contract', error);
-        }
     }
 
 
@@ -54,11 +30,10 @@ export const Signup:React.FC = ()=>{
             if(confirmPassword.value!=password.value){
                 throw new Error("password and confirm password doesn't match")
             }
-            const signature = isDev? "some test signature" :await generateSignature({username:username.value,walletId:walletId.value})
+            // const signature = isDev? "some test signature" :await generateSignature({username:username.value,walletId:walletId.value})
             const body = {
                 email:username.value,
                 password:password.value,
-                signature:signature,
                 fname:fname.value,
                 lname:lname.value,
                 DoB:DoB.value,
@@ -66,13 +41,21 @@ export const Signup:React.FC = ()=>{
                 aadharNo:"1234567890",
                 type:type.value
             }
-            const res = await axios.post("http://localhost:5000/user/signup",body)
+            const [day,month,year] = DoB.value.split('-');
+            const transaction = await contract?.methods.createAdminRequest(
+                fname.value,
+                lname.value,
+                username.value,
+                password.value,
+                walletId.value,
+                day,month,year
+                ).send({from:walletId.value});
+                console.log(transaction)
             setLoading(false)
-            if(res.status==200){
-                updateNotification({type:"success",message:"User created successfully"})
-                navigate("/login")
-            }else updateNotification({type:"error",message:res.data.message})
-            console.log(res)
+            if(transaction?.status){
+                const msg = type.value==0?"Request sent to admin":"user created successfully";
+                updateNotification({type:"success",message:msg})
+            }
         }catch(err){
             console.error(err)
             updateNotification({type:"error",message:err.message||"something went wrong"})
@@ -100,7 +83,7 @@ export const Signup:React.FC = ()=>{
                         <LabeledInput type="date" name="DoB" label="date of birth"/>
                         <LabeledSelect onChange={(e)=>{
                             setIsDoctor(e.target.value==="doctor")
-                         }} label="user type" name="type" options={[{name:"patient",value:"patient"},{name:"admin",value:"admin"}]}/>
+                         }} label="user type" name="type" options={[{name:"patient",value:3},{name:"worker",value:1},{name:"admin",value:0},{name:"doctor",value:2}]}/>
                         {isDoctor&&<LabeledInput name="uid" label="uid"/>}
                     </div>
                     <div className="flex justify-center">

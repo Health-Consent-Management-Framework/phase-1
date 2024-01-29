@@ -36,7 +36,7 @@ contract Facility {
 
     modifier isAdmin() {
         Admin adminContract = Admin(adminContractAddress);
-        require(adminContract.adminAddresses(msg.sender), "Only admin can access the feature");
+        require(adminContract.checkIfAdmin(msg.sender), "Only admin can access the feature");
         _;
     }
 
@@ -69,6 +69,7 @@ contract Facility {
     }
 
     function editFacility(string memory facilityId) public view isAdmin returns(bool){
+        require(bytes(facilityId).length>0,"no facility id");
         return false;
         // good way of editing parameters even one or two are null
     }

@@ -22,11 +22,13 @@ export default function useContract(abi,networks){
                   setContract(instance);
                 }
             } catch (error) {
+                console.log(error)
                 updateNotification({type:"error",message:"contract not deployed"})
                 console.error('Error initializing contract', error);
             }
         }
         if(web3&&networkId) initContract();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     },[web3, networkId,abi,networks])
     return contract;
 }

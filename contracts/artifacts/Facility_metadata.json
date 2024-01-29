@@ -6,6 +6,17 @@
 	"output": {
 		"abi": [
 			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_adminContractAddress",
+						"type": "address"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
 				"anonymous": false,
 				"inputs": [
 					{
@@ -64,10 +75,10 @@
 			},
 			{
 				"inputs": [],
-				"name": "adminContract",
+				"name": "adminContractAddress",
 				"outputs": [
 					{
-						"internalType": "contract Admin",
+						"internalType": "address",
 						"name": "",
 						"type": "address"
 					}
@@ -103,7 +114,7 @@
 						"type": "string"
 					},
 					{
-						"internalType": "enum Utils.accessType",
+						"internalType": "enum Facility.accessType",
 						"name": "facilityType",
 						"type": "uint8"
 					}
@@ -120,32 +131,6 @@
 				"type": "function"
 			},
 			{
-				"inputs": [],
-				"name": "defaultAccessType",
-				"outputs": [
-					{
-						"internalType": "enum Utils.accessType",
-						"name": "",
-						"type": "uint8"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "doctorContract",
-				"outputs": [
-					{
-						"internalType": "contract Doctor",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
 				"inputs": [
 					{
 						"internalType": "string",
@@ -156,51 +141,12 @@
 				"name": "editFacility",
 				"outputs": [
 					{
-						"components": [
-							{
-								"internalType": "string",
-								"name": "facilityName",
-								"type": "string"
-							},
-							{
-								"internalType": "string",
-								"name": "facilityId",
-								"type": "string"
-							},
-							{
-								"components": [
-									{
-										"internalType": "string",
-										"name": "state",
-										"type": "string"
-									},
-									{
-										"internalType": "string",
-										"name": "district",
-										"type": "string"
-									},
-									{
-										"internalType": "string",
-										"name": "street",
-										"type": "string"
-									}
-								],
-								"internalType": "struct Utils.Location",
-								"name": "location",
-								"type": "tuple"
-							},
-							{
-								"internalType": "enum Utils.accessType",
-								"name": "facilityType",
-								"type": "uint8"
-							}
-						],
-						"internalType": "struct Utils.Facility",
+						"internalType": "bool",
 						"name": "",
-						"type": "tuple"
+						"type": "bool"
 					}
 				],
-				"stateMutability": "nonpayable",
+				"stateMutability": "view",
 				"type": "function"
 			},
 			{
@@ -241,14 +187,33 @@
 								"type": "string"
 							}
 						],
-						"internalType": "struct Utils.Location",
+						"internalType": "struct Facility.Location",
 						"name": "location",
 						"type": "tuple"
 					},
 					{
-						"internalType": "enum Utils.accessType",
+						"internalType": "enum Facility.accessType",
 						"name": "facilityType",
 						"type": "uint8"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "length",
+						"type": "uint256"
+					}
+				],
+				"name": "generateRandomString",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
 					}
 				],
 				"stateMutability": "view",
@@ -288,17 +253,17 @@
 										"type": "string"
 									}
 								],
-								"internalType": "struct Utils.Location",
+								"internalType": "struct Facility.Location",
 								"name": "location",
 								"type": "tuple"
 							},
 							{
-								"internalType": "enum Utils.accessType",
+								"internalType": "enum Facility.accessType",
 								"name": "facilityType",
 								"type": "uint8"
 							}
 						],
-						"internalType": "struct Utils.Facility[]",
+						"internalType": "struct Facility.FacilityType[]",
 						"name": "",
 						"type": "tuple[]"
 					}
@@ -334,7 +299,7 @@
 								"type": "string"
 							}
 						],
-						"internalType": "struct Utils.Location",
+						"internalType": "struct Facility.Location",
 						"name": "",
 						"type": "tuple"
 					}
@@ -359,6 +324,35 @@
 					}
 				],
 				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "str",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "startIndex",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "endIndex",
+						"type": "uint256"
+					}
+				],
+				"name": "substring",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "pure",
 				"type": "function"
 			}
 		],
@@ -390,27 +384,19 @@
 	},
 	"sources": {
 		"admin.sol": {
-			"keccak256": "0x234ae5f0f4dfcedc36eecddb44f1d3cdaa23a682534f39dfe75bf5ee3771d619",
+			"keccak256": "0x3cc9fe240871883a143d1f226e2edab2b2f03a3446c6598289587a851be06616",
 			"license": "GPL-3.0",
 			"urls": [
-				"bzz-raw://dceb3ad2c327d7a6171d965a7339a89933ebb94ae3c4ec7abfabf58e758577f4",
-				"dweb:/ipfs/QmNsSqjJHsfjSASAJSUqujBxSopyBCMpqyBpNraGF9krAk"
-			]
-		},
-		"doctor.sol": {
-			"keccak256": "0xa1a6f611299ee2d37c422ccdd23e5d91dcd2e14838a3df2bf752ba0d6a894dae",
-			"license": "GPL-3.0",
-			"urls": [
-				"bzz-raw://340b2d204d5500d04e1a62cfcebeff37b84544c64a22a6cee65533816542d3f5",
-				"dweb:/ipfs/QmcQkXiTiNkLYvRMznDv1hoa79fzn6vEb85PcF2P7mykYQ"
+				"bzz-raw://d9565486fc03e1797f8cad92123305aaea2fec40b12b5e56b0d5f7768ee425ae",
+				"dweb:/ipfs/QmfRcw8JuwENcY2PrKpL8QNLwawr27654aQg9PWRDg4TXD"
 			]
 		},
 		"facility.sol": {
-			"keccak256": "0xe51db7f81004109d3bb4cd20189aa3131eafd8233121264b832963ee38f1413f",
+			"keccak256": "0xe4943f3b7d69ed8c4c4abd5af35262446860cf9167e5d377427dac0f32f56767",
 			"license": "GPL-3.0",
 			"urls": [
-				"bzz-raw://981e8b90157627e8307a549925f7d930016dbd018889531b766ebdf0cb20d011",
-				"dweb:/ipfs/QmZ9jmUzpAcfdGePyutHwSyQ5HJFi3ty3trhc13v17wjnA"
+				"bzz-raw://30fff6045686e5a2bd41f02e0b76f1996f7621146a7c06e38c81795f2d77ba9f",
+				"dweb:/ipfs/QmZjefgM8MsKrsw8zs4PToVWJ1yV9uouVFLhYb518sM46V"
 			]
 		},
 		"lib.sol": {
@@ -419,14 +405,6 @@
 			"urls": [
 				"bzz-raw://6f17647296ddc722728fcb3626519781f40d9f18d7b5ba4c53b554483229098b",
 				"dweb:/ipfs/QmYEdkgAjVBLqKwhnnEUB1Ncj9ytCABJgkTda2dH2KdtLi"
-			]
-		},
-		"owner.sol": {
-			"keccak256": "0x06afa2efc61d6c816ae781478df35c04a65a53fe854722162e4d80ad3f27ec65",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://b0747bd9016a4068ea43246483eb9fef58b6a02fc544bc586ef935d7336ec254",
-				"dweb:/ipfs/QmSrgLV3BcenQc5E5X7pXbwsxeoooN9gEjskLUfq6sygb8"
 			]
 		}
 	},

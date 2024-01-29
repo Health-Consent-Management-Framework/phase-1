@@ -20,12 +20,12 @@ export const NotifcationProvider:React.FC<{children:React.ReactNode}> = ({childr
         setNotification({type,message})
     }
 
-    // useEffect(()=>{
-    //     const timer = setTimeout(()=>{
-    //         setShowNotification(false)  
-    //     },2000) 
-    //     return ()=> clearTimeout(timer)
-    // },[shownNotification])
+    useEffect(()=>{
+        const timer = setTimeout(()=>{
+            setShowNotification(false)  
+        },2000) 
+        return ()=> clearTimeout(timer)
+    },[shownNotification])
 
     function closeInvitation(){
         setShowNotification(false)
