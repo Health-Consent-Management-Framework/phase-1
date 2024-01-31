@@ -13,17 +13,17 @@
 			{
 				"inputs": [
 					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
+						"internalType": "address",
+						"name": "senderAddress",
+						"type": "address"
 					}
 				],
-				"name": "workersKeys",
+				"name": "checkIfWorker",
 				"outputs": [
 					{
-						"internalType": "address",
+						"internalType": "bool",
 						"name": "",
-						"type": "address"
+						"type": "bool"
 					}
 				],
 				"stateMutability": "view",
@@ -58,11 +58,11 @@
 	},
 	"sources": {
 		"worker.sol": {
-			"keccak256": "0x7ea279f7accf5800542d6f71ba162893f03ba6c49d32f6110a357247d99c59fb",
+			"keccak256": "0x18f2d82bda5d197063e5ef57cae70c260ae75c98188f525bcc10ba6066607200",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://370f8c6b836da7b0a9c6be7188f62c9ebae067e6730f1c818725384206c8eb5d",
-				"dweb:/ipfs/QmWX8gnKnRucZHTwkAEF8oMCzdMcbe6xaCuiCGEFYS8mFx"
+				"bzz-raw://62d541ac6b9ed972e1dc26b72d2cdbd881013001818cb25084947cfa6f112442",
+				"dweb:/ipfs/QmdcTQ6Fm4SGKRbBZGMSGFPxzuvwh5Sasc4CJnm3paomFy"
 			]
 		}
 	},

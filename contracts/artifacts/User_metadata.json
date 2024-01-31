@@ -32,36 +32,60 @@
 				"type": "constructor"
 			},
 			{
-				"anonymous": false,
+				"inputs": [],
+				"name": "authorize",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
 				"inputs": [
 					{
-						"indexed": false,
 						"internalType": "string",
-						"name": "data",
+						"name": "email",
 						"type": "string"
 					}
 				],
-				"name": "log",
-				"type": "event"
+				"name": "checkAddressByEmail",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
 			},
 			{
-				"anonymous": false,
 				"inputs": [
 					{
-						"indexed": false,
 						"internalType": "string",
-						"name": "contractName",
+						"name": "email",
 						"type": "string"
 					},
 					{
-						"indexed": false,
 						"internalType": "address",
-						"name": "contractAddress",
+						"name": "accountAddress",
 						"type": "address"
 					}
 				],
-				"name": "logAddress",
-				"type": "event"
+				"name": "forgotPassword",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
 			},
 			{
 				"inputs": [
@@ -94,11 +118,27 @@
 						"type": "bool"
 					}
 				],
-				"stateMutability": "nonpayable",
+				"stateMutability": "view",
 				"type": "function"
 			},
 			{
-				"inputs": [],
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "password",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "email",
+						"type": "string"
+					},
+					{
+						"internalType": "enum User.type_of_user",
+						"name": "givenType",
+						"type": "uint8"
+					}
+				],
 				"name": "setUpPassword",
 				"outputs": [
 					{
@@ -163,10 +203,6 @@
 				],
 				"stateMutability": "nonpayable",
 				"type": "function"
-			},
-			{
-				"stateMutability": "payable",
-				"type": "receive"
 			}
 		],
 		"devdoc": {
@@ -197,11 +233,11 @@
 	},
 	"sources": {
 		"admin.sol": {
-			"keccak256": "0x3cc9fe240871883a143d1f226e2edab2b2f03a3446c6598289587a851be06616",
+			"keccak256": "0x786356fa6b7a8e50402cfa4314de95d2db711a6f4fa4db75b34c827066d6f597",
 			"license": "GPL-3.0",
 			"urls": [
-				"bzz-raw://d9565486fc03e1797f8cad92123305aaea2fec40b12b5e56b0d5f7768ee425ae",
-				"dweb:/ipfs/QmfRcw8JuwENcY2PrKpL8QNLwawr27654aQg9PWRDg4TXD"
+				"bzz-raw://9eabb458327a2b7db5d30d127ccd41a43df0a6aa1faf83b9087ebc5671905048",
+				"dweb:/ipfs/QmR2ox8L491y4vWA66jUzL9BvtSLwb2iLQViNzk2q6VH3u"
 			]
 		},
 		"doctor.sol": {
@@ -212,28 +248,28 @@
 				"dweb:/ipfs/QmcE35o9BXwtcqwKL75sbb2K1dWdRyYBnhaNh1erJExru7"
 			]
 		},
-		"patientCRUD.sol": {
-			"keccak256": "0xfc9a77017aee3e1d8ca0bc6e294b51fb44915662557db6eb1d21db43a3550445",
+		"patient.sol": {
+			"keccak256": "0x2e061fce89499bddc96750911a0afa45f298f24a71ecf7b9530af1474e57843f",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://54bff4434cfc4d176097eb9c3caadbed842068d5b888ed5803d0d493b373b9f1",
-				"dweb:/ipfs/QmP28qWh54W4Z3zmuYYRgXKZcz4SmYLTJhb5Q8hSAKrZRb"
+				"bzz-raw://7f6463d81c4654485df46364eb5c235dee82cd91e40705c766f3d9be3ebdbeac",
+				"dweb:/ipfs/QmfFcA9xHvq4p15iCrZPZRJHzSfa1s57e6mTspK9JG2JLT"
 			]
 		},
 		"user.sol": {
-			"keccak256": "0xfc073941bb049dc58d6a1cc8ec0267d686938aefccea2db0bb296ab093eb5bea",
+			"keccak256": "0xa2a34e14758fb9c664734fc2f3b65989cde4fd97af8ece842c0dab3fbe4dced3",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://3ce00251b0f1238e24f05db32dd38b15f39f8c6d1e4d1750d469b4211302c61b",
-				"dweb:/ipfs/QmZ7Gmx1XfdhiAp5Ah84UdbfXbcf8LCaTMFrNmxZ8rXM13"
+				"bzz-raw://58d83cc53b0485bfd4f70378809df3b0d828ac3c5fbd1df82da44054f81a5e12",
+				"dweb:/ipfs/Qmby7E1Q3hJpmUkhRAAeC1HiZNajNvw8uG2M9XK9tGyGGR"
 			]
 		},
 		"worker.sol": {
-			"keccak256": "0x7ea279f7accf5800542d6f71ba162893f03ba6c49d32f6110a357247d99c59fb",
+			"keccak256": "0x18f2d82bda5d197063e5ef57cae70c260ae75c98188f525bcc10ba6066607200",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://370f8c6b836da7b0a9c6be7188f62c9ebae067e6730f1c818725384206c8eb5d",
-				"dweb:/ipfs/QmWX8gnKnRucZHTwkAEF8oMCzdMcbe6xaCuiCGEFYS8mFx"
+				"bzz-raw://62d541ac6b9ed972e1dc26b72d2cdbd881013001818cb25084947cfa6f112442",
+				"dweb:/ipfs/QmdcTQ6Fm4SGKRbBZGMSGFPxzuvwh5Sasc4CJnm3paomFy"
 			]
 		}
 	},

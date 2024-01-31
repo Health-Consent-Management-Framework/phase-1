@@ -19,7 +19,7 @@ export const AddPatient = () => {
         const {fname,lname,DoB,pincode,patientAddress,address,email} = e.target
         console.log(fname,lname,DoB,pincode,patientAddress,address)
         const [day,month,year] = DoB.value.split('-').map(ele=>Number(ele))
-        const transaction = await contract?.methods.createPatient(fname.value,lname.value,email.value,"1234567890",day,month,year,address.value,patientAddress.value).send({ from: wallet.accounts[1],gas:"1000000" });
+        const transaction = await contract?.methods.createPatient(fname.value,lname.value,email.value,"1234567890",day,month,year,address.value,patientAddress.value).send({ from: wallet.accounts[0],gas:"1000000" });
         console.log(transaction)
       }
     } catch (error) {
