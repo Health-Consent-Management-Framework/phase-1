@@ -89,7 +89,7 @@
 					},
 					{
 						"internalType": "string",
-						"name": "username",
+						"name": "email",
 						"type": "string"
 					},
 					{
@@ -218,16 +218,21 @@
 				"inputs": [
 					{
 						"internalType": "string",
-						"name": "myString",
+						"name": "str1",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "str2",
 						"type": "string"
 					}
 				],
-				"name": "convertString",
+				"name": "compareString",
 				"outputs": [
 					{
-						"internalType": "bytes32",
+						"internalType": "bool",
 						"name": "",
-						"type": "bytes32"
+						"type": "bool"
 					}
 				],
 				"stateMutability": "pure",
@@ -247,7 +252,7 @@
 					},
 					{
 						"internalType": "string",
-						"name": "username",
+						"name": "email",
 						"type": "string"
 					},
 					{
@@ -374,7 +379,7 @@
 				"inputs": [
 					{
 						"internalType": "string",
-						"name": "username",
+						"name": "email",
 						"type": "string"
 					},
 					{
@@ -441,11 +446,11 @@
 	},
 	"sources": {
 		"admin.sol": {
-			"keccak256": "0x91cc63de4b76ae23c278e069eb0fb1e2527058587b0a7d1650d8d733bf66c729",
+			"keccak256": "0x786356fa6b7a8e50402cfa4314de95d2db711a6f4fa4db75b34c827066d6f597",
 			"license": "GPL-3.0",
 			"urls": [
-				"bzz-raw://ebd401681dd569c7f70db96c90403e51de685b1c34fa8ac075ec0ad75965d3da",
-				"dweb:/ipfs/QmVpoTU6xZ5Tj12TEVf9NHfgfGDCPuejVNFPhC8rWPW5qM"
+				"bzz-raw://9eabb458327a2b7db5d30d127ccd41a43df0a6aa1faf83b9087ebc5671905048",
+				"dweb:/ipfs/QmR2ox8L491y4vWA66jUzL9BvtSLwb2iLQViNzk2q6VH3u"
 			]
 		}
 	},

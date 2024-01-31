@@ -1,5 +1,5 @@
 import {Routes,Route, Navigate, useLocation } from 'react-router-dom'
-import {Login,Signup,PageNotFound,Home,DashBoard,Facilities,Reports,AddFacility,AddAdmin, AddWorker, VerifyEmail, AddPatient} from './components'
+import {Login,Signup,PageNotFound,Home,DashBoard,Facilities,Reports,AddFacility,AddAdmin, AddWorker, VerifyEmail, AddPatient, AddReport} from './components'
 import { Header } from './components/ui'
 import './index.css'
 import { useUserContext } from './store/userProvider'
@@ -20,6 +20,7 @@ function App() {
           <Route element={<AddFacility/>} path='/facility/add'/>
           <Route element={<AddWorker/>} path='/worker/add'/>
           <Route element={<AddPatient/>} path='/patient/add'/>
+          <Route element={<AddReport/>} path="/report/add"/>
           <Route element={<AddAdmin/>} path='/admin/add'/>
           <Route element={<VerifyEmail/>} path='/verify'/>
           <Route element={<Reports/>} path='/reports'/>

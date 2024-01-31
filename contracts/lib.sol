@@ -53,6 +53,10 @@ library Utils{
         string profilePic;
         string uniqueId;
     }
+
+    struct ReportType{
+        bool success;
+    }
         
     function generateRandomString(uint256 length) public view returns (string memory) {
         bytes memory characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -93,6 +97,39 @@ library Utils{
 
     function compareString(string memory str1, string memory str2) public pure returns (bool) {
         return keccak256(abi.encodePacked(str1)) == keccak256(abi.encodePacked(str2));
+    }
+
+    function appendToDynamicArray(ReportType[] memory array, ReportType memory element) internal pure returns (ReportType[] memory) {
+        ReportType[] memory newArray = new ReportType[](array.length + 1);
+        for (uint i = 0; i < array.length; i++) {
+            newArray[i] = array[i];
+        }
+        newArray[array.length] = element;
+        return newArray;
+    }
+
+    function uintToString(uint256 value) public pure returns (string memory) {
+        if (value == 0) {
+            return "0";
+        }
+
+        uint256 temp = value;
+        uint256 digits;
+        
+        while (temp != 0) {
+            digits++;
+            temp /= 10;
+        }
+
+        bytes memory buffer = new bytes(digits);
+
+        while (value != 0) {
+            digits--;
+            buffer[digits] = bytes1(uint8(48 + value % 10));
+            value /= 10;
+        }
+
+        return string(buffer);
     }
 
 

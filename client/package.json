@@ -15,6 +15,7 @@
     "@types/har-format": "^1.2.15",
     "@types/web3": "^1.2.2",
     "@web3-react/core": "^8.2.3",
+    "alchemy-sdk": "^3.1.2",
     "axios": "^1.6.5",
     "dotenv": "^16.4.1",
     "ethers": "^6.9.2",

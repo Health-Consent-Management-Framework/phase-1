@@ -29,6 +29,7 @@ contract Patient {
         string location;
         Date DoB;
         address walletAddress;
+        bool verfiedEmailAddress;
     }
 
     struct PatientDeleteRequest{
@@ -63,6 +64,7 @@ contract Patient {
     event PatientDeleted(address patientAddress);
     event PatientAccepted(address patientAddress, string name,uint age);
     event PatientUpdated(address patietnAddress);
+    event PatientVerified(address patientAddress,bool status);
 
     function compareString(string memory str1, string memory str2) public pure returns (bool) {
         return keccak256(abi.encodePacked(str1)) == keccak256(abi.encodePacked(str2));
@@ -74,7 +76,7 @@ contract Patient {
         uint day,uint month, uint year,
         string memory location,
         address patientAddress
-        ) external {
+        ) public returns (bool) {
         if(compareString(email, patients[patientAddress].email)){
             revert("patient with given email already exists");
         }
@@ -82,12 +84,19 @@ contract Patient {
         // Location memory location = Location(street,district,state);
         patientKeys[totalPatients] = patientAddress;
         totalPatients+=1;
-        patients[patientAddress] = PatientType(fname,lname,email,password,location,date,patientAddress);
+        patients[patientAddress] = PatientType(fname,lname,email,password,location,date,patientAddress,false);
         emit PatientCreated(totalPatients, email);
+        return true;
     }
 
     function updatePatient(address _patientId) public isOwner returns(bool){
         emit PatientUpdated(_patientId);
+        return true;
+    }
+
+    function verifyPatientEmail() public isOwner returns(bool){
+        patients[msg.sender].verfiedEmailAddress = true;
+        emit PatientVerified(msg.sender,patients[msg.sender].verfiedEmailAddress);
         return true;
     }
 

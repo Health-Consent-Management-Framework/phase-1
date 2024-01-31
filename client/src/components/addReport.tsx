@@ -4,6 +4,7 @@ import {abi ,networks} from '../contracts/Report.json'
 import { useWalletContext } from "../store/walletProvider";
 import { useNotificationContext } from "../store/notificationProvider";
 import useContract from "../hooks/useContract";
+import { useNavigate } from "react-router-dom";
 
 interface Report{
     patientId:string,
@@ -16,6 +17,7 @@ export const AddReport:React.FC = ()=>{
     const {wallet} = useWalletContext();
     const contract = useContract(abi,networks)
     const {updateNotification} = useNotificationContext()
+    const navigate = useNavigate();
     const [report,setReport] = useState()
     const [loading,setLoading] = useState(false)
 
@@ -40,7 +42,11 @@ export const AddReport:React.FC = ()=>{
         createReport()
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[report])
-    
+
+    async function checkForWoker(){
+        const transaction = await contract?.methods.checkForWorker().send({from:wallet.accounts[0]})
+        console.log(transaction)
+    }
 
         return(
             <section className="w-full h-full items-center justify-center flex mt-16">
@@ -63,6 +69,7 @@ export const AddReport:React.FC = ()=>{
                         <Button className="bg-blue-500 text-white hover:border-blue-700 hover:bg-blue-300" buttonType="primary" loader={loading}>Add Worker</Button>
                         <Button className="hover:border-blue-700 hover:text-blue-700" onClick={()=>navigate('/login')}>Clear</Button>
                     </div>
+                    <Button className="hover:border-blue-700 hover:text-blue-700" onClick={()=>checkForWoker()}>Clear</Button>
             </form>
             </section>
     )
