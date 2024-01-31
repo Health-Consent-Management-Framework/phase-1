@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract DoctorAccessControl {
-    address public owner;
+import "./patient.sol";
+import "./doctor.sol";
+
+contract Report {
+
+    Doctor doctorContract;
+    Patient patientContract;
 
     enum RequestStatus { Pending, Approved, Rejected }
-
-    struct Doctor {
-        string name;
-        address doctorAddress;
-    }
 
     struct AccessRequest {
         address doctorAddress;
@@ -17,7 +17,13 @@ contract DoctorAccessControl {
         RequestStatus status;
     }
 
-    mapping(address => Doctor) public doctors;
+    struct ReportType{
+        string reportId;
+        address patientAddress;
+        address[] doctorsAddress;
+    }
+
+    mapping(address => DoctorType) public doctors;
     mapping(uint256 => address) public patientToDoctor;
     mapping(uint256 => AccessRequest) public accessRequests;
 
@@ -38,20 +44,11 @@ contract DoctorAccessControl {
     event AccessRequestApproved(address doctorAddress, uint256 patientId);
     event AccessRequestRejected(address doctorAddress, uint256 patientId);
 
-    constructor() {
-        owner = msg.sender;
+    constructor(address patientAddress,address doctorAddress) {
+        patientContract = Patient(patientAddress);
+        doctorContract = Doctor(doctorAddress);
     }
 
-    function registerDoctor(string memory _name) external {
-        require(doctors[msg.sender].doctorAddress == address(0), "Doctor already registered");
-
-        doctors[msg.sender] = Doctor({
-            name: _name,
-            doctorAddress: msg.sender
-        });
-
-        emit DoctorRegistered(msg.sender, _name);
-    }
 
     function assignDoctorToPatient(address _doctorAddress, uint256 _patientId) external onlyOwner {
         require(_doctorAddress != address(0), "Invalid doctor address");
@@ -111,5 +108,9 @@ contract DoctorAccessControl {
 
     function getAccessRequestStatus(uint256 _patientId) external view returns (RequestStatus) {
         return accessRequests[_patientId].status;
+    }
+
+    function updateReport(address patientId) public returns (){
+
     }
 }

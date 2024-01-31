@@ -1,0 +1,241 @@
+{
+	"compiler": {
+		"version": "0.8.22+commit.4fc1097e"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "patient",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "doctor",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "worker",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "admin",
+						"type": "address"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "string",
+						"name": "data",
+						"type": "string"
+					}
+				],
+				"name": "log",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "string",
+						"name": "contractName",
+						"type": "string"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "contractAddress",
+						"type": "address"
+					}
+				],
+				"name": "logAddress",
+				"type": "event"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "username",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "password",
+						"type": "string"
+					},
+					{
+						"internalType": "address",
+						"name": "walletAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "enum User.type_of_user",
+						"name": "givenType",
+						"type": "uint8"
+					}
+				],
+				"name": "login",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "setUpPassword",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "fname",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "lname",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "email",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "password",
+						"type": "string"
+					},
+					{
+						"internalType": "enum User.type_of_user",
+						"name": "givenType",
+						"type": "uint8"
+					},
+					{
+						"internalType": "uint256",
+						"name": "day",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "month",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "year",
+						"type": "uint256"
+					}
+				],
+				"name": "signup",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"stateMutability": "payable",
+				"type": "receive"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"user.sol": "User"
+		},
+		"evmVersion": "shanghai",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"admin.sol": {
+			"keccak256": "0x3cc9fe240871883a143d1f226e2edab2b2f03a3446c6598289587a851be06616",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://d9565486fc03e1797f8cad92123305aaea2fec40b12b5e56b0d5f7768ee425ae",
+				"dweb:/ipfs/QmfRcw8JuwENcY2PrKpL8QNLwawr27654aQg9PWRDg4TXD"
+			]
+		},
+		"doctor.sol": {
+			"keccak256": "0xda95da13ae00c1db4cce543198974646199a2cd6f6ef9c30bd9d862c9e38bf11",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://e5a1d9216bc6e54970a64c504382614a7fc7ab6e904e6247c07f3371021c0f6a",
+				"dweb:/ipfs/QmcE35o9BXwtcqwKL75sbb2K1dWdRyYBnhaNh1erJExru7"
+			]
+		},
+		"patientCRUD.sol": {
+			"keccak256": "0xfc9a77017aee3e1d8ca0bc6e294b51fb44915662557db6eb1d21db43a3550445",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://54bff4434cfc4d176097eb9c3caadbed842068d5b888ed5803d0d493b373b9f1",
+				"dweb:/ipfs/QmP28qWh54W4Z3zmuYYRgXKZcz4SmYLTJhb5Q8hSAKrZRb"
+			]
+		},
+		"user.sol": {
+			"keccak256": "0xfc073941bb049dc58d6a1cc8ec0267d686938aefccea2db0bb296ab093eb5bea",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://3ce00251b0f1238e24f05db32dd38b15f39f8c6d1e4d1750d469b4211302c61b",
+				"dweb:/ipfs/QmZ7Gmx1XfdhiAp5Ah84UdbfXbcf8LCaTMFrNmxZ8rXM13"
+			]
+		},
+		"worker.sol": {
+			"keccak256": "0x7ea279f7accf5800542d6f71ba162893f03ba6c49d32f6110a357247d99c59fb",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://370f8c6b836da7b0a9c6be7188f62c9ebae067e6730f1c818725384206c8eb5d",
+				"dweb:/ipfs/QmWX8gnKnRucZHTwkAEF8oMCzdMcbe6xaCuiCGEFYS8mFx"
+			]
+		}
+	},
+	"version": 1
+}

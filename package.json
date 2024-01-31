@@ -1,6 +1,8 @@
 {
   "dependencies": {
     "@metamask/rpc-errors": "^6.1.0",
-    "@types/web3": "^1.2.2"
+    "@openzeppelin/contracts": "^5.0.1",
+    "@types/web3": "^1.2.2",
+    "dotenv": "^16.4.1"
   }
 }

@@ -1,6 +1,16 @@
 /* eslint-disable react-refresh/only-export-components */
 export * from './login'
 export * from './signup'
+export * from './verfiyEmail'
+// export * from './forgot'
+// export * from './reset'
 export * from './Home'
 export * from './DashBoard'
 export * from './faclilities'
+export * from './reports'
+export * from './addAdmin'
+export * from './addWorker'
+export * from './addPatient' // same page will be used to create doctor
+export * from './addFacility'
+export * from './addReport'
+export * from './pageNotFound'

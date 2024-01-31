@@ -11,6 +11,63 @@
 				"type": "constructor"
 			},
 			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "number",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "data",
+						"type": "address"
+					}
+				],
+				"name": "logAddress",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "number",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "string",
+						"name": "data",
+						"type": "string"
+					}
+				],
+				"name": "logAdmin",
+				"type": "event"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "newAdmin",
+						"type": "address"
+					}
+				],
+				"name": "acceptAdminRequest",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "newAdminAddress",
+						"type": "address"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
 				"inputs": [
 					{
 						"internalType": "address",
@@ -19,6 +76,134 @@
 					}
 				],
 				"name": "adminAddresses",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "fname",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "lname",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "username",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "password",
+						"type": "string"
+					},
+					{
+						"internalType": "address",
+						"name": "walletAddress",
+						"type": "address"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "date",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "month",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "year",
+								"type": "uint256"
+							}
+						],
+						"internalType": "struct Admin.Date",
+						"name": "DoB",
+						"type": "tuple"
+					},
+					{
+						"internalType": "bool",
+						"name": "verified",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "adminKeys",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "adminRequestkeys",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"name": "adminRequests",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "walletAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "enum Admin.RequestStatusType",
+						"name": "requestStatus",
+						"type": "uint8"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_adminAddress",
+						"type": "address"
+					}
+				],
+				"name": "checkIfAdmin",
 				"outputs": [
 					{
 						"internalType": "bool",
@@ -32,14 +217,118 @@
 			{
 				"inputs": [
 					{
+						"internalType": "string",
+						"name": "myString",
+						"type": "string"
+					}
+				],
+				"name": "convertString",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "fname",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "lname",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "username",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "password",
+						"type": "string"
+					},
+					{
+						"internalType": "address",
+						"name": "fromAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "day",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "month",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "year",
+						"type": "uint256"
+					}
+				],
+				"name": "createAdminRequest",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
 						"internalType": "address",
 						"name": "newAdmin",
 						"type": "address"
 					}
 				],
-				"name": "createAdmin",
-				"outputs": [],
+				"name": "declineAdminRequest",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "rejectedAddress",
+						"type": "address"
+					}
+				],
 				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getAdminRequests",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "address",
+								"name": "walletAddress",
+								"type": "address"
+							},
+							{
+								"internalType": "enum Admin.RequestStatusType",
+								"name": "requestStatus",
+								"type": "uint8"
+							}
+						],
+						"internalType": "struct Admin.AdminRequest[]",
+						"name": "",
+						"type": "tuple[]"
+					}
+				],
+				"stateMutability": "view",
 				"type": "function"
 			},
 			{
@@ -57,12 +346,67 @@
 			},
 			{
 				"inputs": [],
-				"name": "totalAdminCount",
+				"name": "getMasterAdmin",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getTotalAdminCount",
 				"outputs": [
 					{
 						"internalType": "uint256",
 						"name": "",
 						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "username",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "password",
+						"type": "string"
+					},
+					{
+						"internalType": "address",
+						"name": "walletAddress",
+						"type": "address"
+					}
+				],
+				"name": "login",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "masterAdmin",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
 					}
 				],
 				"stateMutability": "view",
@@ -97,19 +441,11 @@
 	},
 	"sources": {
 		"admin.sol": {
-			"keccak256": "0x16a4b88467cecd2424573e09af2dcf6977767beede95848e56400cb75288000f",
+			"keccak256": "0x91cc63de4b76ae23c278e069eb0fb1e2527058587b0a7d1650d8d733bf66c729",
 			"license": "GPL-3.0",
 			"urls": [
-				"bzz-raw://92ca247f4abc2a2376ae7b533179d9770b1a37d3d803c50a4ca30ae35bee42bd",
-				"dweb:/ipfs/Qmf7T8tjc563DGj1ym1Hyf6UGKbfahaR4E2YvUnySetRu8"
-			]
-		},
-		"owner.sol": {
-			"keccak256": "0x06afa2efc61d6c816ae781478df35c04a65a53fe854722162e4d80ad3f27ec65",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://b0747bd9016a4068ea43246483eb9fef58b6a02fc544bc586ef935d7336ec254",
-				"dweb:/ipfs/QmSrgLV3BcenQc5E5X7pXbwsxeoooN9gEjskLUfq6sygb8"
+				"bzz-raw://ebd401681dd569c7f70db96c90403e51de685b1c34fa8ac075ec0ad75965d3da",
+				"dweb:/ipfs/QmVpoTU6xZ5Tj12TEVf9NHfgfGDCPuejVNFPhC8rWPW5qM"
 			]
 		}
 	},

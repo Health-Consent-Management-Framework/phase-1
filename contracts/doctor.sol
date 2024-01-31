@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.21;
+contract Doctor{
+    address owner;
 
-import {Ownable} from "./owner.sol";
-import {Utils} from "./lib.sol";
+    constructor(){
+        owner = msg.sender;
+    }
 
-contract Doctor is Ownable{
-    Utils.Doctor self;
-    constructor(Utils.Doctor memory doctor){
-        self = doctor;
-        super;
-    }   
+    modifier isOwner(){
+        require(msg.sender== owner, "User doesn't own this data");
+        _;
+    }
 
     event doctorCreated();
     event doctorUpdated();
