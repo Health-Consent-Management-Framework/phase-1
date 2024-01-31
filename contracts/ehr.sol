@@ -223,7 +223,7 @@ contract Report {
     }
 
         
-    function createReport(string memory fname,string memory lname,string memory email,uint day,uint month,uint year,string[] memory attachements,string[] memory diagnosis,string[] memory tags) public onlyWorker returns(bool){
+    function createReport(string memory fname,string memory lname,string memory email,uint day,uint month,uint year) public onlyWorker returns(bool){
         (bool success,bytes memory data) = userContractAddress.delegatecall(abi.encodeWithSignature("emailToUser(string)", email));
         if(!success) revert("delegate call failed");
         address resultAddress = abi.decode(data, (address));
@@ -232,12 +232,16 @@ contract Report {
         address[] memory accessedDoctors;
         uint createdAt = 0;
         uint updatedAt = 0;
+        string[] memory attachements;
+        string[] memory diagnosis;
+        string[] memory tags;
         ReportType memory report = ReportType(reportId,resultAddress,address(0),accessedDoctors,attachements,diagnosis,tags,createdAt,updatedAt);
         reports[reportId] = report;
         patientToReportMapping[resultAddress].push(reportId);
         emit reportCreated(reportId);
         return true;
     }
+
 
     function updateReport(string memory reportId,string[] memory newDiagnosis) public onlyDoctorWithAccess(reportId) returns (bool) {
         ReportType memory report = reports[reportId];

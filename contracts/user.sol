@@ -124,7 +124,7 @@ contract User{
             return exists;
         }
         else if (givenType==type_of_user.worker){
-            bool success = workerContract.login(username,password,walletAddress);
+            // bool success = workerContract.login(username,password,walletAddress);
         }
         else if(givenType==type_of_user.doctor){
           
@@ -151,7 +151,4 @@ contract User{
         return true;
     }
 
-    function authorize() public pure returns(bool){
-        return true;
-    }
 }
