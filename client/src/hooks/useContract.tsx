@@ -11,7 +11,9 @@ export default function useContract(abi,networks){
         const initContract = async () => {
             try {
               if(web3&&networkId){
+                // console.log(networkId);
                 const deployedNetwork = networks[networkId];
+                // const deployedNetwork = networks[5777];
                 if(!deployedNetwork.address){
                     throw new Error("Deploy the contract")
                 }

@@ -15,6 +15,7 @@ export const AddPatient = () => {
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
+      // console.log(contract);
       if(contract) {
         const {fname,lname,DoB,pincode,patientAddress,address,email} = e.target
         console.log(fname,lname,DoB,pincode,patientAddress,address)
