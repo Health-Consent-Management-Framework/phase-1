@@ -119,6 +119,12 @@ contract Admin{
         return false;
     }
 
+    function hashPasswordWithSecret(string memory password, string memory secret) public pure returns (bytes32) {
+        bytes memory passwordBytes = bytes(password);
+        bytes memory secretBytes = bytes(secret);
+        return keccak256(abi.encodePacked(passwordBytes, secretBytes));
+    }
+
     function acceptAdminRequest(address newAdmin) public returns (address newAdminAddress){
         require(msg.sender==masterAdmin || bytes(adminAddresses[msg.sender].email).length>0,"only master admin can add the user");
         if(bytes(adminAddresses[msg.sender].email).length==0){
