@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 type User = {
     email:string,
@@ -20,7 +20,7 @@ const UserContext = createContext<UserContextInterface|null>(null)
 export const UserProvier:React.FC<{children:React.ReactNode}> = (props)=>{
     const [user,setUser] = useState<User>()
     const [token,setToken] = useState(()=>{
-        const userToken = sessionStorage.getItem("userToken")
+        const userToken = localStorage.getItem("access_token")
         return userToken ? userToken:""
     })
 
@@ -28,9 +28,9 @@ export const UserProvier:React.FC<{children:React.ReactNode}> = (props)=>{
         setUser(e)
     }
 
-    function updateToken(e){
+    function updateToken(e:string){
         setToken(e)
-        sessionStorage.setItem("userToken",JSON.stringify(e))
+        localStorage.setItem("access_token",JSON.stringify(e))
     }
 
     return(

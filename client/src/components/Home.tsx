@@ -1,8 +1,22 @@
 import { useWalletContext } from '../store/walletProvider'
-import { Header } from './ui'
 
 export const Home:React.FC = ()=>{
-    const {wallet,hasProvider,networkId} = useWalletContext()
+    const {wallet,hasProvider,networkId,web3} = useWalletContext()
+
+    async function decodeSignature(data) {
+        try {
+            const signature = localStorage.getItem('access_token') as string
+            const dataString = '0x' + Buffer.from(JSON.stringify(data)).toString('hex');
+            console.log(dataString)
+            web3?.eth.personal.ecRecover(dataString, signature).then(()=>{
+
+            })
+        } catch (error) {
+            console.error('Error decoding signature:', error);
+            throw error;
+        }
+    }
+
     const walletInfo = (
         <div className='bg-blue-400 border-2 w-fit p-3 text-center mx-auto'>        
         <h2>Injected Provider { hasProvider ? 'DOES' : 'DOES NOT'} Exist</h2>
@@ -11,6 +25,7 @@ export const Home:React.FC = ()=>{
         <div>NetworkId: { networkId }</div>
         </div>
     )
+    
     return(
         <section className='w-screen'>
             {walletInfo}

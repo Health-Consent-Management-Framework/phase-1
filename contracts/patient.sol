@@ -8,7 +8,7 @@ contract Patient {
     Worker workerContract;
     uint totalPatients;
     enum status{pending,accepted,rejeceted}
-
+    string patientSecret = 'patient_123';
     struct Date{
         uint date;
         uint month;
@@ -25,7 +25,7 @@ contract Patient {
         string fname;
         string lname;
         string email;
-        string password;
+        bytes32 password;
         string location;
         Date DoB;
         address walletAddress;
@@ -57,10 +57,11 @@ contract Patient {
 
     mapping(uint => address) public patientKeys;
     mapping(address => PatientType) public patients;
-    mapping(address=>PatientDeleteRequest) public patientDeleteRequests;
+    mapping(address=> PatientDeleteRequest) public patientDeleteRequests;
 
 
     event PatientCreated(uint256 totalPatients, string email);
+    event PatientFound(address patientAddress);
     event PatientDeleted(address patientAddress);
     event PatientAccepted(address patientAddress, string name,uint age);
     event PatientUpdated(address patietnAddress);
@@ -84,7 +85,8 @@ contract Patient {
         // Location memory location = Location(street,district,state);
         patientKeys[totalPatients] = patientAddress;
         totalPatients+=1;
-        patients[patientAddress] = PatientType(fname,lname,email,password,location,date,patientAddress,false);
+        bytes32 hashedPassword = hashPasswordWithSecret(password,patientSecret);
+        patients[patientAddress] = PatientType(fname,lname,email,hashedPassword,location,date,patientAddress,false);
         emit PatientCreated(totalPatients, email);
         return true;
     }
@@ -122,5 +124,30 @@ contract Patient {
             allPatients[i] = patients[patientKeys[i]];
         }
         return allPatients;
+    }
+
+    function login(string memory email,string memory password,address walletAddress) public returns (bool){
+        bool exists = true;
+        for(uint i=0;i<totalPatients;i++){
+            if(patientKeys[i]==walletAddress) exists = true;
+        }
+        bytes32 hashedPassword = hashPasswordWithSecret(password, patientSecret);
+        if(exists){
+            emit PatientFound(walletAddress);
+        }
+        if(!compareString(patients[walletAddress].email,email) || patients[walletAddress].password != hashedPassword)
+            revert("incorrect email or password");
+        return true;
+    }
+
+    function hashPasswordWithSecret(string memory password, string memory secret) public pure returns (bytes32) {
+        bytes memory passwordBytes = bytes(password);
+        bytes memory secretBytes = bytes(secret);
+        return keccak256(abi.encodePacked(passwordBytes, secretBytes));
+    }
+
+    function createToken(string memory username, string memory password, uint256 expirationTime, string memory secret) public pure returns (bytes32) {
+        string memory concatenatedString = string(abi.encodePacked(username, ".", password, ".", expirationTime, ".", secret));
+        return keccak256(bytes(concatenatedString));
     }
 }

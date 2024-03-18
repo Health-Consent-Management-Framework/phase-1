@@ -1,7 +1,6 @@
 import {Routes,Route, Navigate, useLocation } from 'react-router-dom'
-import {Login,Signup,PageNotFound,Home,DashBoard,Facilities,Reports,AddFacility,AddAdmin, AddWorker, VerifyEmail, AddPatient, AddReport} from './components';
+import {Login,Signup,PageNotFound,Home,Facilities,Reports,AddFacility,AddAdmin, AddWorker, VerifyEmail, AddPatient, AddReport} from './components';
 import PatientPage from './components/PatientPage';
-import DoctorPage from './components/DoctorPage';
 import { Header } from './components/ui'
 import './index.css'
 import { useUserContext } from './store/userProvider'
@@ -19,7 +18,6 @@ function App() {
           {/* <Route element={token?<Navigate to={"/"}/>:<Login/>} path='/login'/> */}
           <Route element={<Login/>} path='/login'/>
           <Route element={<Signup/>} path='/signup'/>
-          {/* <Route element={<DashBoard/>} path='/patient'/> */}
           <Route element={<PatientPage/>} path='/patient' />
           <Route element={<DoctorPage/>} path='/doctor' />
           <Route element={<Facilities/>} path='/facility'/>
@@ -32,10 +30,6 @@ function App() {
           <Route element={<AddAdmin/>} path='/admin/add'/>
           <Route element={<VerifyEmail/>} path='/verify'/>
           <Route element={<Reports/>} path='/reports'/>
-          <Route element={<></>} path='/report/:id'/>
-          <Route element={<></>} path='/doctor/:id'/>
-          {/* <Route element={<ForgotPassword/>} path='/forgot'/>
-          <Route element={<ResetPassword/>} path='/reset'/> */}
           <Route element={<PageNotFound/>} path='*'/>
         </Routes>
       </div>

@@ -29,12 +29,18 @@ contract Report {
     }
 
     enum RequestStatus { pending, approved, rejected }
+    enum UploadStatus { pending, uploaded, rejected }
 
     struct AccessRequest {
         uint accessRequestId;
         address doctorAddress;
         string reportId;
         RequestStatus status;
+    }
+
+    struct UploadRequest {
+        address patientAddress;
+        UploadStatus status;
     }
 
     struct CompleteReportInfo{
@@ -87,11 +93,13 @@ contract Report {
         _;
     }
 
-    modifier onlyWorker(){
-        (bool success,bytes memory data) = workerContractAddress.delegatecall(abi.encodeWithSignature("checkIfWorker(address)",msg.sender)); 
-        if(!success) revert("only worker delegate call failer");
-        bool isWorker = abi.decode(data, (bool));
-        require(bool(isWorker),"only worker has access to this request");
+    modifier onlyWorkerOrAdmin(){
+        (bool adminSuccess,bytes memory adminData) = workerContractAddress.delegatecall(abi.encodeWithSignature("checkIfWorker(address)",msg.sender)); 
+        if(!adminSuccess) revert("only worker delegate call failer");
+        (bool workerSuccess,bytes memory workerData) = workerContractAddress.delegatecall(abi.encodeWithSignature("checkIfWorker(address)",msg.sender)); 
+        bool isAdmin = abi.decode(adminData, (bool));
+        bool isWorker = abi.decode(workerData,(bool));
+        require(bool(isWorker)||bool(isAdmin),"only worker has access to this request");
         _;
     }
 
@@ -141,8 +149,8 @@ contract Report {
         uint index = accessRequests[reportId].length;
         AccessRequest memory request = AccessRequest(index,msg.sender,reportId,RequestStatus.pending);
         accessRequests[reportId].push(request);
-        
         emit AccessRequestSent(msg.sender, reportId,index);
+        return hasAccess;
     }
 
     function approveAccessRequest(uint256 requestId,string memory reportId) public onlyOwner(reportId) returns (bool){
@@ -222,8 +230,7 @@ contract Report {
         return reportId;
     }
 
-        
-    function createReport(string memory fname,string memory lname,string memory email,uint day,uint month,uint year) public onlyWorker returns(bool){
+    function createReport(string memory fname,string memory lname,string memory email,uint day,uint month,uint year) public onlyWorkerOrAdmin returns(bool){
         (bool success,bytes memory data) = userContractAddress.delegatecall(abi.encodeWithSignature("emailToUser(string)", email));
         if(!success) revert("delegate call failed");
         address resultAddress = abi.decode(data, (address));
@@ -242,6 +249,24 @@ contract Report {
         return true;
     }
 
+    function createTempReport(string memory fname,string memory lname,string memory email,uint day,uint month,uint year) public returns(bool){
+        (bool success,bytes memory data) = userContractAddress.delegatecall(abi.encodeWithSignature("emailToUser(string)", email));
+        if(!success) revert("delegate call failed");
+        address resultAddress = abi.decode(data, (address));
+        string memory reportId = createReportId(fname,lname,day,month,year);
+        reportKeys.push(reportId);
+        address[] memory accessedDoctors;
+        uint createdAt = 0;
+        uint updatedAt = 0;
+        string[] memory attachements;
+        string[] memory diagnosis;
+        string[] memory tags;
+        ReportType memory report = ReportType(reportId,resultAddress,address(0),accessedDoctors,attachements,diagnosis,tags,createdAt,updatedAt);
+        reports[reportId] = report;
+        patientToReportMapping[resultAddress].push(reportId);
+        emit reportCreated(reportId);
+        return true;
+    }
 
     function updateReport(string memory reportId,string[] memory newDiagnosis) public onlyDoctorWithAccess(reportId) returns (bool) {
         ReportType memory report = reports[reportId];
