@@ -5,6 +5,8 @@ import DoctorPage from './components/DoctorPage';
 import { Header } from './components/ui'
 import './index.css'
 import { useUserContext } from './store/userProvider'
+import { AddDoctor } from './components/addDoctor';
+import { AddDoctorPatient } from './components/addDoctorPatient';
 
 function App() {
   const {token} = useUserContext()
@@ -22,6 +24,8 @@ function App() {
           <Route element={<DoctorPage/>} path='/doctor' />
           <Route element={<Facilities/>} path='/facility'/>
           <Route element={<AddFacility/>} path='/facility/add'/>
+          <Route element={<AddDoctor/>} path='/doctor/add'/>
+          <Route element={<AddDoctorPatient/>} path='/doctor/addpatient'/>
           <Route element={<AddWorker/>} path='/worker/add'/>
           <Route element={<AddPatient/>} path='/patient/add'/>
           <Route element={<AddReport/>} path="/report/add"/>

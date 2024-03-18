@@ -48,9 +48,9 @@ const PatientPage = () => {
           <Patient />
           <Hr />
           <Wrapper>
-            <PatientReport />
-            <PatientReport />
-            <PatientReport />
+            <PatientReport disease={"diabetes"} date={"12-12-23"} />
+            <PatientReport disease={"diabetes"} date={"12-12-23"} />
+            <PatientReport disease={"diabetes"} date={"12-12-23"} />
           </Wrapper>
         </Container>
       </div>
