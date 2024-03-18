@@ -29,10 +29,10 @@ const DoctorPage = () => {
 
     return (
         <div className="flex flex-col w-screen">
-            <Navbar />
+            {/* <Navbar /> */}
             <div className="flex">
                 <SideNav />
-                <div className="w-[80%]">
+                <div className="w-[80%] bg-[#faf7f5]">
                     {/* {patients.map(patient => (
                         <PatientInfo key={patient.key} contact={patient.contact} details={patient.details} />
                     ))} */}

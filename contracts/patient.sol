@@ -102,10 +102,17 @@ contract Patient {
         return true;
     }
 
-    function deletePatient(address _patientId) external isWorker {
-        delete patients[_patientId];
-        emit PatientDeleted(_patientId);
+    function deletePatient(address patientAddress) public isOwner() {
+        delete patients[patientAddress];
+        emit PatientDeleted(patientAddress);
     }
+
+    // function deletePatient(address patientAddress) public isOwner() {
+    //     require(patients[patientAddress].active, "Patient does not exist");
+    //     patients[patientAddress].active = false;
+    //     totalPatients-=1;
+    //     emit PatientDeleted(patientAddress);
+    // }
 
     function getPatient(address patientAddress) external view returns (PatientType memory) {
         return patients[patientAddress];

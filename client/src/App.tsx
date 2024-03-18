@@ -10,13 +10,14 @@ function App() {
   const location = useLocation()
   return (
       <div className="App">
-        {!["/login","/signup","/forgot","/reset","/verify"].includes(location.pathname)&&<Header/>}
+        {/* {!["/login","/signup","/forgot","/reset","/verify"].includes(location.pathname)&&<Header/>} */}
         <Routes>
           <Route element={token?<Home/>:<Navigate to={'/login'}/>} path='/'/>
           {/* <Route element={token?<Navigate to={"/"}/>:<Login/>} path='/login'/> */}
           <Route element={<Login/>} path='/login'/>
           <Route element={<Signup/>} path='/signup'/>
           <Route element={<PatientPage/>} path='/patient' />
+          <Route element={<DoctorPage/>} path='/doctor' />
           <Route element={<Facilities/>} path='/facility'/>
           <Route element={<AddFacility/>} path='/facility/add'/>
           <Route element={<AddWorker/>} path='/worker/add'/>
