@@ -1,10 +1,9 @@
 import {  useState } from "react"
 import { LabeledInput,Button, LabeledSelect } from "./ui"
-import {useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { useNotificationContext } from "../store/notificationProvider"
 import { useWalletContext } from "../store/walletProvider"
-import {abi,networks} from '../contracts/User.json'
-import {abi as AdminAbi,networks as AdminNetwork} from '../contracts/Admin.json'
+import {abi as UserAbi,networks as UserNetwork} from '../contracts/User.json'
 import useContract from "../hooks/useContract"
 
 
@@ -14,13 +13,7 @@ export const Signup:React.FC = ()=>{
     const [isDoctor,setIsDoctor] = useState(false)
     const {web3,wallet} = useWalletContext();
     const {updateNotification} = useNotificationContext()
-    const isDev = import.meta.env.VITE_DEV_MODE
-    const contract = useContract(AdminAbi,AdminNetwork) 
-
-    async function generateSignature(data){  
-       return await web3?.eth.personal.sign(JSON.stringify(data),wallet.accounts[0],'')
-    }
-
+    const contract = useContract(UserAbi,UserNetwork) 
 
     const handleSubmit = async(e)=>{
         try{
@@ -30,24 +23,14 @@ export const Signup:React.FC = ()=>{
             if(confirmPassword.value!=password.value){
                 throw new Error("password and confirm password doesn't match")
             }
-            // const signature = isDev? "some test signature" :await generateSignature({username:username.value,walletId:walletId.value})
-            const body = {
-                email:username.value,
-                password:password.value,
-                fname:fname.value,
-                lname:lname.value,
-                DoB:DoB.value,
-                walletId:walletId.value,
-                aadharNo:"1234567890",
-                type:type.value
-            }
+
             const [day,month,year] = DoB.value.split('-');
-            const transaction = await contract?.methods.createAdminRequest(
+            const transaction = await contract?.methods.signup(
                 fname.value,
                 lname.value,
                 username.value,
                 password.value,
-                walletId.value,
+                type.value,
                 day,month,year
                 ).send({from:walletId.value});
                 console.log(transaction)
@@ -90,7 +73,7 @@ export const Signup:React.FC = ()=>{
                         <LabeledSelect name="walletId" label="account" options={wallet.accounts.map(ele=>({value:ele,name:ele}))} />
                     </div>
                     <div className={`flex gap-3 justify-center pt-3`}>
-                        <Button buttonType="primary" loader={loading}>Signup</Button>
+                        <Button type={'submit'} buttonType="primary" loader={loading}>Signup</Button>
                         <Button onClick={()=>navigate('/login')}>Login</Button>
                     </div>
                 </form>
