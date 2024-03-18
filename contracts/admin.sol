@@ -108,15 +108,14 @@ contract Admin{
         return false;
     }
 
-    function login(string memory email,string memory password,address walletAddress) public view returns (bool){
+    function login(string memory email,string memory password,address walletAddress) public view returns (bool,AdminType memory){
         if(checkIfAdmin(walletAddress)){
             if(
                    !compareString(adminAddresses[walletAddress].email,email)
                 || !compareString(adminAddresses[walletAddress].password,password)) 
-                    revert("incorrect email or password");
-            return true;
-        }
-        return false;
+                    return (false, adminAddresses[address(0)]);
+            return (true,adminAddresses[walletAddress]);
+        }else revert('user is not an admin');
     }
 
     function hashPasswordWithSecret(string memory password, string memory secret) public pure returns (bytes32) {

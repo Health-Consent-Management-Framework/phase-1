@@ -1,21 +1,16 @@
-import {Routes,Route, Navigate, useLocation } from 'react-router-dom'
-import {Login,Signup,PageNotFound,Home,Facilities,Reports,AddFacility,AddAdmin, AddWorker, VerifyEmail, AddPatient, AddReport} from './components';
-import PatientPage from './components/PatientPage';
-import { Header } from './components/ui'
+import {RouterProvider } from 'react-router-dom'
+// import { Header } from './components/ui'
 import './index.css'
-import { useUserContext } from './store/userProvider'
-import { AddDoctor } from './components/addDoctor';
-import { AddDoctorPatient } from './components/addDoctorPatient';
+import router from './router';
 
 function App() {
-  const {token} = useUserContext()
-  const location = useLocation()
   return (
       <div className="App">
+        <RouterProvider router={router}></RouterProvider>
         {/* {!["/login","/signup","/forgot","/reset","/verify"].includes(location.pathname)&&<Header/>} */}
-        <Routes>
+        {/* <Routes>
+          <Route element={token?<Navigate to={"/"}/>:<Login/>} path='/login'/> 
           <Route element={token?<Home/>:<Navigate to={'/login'}/>} path='/'/>
-          {/* <Route element={token?<Navigate to={"/"}/>:<Login/>} path='/login'/> */}
           <Route element={<Login/>} path='/login'/>
           <Route element={<Signup/>} path='/signup'/>
           <Route element={<PatientPage/>} path='/patient' />
@@ -31,7 +26,7 @@ function App() {
           <Route element={<VerifyEmail/>} path='/verify'/>
           <Route element={<Reports/>} path='/reports'/>
           <Route element={<PageNotFound/>} path='*'/>
-        </Routes>
+        </Routes> */}
       </div>
   )
 }

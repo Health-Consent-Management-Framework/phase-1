@@ -5,6 +5,7 @@ import { useNotificationContext } from "../store/notificationProvider"
 import { useWalletContext } from "../store/walletProvider"
 import {abi as UserAbi,networks as UserNetwork} from '../contracts/User.json'
 import useContract from "../hooks/useContract"
+import { routeConfig } from "../router"
 
 
 export const Signup:React.FC = ()=>{
@@ -41,8 +42,7 @@ export const Signup:React.FC = ()=>{
             }
         }catch(err){
             console.error(err)
-            updateNotification({type:"error",message:err.message||"something went wrong"})
-            throw err
+            updateNotification({type:"error",message:"User creation failed"})
         }
     }
     return(
@@ -74,7 +74,7 @@ export const Signup:React.FC = ()=>{
                     </div>
                     <div className={`flex gap-3 justify-center pt-3`}>
                         <Button type={'submit'} buttonType="primary" loader={loading}>Signup</Button>
-                        <Button onClick={()=>navigate('/login')}>Login</Button>
+                        <Button onClick={()=>navigate(routeConfig.login)}>Login</Button>
                     </div>
                 </form>
             </div>

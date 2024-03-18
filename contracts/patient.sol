@@ -2,11 +2,14 @@
 pragma solidity ^0.8.21;
 
 import './worker.sol';
+import './admin.sol';
 
 contract Patient {
 
     Worker workerContract;
-    uint totalPatients;
+    Admin  adminContract;
+    uint totalPatients = 0;
+
     enum status{pending,accepted,rejeceted}
     string patientSecret = 'patient_123';
     struct Date{
@@ -40,8 +43,9 @@ contract Patient {
         string reason;
     }
 
-    constructor(address workerAddress){
+    constructor(address workerAddress,address adminAddress){
         workerContract = Worker(workerAddress);
+        adminContract = Admin(adminAddress);
     }
 
     modifier isWorker(){
@@ -55,13 +59,14 @@ contract Patient {
     }
     
 
-    mapping(uint => address) public patientKeys;
+    address[] public patientKeys;
     mapping(address => PatientType) public patients;
     mapping(address=> PatientDeleteRequest) public patientDeleteRequests;
 
 
     event PatientCreated(uint256 totalPatients, string email);
     event PatientFound(address patientAddress);
+    event PatientNotFound(address patientAddress);
     event PatientDeleted(address patientAddress);
     event PatientAccepted(address patientAddress, string name,uint age);
     event PatientUpdated(address patietnAddress);
@@ -79,12 +84,15 @@ contract Patient {
         address patientAddress
         ) public returns (bool) {
         if(compareString(email, patients[patientAddress].email)){
-            revert("patient with given email already exists");
+            emit PatientFound(patientAddress);
+            return false;
+        }else{
+            emit PatientNotFound(patientAddress);
         }
         Date memory date = Date(day,month,year);
         // Location memory location = Location(street,district,state);
-        patientKeys[totalPatients] = patientAddress;
-        totalPatients+=1;
+        patientKeys.push(patientAddress);
+        totalPatients =patientKeys.length ;
         bytes32 hashedPassword = hashPasswordWithSecret(password,patientSecret);
         patients[patientAddress] = PatientType(fname,lname,email,hashedPassword,location,date,patientAddress,false);
         emit PatientCreated(totalPatients, email);
@@ -134,20 +142,15 @@ contract Patient {
         bytes32 hashedPassword = hashPasswordWithSecret(password, patientSecret);
         if(exists){
             emit PatientFound(walletAddress);
-        }
+        }else emit PatientNotFound(walletAddress);
         if(!compareString(patients[walletAddress].email,email) || patients[walletAddress].password != hashedPassword)
-            revert("incorrect email or password");
-        return true;
+            return false;
+        return exists;
     }
 
     function hashPasswordWithSecret(string memory password, string memory secret) public pure returns (bytes32) {
         bytes memory passwordBytes = bytes(password);
         bytes memory secretBytes = bytes(secret);
         return keccak256(abi.encodePacked(passwordBytes, secretBytes));
-    }
-
-    function createToken(string memory username, string memory password, uint256 expirationTime, string memory secret) public pure returns (bytes32) {
-        string memory concatenatedString = string(abi.encodePacked(username, ".", password, ".", expirationTime, ".", secret));
-        return keccak256(bytes(concatenatedString));
     }
 }

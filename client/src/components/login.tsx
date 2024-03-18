@@ -6,6 +6,7 @@ import {abi,networks} from '../contracts/User.json'
 import { useNotificationContext } from "../store/notificationProvider"
 import useContract from "../hooks/useContract"
 import { useState } from "react"
+import { routeConfig } from "../router"
 
 export const Login:React.FC = ()=>{
     const navigate = useNavigate()
@@ -26,7 +27,7 @@ export const Login:React.FC = ()=>{
             });
     }
 
-    async function decodeSignature(signature) {
+    async function decodeSignature(signature,data) {
         try {
             // Decode the signature and recover the signer's address
             const dataString = '0x' + Buffer.from(JSON.stringify(data)).toString('hex');
@@ -40,20 +41,24 @@ export const Login:React.FC = ()=>{
     }
 
     const handleSubmit = async(e)=>{
-        console.log(e)
-        e.preventDefault();
-        const {userName,password,walletId,type} = e.target;
-        const transaction = await contract?.methods.login(userName.value,password.value,walletId.value, Number(type.value)).send({from:walletId.value}) 
-        console.log(transaction)
-        if(transaction?.status){
-            updateNotification({type:"success",message:"user Found and verfied. Please accept the request"})
-            const time = new Date().getSeconds()
-            const token = await generateSignature({username:userName.value,address:walletId.value,time:time})
-            localStorage.setItem('role',JSON.stringify(type.value))
-            updateToken(JSON.stringify(token))
-            navigate('/')
-        }else{
-            updateNotification({type:"error",message:"Unable to create transaction"})
+        try{
+            console.log(e)
+            e.preventDefault();
+            const {userName,password,walletId,type} = e.target;
+            const data = await contract?.methods.login(userName.value,password.value,walletId.value, Number(type.value)).call({from:walletId.value}) 
+            console.log(data)
+            if(data[0]){
+                updateNotification({type:"success",message:"user Found and verfied. Please accept the request"})
+                const time = new Date().getSeconds()
+                const token = await generateSignature({username:userName.value,address:walletId.value,time:time})
+                localStorage.setItem('role',JSON.stringify(type.value))
+                updateToken(JSON.stringify(token))
+                navigate('/')
+            }else{
+                updateNotification({type:"error",message:data[1]||"Unable to create transaction"})
+            }
+        }catch(err){
+            console.log(err.message)
         }
     }
 
@@ -77,7 +82,7 @@ export const Login:React.FC = ()=>{
                     <LabeledSelect label="user type" name="type" options={[{name:"patient",value:3},{name:"worker",value:1},{name:"admin",value:0},{name:"doctor",value:2}]}/>
                     <div className="pt-1">
                         <p className="text-center p-0 m-0 text-sm">Not a user?
-                            <Link to={'/signup'}>
+                            <Link to={routeConfig.signup}>
                                 <span className="text-red-400 pl-1 hover:text-red-600 hover:underline duration-200 ">Signup</span>
                             </Link>
                         </p>

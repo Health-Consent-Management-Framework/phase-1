@@ -87,8 +87,8 @@ contract User{
         uint day,uint month,uint year
     ) public returns(bool){
         bool success;
-        if(emailToUser[email] != address(0)) revert("User with given mail already exists");
-        if(bytes(userToEmail[msg.sender]).length>0) revert("user with given wallet already exist");
+        require(emailToUser[email] == address(0),"User with given mail already exists");
+        require(bytes(userToEmail[msg.sender]).length<=0,"user with given wallet already exist");
 
         if(givenType==type_of_user.admin){
             success = adminContract.createAdminRequest(fname,lname,email,password,msg.sender,day,month,year);
@@ -99,7 +99,9 @@ contract User{
         }else if(givenType==type_of_user.patient){    
             success = patientContract.createPatient(fname,lname,email,password,day,month,year,"location-1",msg.sender);     
         }
-
+        if(!success){
+            revert("failed to create user");
+        }
         emailToUser[email] = msg.sender;
         userToEmail[msg.sender] = email;
         return success;
@@ -115,30 +117,24 @@ contract User{
         return keccak256(abi.encodePacked(password, salt));
     }
 
-    function workerSignUp() public onlyAdmin() returns(bool){
-        return true;
-    }
-
     function login(string memory username,string memory password,address walletAddress,type_of_user givenType) public returns(bool,string memory){
+        bool exists = false; 
+        string memory isVerifed = 'verified';
         if(keccak256(abi.encodePacked(userToEmail[msg.sender]))!=keccak256(abi.encodePacked(username)))
-            revert("Invalid credentials");
-        
+            return (false,"invalid credential");
         if(givenType==type_of_user.admin){
-            bool exists = adminContract.login(username,password,walletAddress);
-            return (exists,"verified");
+            exists = adminContract.login(username,password,walletAddress);
         }
         else if (givenType==type_of_user.worker){
-            (bool exists,string memory isVerfied) = workerContract.login(username,password,walletAddress);
-            return (exists,isVerfied);
+            (exists,isVerifed) = workerContract.login(username,password,walletAddress);
         }
         else if(givenType==type_of_user.doctor){
-          
+            (exists,isVerifed) = doctorContract.login(username,password,walletAddress);
         }
-        else if(givenType==type_of_user.patient){
-            bool exists = patientContract.login(username,password,walletAddress);
-            return (exists,"verfied");
-        }
-        return (false,"not verified");
+        else if(givenType==type_of_user.patient)
+            exists = patientContract.login(username,password,walletAddress);
+        if(!exists) revert("Please check the given credentials");
+        return (exists,isVerifed);
     }
 
     function forgotPassword(string memory email,address accountAddress) public returns (bool){

@@ -163,7 +163,7 @@ contract Worker{
         bytes32 hashedPassword = hashPasswordWithSecret(password, workerSecret);
         if(exists){    
             if(!compareString(workerData[walletAddress].email,email) || workerData[walletAddress].password != hashedPassword)
-                revert("incorrect email or password");
+                return (false,'not verfied');
             return (true,"verfied");
         }else{
             for(uint i=0;i<workerRequestKeys.length;i++){

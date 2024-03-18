@@ -61,7 +61,7 @@ contract Report {
         uint createdAt;
         uint updatedAt;
     }
-
+    uint256 private nonce;
     mapping(address => DoctorType) public doctors;
     mapping(address=>string[]) private patientToReportMapping;
     mapping(string => AccessRequest[]) public accessRequests;
@@ -189,71 +189,48 @@ contract Report {
         return accessRequests[reportId];
     }
 
-    function createReportId(
-        string memory fname,
-        string memory lname,
-        uint day,
-        uint month,
-        uint year
-    ) internal returns (string memory) {
-        string memory reportId = string(abi.encodePacked("RT", Strings.toString(year), Strings.toString(month), Strings.toString(day)));
-        // Process first name
-        bytes memory fnameBytes = bytes(fname);
-        bytes memory resultFname = new bytes(4);
-        for (uint i = 0; i < 2 && i < fnameBytes.length; i++) {
-            resultFname[i] = fnameBytes[i];
-        }
-        for (uint i = 0; i < 2 - fnameBytes.length; i++) {
-            resultFname[4 - i - 1] = "X";
-        }
-        reportId = string(abi.encodePacked(reportId, string(resultFname)));
-        // Process last name
-        bytes memory lnameBytes = bytes(lname);
-        bytes memory resultLname = new bytes(4);
-        for (uint i = 0; i < 4 && i < lnameBytes.length; i++) {
-            resultLname[i] = lnameBytes[i];
-        }
-        if (lnameBytes.length < 4) {
-            for (uint i = 0; i < 4 - lnameBytes.length; i++) {
-                resultLname[4 - i - 1] = "0";
-            }
-        }
-        reportId = string(abi.encodePacked(reportId, string(resultLname), "-"));
-
-        // Random characters
-        bytes memory chars = "ABCDEFGHIK=JKLMNOPQRSTUVWXYZ";
-        for (uint i = 0; i < 4; i++) {
-            counter++;
-            uint randomNumber = uint256(keccak256(abi.encodePacked(block.timestamp, blockhash(block.number - 1), msg.sender, counter))) % 26;
-            reportId = string(abi.encodePacked(reportId, chars[randomNumber]));
-        }
-        return reportId;
+    function generateRandomId(uint256 givenNumber) public returns (string memory) {
+        bytes memory characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        uint256 randomNumber = uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty, nonce))) % 100;
+        nonce++;
+        string memory randomId = string(abi.encodePacked("RT", Strings.toString(randomNumber), getRandomLetters(characters), Strings.toString(givenNumber)));
+        return randomId;
     }
 
-    function createReport(string memory fname,string memory lname,string memory email,uint day,uint month,uint year) public onlyWorkerOrAdmin returns(bool){
+    function getRandomLetters(bytes memory characters) private view returns (string memory) {
+        bytes memory randomLetters = new bytes(3);
+        for (uint256 i = 0; i < 3; i++) {
+            uint256 index = uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty, nonce, i))) % characters.length;
+            randomLetters[i] = characters[index];
+        }
+        return string(randomLetters);
+    }
+
+
+    function createReport(string memory email,address patientAddress) public onlyWorkerOrAdmin returns(bool){
         (bool success,bytes memory data) = userContractAddress.delegatecall(abi.encodeWithSignature("emailToUser(string)", email));
         if(!success) revert("delegate call failed");
         address resultAddress = abi.decode(data, (address));
-        string memory reportId = createReportId(fname,lname,day,month,year);
+        string memory reportId = generateRandomId(patientToReportMapping[patientAddress].length);
         reportKeys.push(reportId);
-        address[] memory accessedDoctors;
+        // address[] memory accessedDoctors;
         uint createdAt = 0;
         uint updatedAt = 0;
-        string[] memory attachements;
+        // string[] memory attachements;
         string[] memory diagnosis;
-        string[] memory tags;
-        ReportType memory report = ReportType(reportId,resultAddress,address(0),accessedDoctors,attachements,diagnosis,tags,createdAt,updatedAt);
+        // string[] memory tags;
+        ReportType memory report = ReportType(reportId,resultAddress,address(0),new address[](0),new string[](0),diagnosis,new string[](0),createdAt,updatedAt);
         reports[reportId] = report;
         patientToReportMapping[resultAddress].push(reportId);
         emit reportCreated(reportId);
         return true;
     }
 
-    function createTempReport(string memory fname,string memory lname,string memory email,uint day,uint month,uint year) public returns(bool){
+    function createTempReport(string memory email) public returns(bool){
         (bool success,bytes memory data) = userContractAddress.delegatecall(abi.encodeWithSignature("emailToUser(string)", email));
         if(!success) revert("delegate call failed");
         address resultAddress = abi.decode(data, (address));
-        string memory reportId = createReportId(fname,lname,day,month,year);
+        string memory reportId = generateRandomId(patientToReportMapping[msg.sender].length);
         reportKeys.push(reportId);
         address[] memory accessedDoctors;
         uint createdAt = 0;

@@ -5,6 +5,7 @@ import SideNav from "./SideNav";
 import { SlLogout } from "react-icons/sl";
 import { MdFolderDelete } from "react-icons/md";
 import { IoIosNotifications } from "react-icons/io";
+import { useUserContext } from "../store/userProvider";
 
 const Container = styled.div`
   background-color: #faf7f5;
@@ -40,6 +41,7 @@ const sideContent = [
 ]
 
 const PatientPage = () => {
+  const {token} = useUserContext()
   return (
     <div className="flex">
       <SideNav data={sideContent} />
