@@ -108,13 +108,13 @@ contract Admin{
         return false;
     }
 
-    function login(string memory email,string memory password,address walletAddress) public view returns (bool,AdminType memory){
+    function login(string memory email,string memory password,address walletAddress) public view returns (bool,string memory){
         if(checkIfAdmin(walletAddress)){
             if(
                    !compareString(adminAddresses[walletAddress].email,email)
                 || !compareString(adminAddresses[walletAddress].password,password)) 
-                    return (false, adminAddresses[address(0)]);
-            return (true,adminAddresses[walletAddress]);
+                    return (false,"invalid credentials");
+            return (true,"admin logged in successfully");
         }else revert('user is not an admin');
     }
 

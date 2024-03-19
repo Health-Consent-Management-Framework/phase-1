@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { LabeledInput, LabeledSelect,Button } from "./ui"
-import {abi ,networks} from '../contracts/Facility.json'
-import { useWalletContext } from "../store/walletProvider";
-import { useNotificationContext } from "../store/notificationProvider";
-import useContract from "../hooks/useContract";
+import { LabeledInput, LabeledSelect,Button } from "../ui"
+import {abi ,networks} from '../../contracts/Facility.json'
+import { useWalletContext } from "../../store/walletProvider";
+import { useNotificationContext } from "../../store/notificationProvider";
+import useContract from "../../hooks/useContract";
 import { useNavigate } from "react-router-dom";
 
 

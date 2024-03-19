@@ -2,7 +2,8 @@ import { Navigate, createBrowserRouter } from "react-router-dom";
 import HomeMiddleware from "./components/middleware/home.middleware";
 import { AddAdmin, AddFacility, AddReport, AddWorker, DashBoard, Facilities, Home, Login, PageNotFound, Signup } from "./components";
 import AuthMiddleware from "./components/middleware/auth.middlewate";
-import { AddDoctor } from "./components/addDoctor";
+import { AddDoctor } from "./components/forms/addDoctor";
+import PatientReports from "./components/patientReports";
 
 const router = createBrowserRouter([
  {
@@ -16,7 +17,7 @@ const router = createBrowserRouter([
     children:[
         {
             path:'',
-            element:<DashBoard/>
+            element:<Navigate to={'/home/reports'} replace/>
         },
         {
             path:'info',
@@ -24,7 +25,7 @@ const router = createBrowserRouter([
         },
         {
             path:'reports',
-            element:<h1>Patients page here</h1>
+            element:<PatientReports/>
         },
         {
             path:'report/:id',
@@ -96,6 +97,7 @@ export const routeConfig = {
     addAdmin:'/admin/add',
     addWorker:'admin/worker',
     addReport:'/reports/add',
+    viewRequests:'/requests',
     addFacility:(id:string|number)=>`/home/facilites/${id}`,
     editFacility:(id:string|number)=>`home/facilites/${id}`,
     editReport:(id:string|number)=>`/reports/edit/${id}`,

@@ -53,13 +53,11 @@ contract Report {
     struct ReportType{
         string reportId;
         address patientAddress;
-        address diagnoisedDoctor;
         address[] doctorAddress;
         string[] attachements;
         string[] diagnosis;
-        string[] tags;   
-        uint createdAt;
-        uint updatedAt;
+        string[] tags;
+        string problem;
     }
     uint256 private nonce;
     mapping(address => DoctorType) public doctors;
@@ -189,58 +187,56 @@ contract Report {
         return accessRequests[reportId];
     }
 
-    function generateRandomId(uint256 givenNumber) public returns (string memory) {
-        bytes memory characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        uint256 randomNumber = uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty, nonce))) % 100;
-        nonce++;
-        string memory randomId = string(abi.encodePacked("RT", Strings.toString(randomNumber), getRandomLetters(characters), Strings.toString(givenNumber)));
-        return randomId;
-    }
-
-    function getRandomLetters(bytes memory characters) private view returns (string memory) {
-        bytes memory randomLetters = new bytes(3);
-        for (uint256 i = 0; i < 3; i++) {
-            uint256 index = uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty, nonce, i))) % characters.length;
-            randomLetters[i] = characters[index];
+    function randomString(uint size) public  payable returns(string memory){
+        bytes memory randomWord=new bytes(size);
+        // since we have 26 letters
+        bytes memory chars = new bytes(26);
+        chars="abcdefghijklmnopqrstuvwxyz";
+        for (uint i=0;i<size;i++){
+            uint randomNumber=random(26);
+            // Index access for string is not possible
+            randomWord[i]=chars[randomNumber];
         }
-        return string(randomLetters);
+        return string(randomWord);
+    }
+
+    function random(uint number) public payable returns(uint){
+        counter++;
+        return uint(keccak256(abi.encodePacked(block.timestamp,block.difficulty,  
+        msg.sender,counter))) % number;
     }
 
 
-    function createReport(string memory email,address patientAddress) public onlyWorkerOrAdmin returns(bool){
-        (bool success,bytes memory data) = userContractAddress.delegatecall(abi.encodeWithSignature("emailToUser(string)", email));
-        if(!success) revert("delegate call failed");
-        address resultAddress = abi.decode(data, (address));
-        string memory reportId = generateRandomId(patientToReportMapping[patientAddress].length);
-        reportKeys.push(reportId);
-        // address[] memory accessedDoctors;
-        uint createdAt = 0;
-        uint updatedAt = 0;
-        // string[] memory attachements;
-        string[] memory diagnosis;
-        // string[] memory tags;
-        ReportType memory report = ReportType(reportId,resultAddress,address(0),new address[](0),new string[](0),diagnosis,new string[](0),createdAt,updatedAt);
-        reports[reportId] = report;
-        patientToReportMapping[resultAddress].push(reportId);
-        emit reportCreated(reportId);
-        return true;
-    }
+    // function createReport(string memory email,string memory problem) public onlyWorkerOrAdmin returns(bool){
+    //     (bool success,bytes memory data) = userContractAddress.delegatecall(abi.encodeWithSignature("emailToUser(string)", email));
+    //     if(!success) revert("delegate call failed");
+    //     address resultAddress = abi.decode(data, (address));
+    //     string memory reportId = generateRandomId(patientToReportMapping[resultAddress].length);
+    //     reportKeys.push(reportId);
+    //     // ReportType memory report;
+    //     // address[] memory accessedDoctors;
+    //     // uint createdAt = 0;
+    //     // uint updatedAt = 0;
+    //     // string[] memory attachements;
+    //     // string[] memory diagnosis;
+    //     // string[] memory tags;
+    //     ReportType memory report = ReportType(reportId,resultAddress,new address[](0),new string[](0),new string[](0),new string[](0),problem);
+    //     reports[reportId] = report;
+    //     patientToReportMapping[resultAddress].push(reportId);
+    //     emit reportCreated(reportId);
+    //     return true;
+    // }
 
-    function createTempReport(string memory email) public returns(bool){
-        (bool success,bytes memory data) = userContractAddress.delegatecall(abi.encodeWithSignature("emailToUser(string)", email));
-        if(!success) revert("delegate call failed");
-        address resultAddress = abi.decode(data, (address));
-        string memory reportId = generateRandomId(patientToReportMapping[msg.sender].length);
+    function createTempReport(string memory problem,string[] memory attachement,string[] memory tags) public returns(bool){
+        string memory reportId = randomString(15);
         reportKeys.push(reportId);
         address[] memory accessedDoctors;
-        uint createdAt = 0;
-        uint updatedAt = 0;
-        string[] memory attachements;
+        // uint createdAt = 0;
+        // uint updatedAt = 0;
         string[] memory diagnosis;
-        string[] memory tags;
-        ReportType memory report = ReportType(reportId,resultAddress,address(0),accessedDoctors,attachements,diagnosis,tags,createdAt,updatedAt);
+        ReportType memory report = ReportType(reportId,msg.sender,accessedDoctors,attachement,diagnosis,tags,problem);
         reports[reportId] = report;
-        patientToReportMapping[resultAddress].push(reportId);
+        patientToReportMapping[msg.sender].push(reportId);
         emit reportCreated(reportId);
         return true;
     }
@@ -248,7 +244,7 @@ contract Report {
     function updateReport(string memory reportId,string[] memory newDiagnosis) public onlyDoctorWithAccess(reportId) returns (bool) {
         ReportType memory report = reports[reportId];
         report.diagnosis = newDiagnosis;
-        report.updatedAt = block.timestamp;
+        // report.updatedAt = block.timestamp;
         reports[reportId] = report;
         emit reportUpdate(reportId);
         return true;
@@ -268,7 +264,7 @@ contract Report {
         ReportType memory report = reports[reportId];
         if(report.patientAddress != msg.sender) revert("user doesnot owne the resource to signin");
         report.tags = tags;
-        report.updatedAt = block.timestamp;
+        // report.updatedAt = block.timestamp;
         reports[reportId] = report;
         emit reportUpdate(reportId);
         return true;

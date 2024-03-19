@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom"
-import { LabeledInput, LabeledSelect,Button } from "./ui"
-import { useWalletContext } from "../store/walletProvider"
+import { LabeledInput, LabeledSelect,Button } from "../ui"
+import { useWalletContext } from "../../store/walletProvider"
 import { useEffect, useState } from "react"
-import {abi as facilityABI,networks as facilityNetworks} from '../contracts/Facility.json'
-import {abi as workerABI,networks as workerNetwork} from '../contracts/Worker.json'
-import useContract from "../hooks/useContract"
+import {abi as facilityABI,networks as facilityNetworks} from '../../contracts/Facility.json'
+import {abi as workerABI,networks as workerNetwork} from '../../contracts/Worker.json'
+import useContract from "../../hooks/useContract"
 
 
 export const AddWorker:React.FC = ()=>{

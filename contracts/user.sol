@@ -66,7 +66,8 @@ contract User{
     Patient patientContract;
 
     address adminAddress;
-
+    event logBytes(bytes32);
+    event logAddress(address);
     uint totalUsers;
 
     constructor(address patient,address doctor,address worker,address admin){
@@ -117,13 +118,18 @@ contract User{
         return keccak256(abi.encodePacked(password, salt));
     }
 
+    function verifyToken(bytes32 messageHash,uint8 v,bytes32 r,bytes32 s) public view returns (bool){
+        address signer = ecrecover(messageHash, v, r, s);
+        return msg.sender == signer;
+    }
+
     function login(string memory username,string memory password,address walletAddress,type_of_user givenType) public returns(bool,string memory){
         bool exists = false; 
         string memory isVerifed = 'verified';
         if(keccak256(abi.encodePacked(userToEmail[msg.sender]))!=keccak256(abi.encodePacked(username)))
             return (false,"invalid credential");
         if(givenType==type_of_user.admin){
-            exists = adminContract.login(username,password,walletAddress);
+            (exists,isVerifed) = adminContract.login(username,password,walletAddress);
         }
         else if (givenType==type_of_user.worker){
             (exists,isVerifed) = workerContract.login(username,password,walletAddress);
@@ -132,7 +138,7 @@ contract User{
             (exists,isVerifed) = doctorContract.login(username,password,walletAddress);
         }
         else if(givenType==type_of_user.patient)
-            exists = patientContract.login(username,password,walletAddress);
+            (exists,isVerifed) = patientContract.login(username,password,walletAddress);
         if(!exists) revert("Please check the given credentials");
         return (exists,isVerifed);
     }

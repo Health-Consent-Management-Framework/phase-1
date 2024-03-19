@@ -1,7 +1,7 @@
-import {abi,networks} from '../contracts/Doctor.json';
-import { useWalletContext } from '../store/walletProvider';
-import { LabeledInput, Button, LabeledSelect } from './ui';
-import useContract from '../hooks/useContract';
+import {abi,networks} from '../../contracts/Doctor.json';
+import { useWalletContext } from '../../store/walletProvider';
+import { LabeledInput, Button, LabeledSelect } from '../ui';
+import useContract from '../../hooks/useContract';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 

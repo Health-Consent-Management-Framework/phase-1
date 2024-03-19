@@ -110,9 +110,14 @@ contract Patient {
         return true;
     }
 
-    function deletePatient(address patientAddress) public isOwner() {
+    function deletePatient(address patientAddress) public isOwner{
         delete patients[patientAddress];
         emit PatientDeleted(patientAddress);
+    }
+
+    function getSelfDetails() public view returns(PatientType memory){
+        require(patients[msg.sender].walletAddress==msg.sender,"User doesn't exists as patient");
+        return patients[msg.sender];
     }
 
     // function deletePatient(address patientAddress) public isOwner() {
@@ -134,7 +139,7 @@ contract Patient {
         return allPatients;
     }
 
-    function login(string memory email,string memory password,address walletAddress) public returns (bool){
+    function login(string memory email,string memory password,address walletAddress) public returns (bool,string memory){
         bool exists = true;
         for(uint i=0;i<totalPatients;i++){
             if(patientKeys[i]==walletAddress) exists = true;
@@ -144,8 +149,8 @@ contract Patient {
             emit PatientFound(walletAddress);
         }else emit PatientNotFound(walletAddress);
         if(!compareString(patients[walletAddress].email,email) || patients[walletAddress].password != hashedPassword)
-            return false;
-        return exists;
+            return (false,"invalid credentials");
+        return (exists,"user logged in successfully");
     }
 
     function hashPasswordWithSecret(string memory password, string memory secret) public pure returns (bytes32) {

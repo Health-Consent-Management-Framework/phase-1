@@ -156,14 +156,17 @@ contract Worker{
     }
 
     function login(string memory email,string memory password,address walletAddress) public view returns (bool,string memory){
-        bool exists = true;
+        bool exists = false;
         for(uint i=0;i<totalWorkers;i++){
-            if(workersKeys[i]==walletAddress) exists = true;
+            if(workersKeys[i]==walletAddress){ 
+                exists = true;
+                break;
+            }
         }
         bytes32 hashedPassword = hashPasswordWithSecret(password, workerSecret);
         if(exists){    
             if(!compareString(workerData[walletAddress].email,email) || workerData[walletAddress].password != hashedPassword)
-                return (false,'not verfied');
+                return (true,'please check yyour credentials');
             return (true,"verfied");
         }else{
             for(uint i=0;i<workerRequestKeys.length;i++){
@@ -173,7 +176,7 @@ contract Worker{
                 }
             }
             if(exists) return (true,"not verifed");
-            else return (false,"not verfied");
+            else return (false,"check credentials");
         }
     }
 

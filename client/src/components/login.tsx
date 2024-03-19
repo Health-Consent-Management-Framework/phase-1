@@ -2,20 +2,26 @@ import { LabeledInput,Button, LabeledSelect } from "./ui"
 import {Link, useNavigate } from "react-router-dom"
 import { useWalletContext } from "../store/walletProvider"
 import { useUserContext } from "../store/userProvider"
-import {abi,networks} from '../contracts/User.json'
+import {abi as PatientAbi,networks as PatientNetwork} from '../contracts/Patient.json'
+import {abi as WorkerAbi,networks as WorkerNetwork} from '../contracts/Patient.json'
+import {abi as DoctorAbi,networks as DoctorNetwork} from '../contracts/Doctor.json'
+import {abi as AdminAbi,networks as AdminNetwork} from '../contracts/Admin.json'
 import { useNotificationContext } from "../store/notificationProvider"
 import useContract from "../hooks/useContract"
 import { useState } from "react"
 import { routeConfig } from "../router"
+import { connectStorageEmulator } from "firebase/storage"
 
 export const Login:React.FC = ()=>{
     const navigate = useNavigate()
     const {web3,wallet} = useWalletContext()
-    const {updateToken} = useUserContext()
+    const {updateToken,updateUser} = useUserContext()
     const {updateNotification} = useNotificationContext()
     const [showPassword,setShowPassword] = useState(false)
-    const contract = useContract(abi,networks)
-
+    const patientContract = useContract(PatientAbi,PatientNetwork);
+    const doctorContract = useContract(DoctorAbi,DoctorNetwork);
+    const adminContract = useContract(AdminAbi,AdminNetwork);
+    const workerContract = useContract(WorkerAbi,WorkerNetwork)
     async function generateSignature(data){  
         const dataString = '0x' + Buffer.from(JSON.stringify(data)).toString('hex');
         return web3?.eth.personal.sign(dataString, data.address,'secret_123')
@@ -45,14 +51,44 @@ export const Login:React.FC = ()=>{
             console.log(e)
             e.preventDefault();
             const {userName,password,walletId,type} = e.target;
-            const data = await contract?.methods.login(userName.value,password.value,walletId.value, Number(type.value)).call({from:walletId.value}) 
+            let data;
+            switch(type.value){
+                case '3':
+                    data = await patientContract?.methods.login(userName.value,password.value,walletId.value).call({from:wallet.accounts[0]})
+                    break;
+                case '2':
+                    data = await doctorContract?.methods.login(userName.value,password.value,walletId.value).call({from:wallet.accounts[0]})
+                    break;
+                case '1':
+                    data = await workerContract?.methods.login(userName.value,password.value,walletId.value).call({from:wallet.accounts[0]})
+                    break;
+                case '0':
+                    data = await adminContract?.methods.login(userName.value,password.value,walletId.value).call({from:wallet.accounts[0]})
+                    break;
+            }
             console.log(data)
             if(data[0]){
                 updateNotification({type:"success",message:"user Found and verfied. Please accept the request"})
                 const time = new Date().getSeconds()
                 const token = await generateSignature({username:userName.value,address:walletId.value,time:time})
                 localStorage.setItem('role',JSON.stringify(type.value))
-                updateToken(JSON.stringify(token))
+                updateToken(JSON.stringify(token),type.value)
+                let userData;
+                switch(type.value){
+                    case '3':
+                        userData = await patientContract?.methods.getPatient(wallet.accounts[0]).call({from:wallet.accounts[0]})
+                        break;
+                    case '2':
+                        userData = await workerContract?.methods.getSelfDetails().call({from:wallet.accounts[0]})
+                        break;
+                    case '1':
+                        userData = await doctorContract?.methods.getSelfDetails().call({from:wallet.accounts[0]})
+                        break;
+                    case '0':
+                        userData = await adminContract?.methods.getSelfDetails().call({from:wallet.accounts[0]})
+                        break;
+                }
+                updateUser(userData)
                 navigate('/')
             }else{
                 updateNotification({type:"error",message:data[1]||"Unable to create transaction"})

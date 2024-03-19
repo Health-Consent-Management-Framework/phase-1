@@ -1,4 +1,5 @@
 import { useWalletContext } from '../store/walletProvider'
+import SideNav from './SideNav'
 
 export const Home:React.FC = ()=>{
     const {wallet,hasProvider,networkId,web3} = useWalletContext()
@@ -27,7 +28,7 @@ export const Home:React.FC = ()=>{
     )
     
     return(
-        <section className='w-screen'>
+        <section className='w-screen flex'>
             {walletInfo}
         </section>
 

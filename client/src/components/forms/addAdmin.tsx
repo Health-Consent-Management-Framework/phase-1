@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom"
-import { LabeledInput, LabeledSelect,Button } from "./ui"
-import { useWalletContext } from "../store/walletProvider"
-import { useEffect, useState } from "react"
-import {abi ,networks } from '../contracts/Admin.json'
-import useContract from "../hooks/useContract"
+import { LabeledInput, LabeledSelect,Button } from "../ui"
+import { useWalletContext } from "../../store/walletProvider"
+import { useState } from "react"
+import {abi ,networks } from '../../contracts/Admin.json'
+import useContract from "../../hooks/useContract"
 
 
 export const AddAdmin:React.FC = ()=>{

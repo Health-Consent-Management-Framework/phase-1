@@ -150,7 +150,7 @@ contract Doctor{
             bytes32 hashedPassword = hashPasswordWithSecret(password, doctorSecret);
         if(exists){ 
             if(!compareString(doctors[walletAddress].email,email) || doctors[walletAddress].password != hashedPassword)
-                return (false,"not verified");
+                return (false,"check your credentials");
             if(doctors[walletAddress].doctorVerified) return (true,"verfied");
             else return (true,"not verifed");
         }else return(false,"not verfied");

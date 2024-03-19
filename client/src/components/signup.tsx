@@ -36,7 +36,7 @@ export const Signup:React.FC = ()=>{
                 ).send({from:walletId.value});
                 console.log(transaction)
             setLoading(false)
-            if(transaction?.status){
+            if(Number(transaction?.status)){
                 const msg = type.value==0?"Request sent to admin":"user created successfully";
                 updateNotification({type:"success",message:msg})
             }
