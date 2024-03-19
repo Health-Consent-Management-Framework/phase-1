@@ -3,10 +3,10 @@
 import {abi,networks} from '../contracts/Doctor.json';
 import useContract from '../hooks/useContract';
 import { useWalletContext } from '../store/walletProvider';
-import SideNav from "./SideNav";
-import PatientInfo from "./PatientInfo";
+import SideNav from "./ui/SideNav";
+import PatientInfo from "./ProfileInfo";
 import data from "./Data";
-import Navbar from "./Navbar";
+import Navbar from "./ui/Navbar";
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { SlLogout } from "react-icons/sl";

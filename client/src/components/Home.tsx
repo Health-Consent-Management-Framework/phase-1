@@ -1,22 +1,21 @@
 import { useWalletContext } from '../store/walletProvider'
-import SideNav from './SideNav'
 
 export const Home:React.FC = ()=>{
-    const {wallet,hasProvider,networkId,web3} = useWalletContext()
+    const {wallet,hasProvider,networkId} = useWalletContext()
 
-    async function decodeSignature(data) {
-        try {
-            const signature = localStorage.getItem('access_token') as string
-            const dataString = '0x' + Buffer.from(JSON.stringify(data)).toString('hex');
-            console.log(dataString)
-            web3?.eth.personal.ecRecover(dataString, signature).then(()=>{
+    // async function decodeSignature(data) {
+    //     try {
+    //         const signature = localStorage.getItem('access_token') as string
+    //         const dataString = '0x' + Buffer.from(JSON.stringify(data)).toString('hex');
+    //         console.log(dataString)
+    //         web3?.eth.personal.ecRecover(dataString, signature).then(()=>{
 
-            })
-        } catch (error) {
-            console.error('Error decoding signature:', error);
-            throw error;
-        }
-    }
+    //         })
+    //     } catch (error) {
+    //         console.error('Error decoding signature:', error);
+    //         throw error;
+    //     }
+    // }
 
     const walletInfo = (
         <div className='bg-blue-400 border-2 w-fit p-3 text-center mx-auto'>        

@@ -1,11 +1,11 @@
 import {  useState } from "react"
-import { LabeledInput,Button, LabeledSelect } from "./ui"
+import { LabeledInput,Button, LabeledSelect } from "../ui"
 import { useNavigate } from "react-router-dom"
-import { useNotificationContext } from "../store/notificationProvider"
-import { useWalletContext } from "../store/walletProvider"
-import {abi as UserAbi,networks as UserNetwork} from '../contracts/User.json'
-import useContract from "../hooks/useContract"
-import { routeConfig } from "../router"
+import { useNotificationContext } from "../../store/notificationProvider"
+import { useWalletContext } from "../../store/walletProvider"
+import {abi as UserAbi,networks as UserNetwork} from '../../contracts/User.json'
+import useContract from "../../hooks/useContract"
+import { routeConfig } from "../../router"
 
 
 export const Signup:React.FC = ()=>{

@@ -1,10 +1,10 @@
-import { LabeledInput,Button, LabeledSelect } from "./ui"
+import { LabeledInput,Button, LabeledSelect } from "../ui"
 import {Link, useNavigate } from "react-router-dom"
-import { useWalletContext } from "../store/walletProvider"
-import { useUserContext } from "../store/userProvider"
-import {abi,networks} from '../contracts/User.json'
-import { useNotificationContext } from "../store/notificationProvider"
-import useContract from "../hooks/useContract"
+import { useWalletContext } from "../../store/walletProvider"
+import { useUserContext } from "../../store/userProvider"
+import {abi,networks} from '../../contracts/User.json'
+import { useNotificationContext } from "../../store/notificationProvider"
+import useContract from "../../hooks/useContract"
 
 export const VerifyEmail:React.FC = ()=>{
     const navigate = useNavigate()

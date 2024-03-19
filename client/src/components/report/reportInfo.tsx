@@ -1,4 +1,4 @@
-import { LabeledInput, LabeledSelect } from "./ui"
+import { LabeledInput, LabeledSelect } from "../ui"
 
 export const Reports:React.FC = ()=>{
     return(

@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { Outlet, useNavigate } from "react-router-dom"
-import SideNav from "../SideNav"
-import Patient from "../Patient"
+import SideNav from "../ui/SideNav"
+import Patient from "../ProfileDetails"
 import styled from "styled-components";
 import { AddReport } from "..";
 import { Dialog,DialogContent } from "@mui/material";

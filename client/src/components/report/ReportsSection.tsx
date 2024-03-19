@@ -1,12 +1,12 @@
-import useContract from "../hooks/useContract";
-import {abi as ReportAbi,networks as ReportNetwork} from '../contracts/Report.json'
-import PatientReport from "./PatientReport";
+import useContract from "../../hooks/useContract";
+import {abi as ReportAbi,networks as ReportNetwork} from '../../contracts/Report.json'
+import PatientReport from "./ReportCardElement";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useWalletContext } from "../store/walletProvider";
+import { useWalletContext } from "../../store/walletProvider";
 import { Dialog, DialogContent } from "@mui/material";
-import { AddReport } from "./forms/addReport";
-import { useUserContext } from "../store/userProvider";
+import { AddReport } from "../forms/addReport";
+import { useUserContext } from "../../store/userProvider";
 
 const PatientReports:React.FC = ()=>{
   const reportContract = useContract(ReportAbi,ReportNetwork);

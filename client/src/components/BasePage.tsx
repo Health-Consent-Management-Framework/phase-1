@@ -1,7 +1,7 @@
-import Patient from "../components/Patient";
+import Patient from "./ProfileDetails";
 import styled from "styled-components";
 import { Outlet } from "react-router-dom";
-import SideNav from "./SideNav";
+import SideNav from "./ui/SideNav";
 import { useUserContext } from "../store/userProvider";
 import { routeConfig } from "../router";
 import { useEffect, useMemo, useState } from "react";

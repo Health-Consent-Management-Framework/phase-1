@@ -1,10 +1,10 @@
 // import { MdSpaceDashboard } from "react-icons/md";
 import { useEffect, useState } from "react";
-import roleEnum from "./utils/enums";
-import { routeConfig } from "../router";
+import roleEnum from "../utils/enums";
+import { routeConfig } from "../../router";
 import { SlMenu } from "react-icons/sl";
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
-import { Button } from "./ui";
+import { Button } from ".";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 const SideNav = () => {

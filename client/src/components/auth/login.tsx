@@ -1,15 +1,15 @@
-import { LabeledInput,Button, LabeledSelect } from "./ui"
+import { LabeledInput,Button, LabeledSelect } from "../ui"
 import {Link, useNavigate } from "react-router-dom"
-import { useWalletContext } from "../store/walletProvider"
-import { useUserContext } from "../store/userProvider"
-import {abi as PatientAbi,networks as PatientNetwork} from '../contracts/Patient.json'
-import {abi as WorkerAbi,networks as WorkerNetwork} from '../contracts/Patient.json'
-import {abi as DoctorAbi,networks as DoctorNetwork} from '../contracts/Doctor.json'
-import {abi as AdminAbi,networks as AdminNetwork} from '../contracts/Admin.json'
-import { useNotificationContext } from "../store/notificationProvider"
-import useContract from "../hooks/useContract"
+import { useWalletContext } from "../../store/walletProvider"
+import { useUserContext } from "../../store/userProvider"
+import {abi as PatientAbi,networks as PatientNetwork} from '../../contracts/Patient.json'
+import {abi as WorkerAbi,networks as WorkerNetwork} from '../../contracts/Patient.json'
+import {abi as DoctorAbi,networks as DoctorNetwork} from '../../contracts/Doctor.json'
+import {abi as AdminAbi,networks as AdminNetwork} from '../../contracts/Admin.json'
+import { useNotificationContext } from "../../store/notificationProvider"
+import useContract from "../../hooks/useContract"
 import { useState } from "react"
-import { routeConfig } from "../router"
+import { routeConfig } from "../../router"
 import { connectStorageEmulator } from "firebase/storage"
 
 export const Login:React.FC = ()=>{

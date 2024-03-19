@@ -74,7 +74,7 @@ const DoctorDetails = styled.div`
   flex-direction: column;
 `;
 
-const Patient = () => {
+const ProfileDetails = () => {
   const [patient, setPatient] = useState({});
   const { wallet } = useWalletContext();
   const contract = useContract(abi, networks);
@@ -168,4 +168,4 @@ const Patient = () => {
   );
 };
 
-export default Patient;
+export default ProfileDetails;

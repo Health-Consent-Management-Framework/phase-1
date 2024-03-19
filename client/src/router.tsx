@@ -1,9 +1,9 @@
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import HomeMiddleware from "./components/middleware/home.middleware";
-import { AddAdmin, AddFacility, AddReport, AddWorker, DashBoard, Facilities, Home, Login, PageNotFound, Signup } from "./components";
+import { AddAdmin, AddFacility, AddReport, AddWorker, Facilities, Home, Login, PageNotFound, Signup } from "./components";
 import AuthMiddleware from "./components/middleware/auth.middlewate";
 import { AddDoctor } from "./components/forms/addDoctor";
-import PatientReports from "./components/patientReports";
+import PatientReports from "./components/report/ReportsSection";
 
 const router = createBrowserRouter([
  {

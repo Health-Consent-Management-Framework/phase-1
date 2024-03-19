@@ -5,7 +5,7 @@ import useContract from '../../hooks/useContract';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export const AddDoctor = () => {
+export const AddDoctor:React.FC = () => {
   const {wallet} = useWalletContext();
   const contract = useContract(abi,networks)
   const navigate = useNavigate();
