@@ -11,7 +11,7 @@ const SideNav = () => {
   const [isOpen, setisOpen] = useState(false);
   const navigate = useNavigate();
   const [role,setRole] = useState(()=>localStorage.getItem('role'))
-  const [queryParams,setQueryParams] = useSearchParams()
+  const [,setQueryParams] = useSearchParams()
   const [profileExpand,setProfileExpand] = useState(false)
   const [expand,setExpand] = useState(false)
   interface menuElement{
@@ -19,25 +19,48 @@ const SideNav = () => {
     onClick:(props:any)=>void
   }
   
-  useEffect(()=>{
-    console.log(roleEnum[parseInt(role)])
-    console.log(menuConfig)
-  },[role])
 
   const togglefunction = () => {
     setisOpen(!isOpen);
   }
 
   const menuConfig = {
-    "patient":[
-      {name:'report',onClick:()=>navigate(routeConfig.reports)},
-      {name:'Add Report',onClick:()=>navigate(routeConfig.addReport)},
-      {name:'View Doctors',onClick:()=>navigate(routeConfig.doctors)},
-      {name:'View Requests',onClick:()=>navigate(routeConfig.viewRequests)},
+    patient:[
+      {img:'/reportIcon.png',name:'Reports',onClick:()=>navigate(routeConfig.reports)},
+      {icon:<NoteAddIcon/>,name:'Add Report',onClick:()=>{
+        navigate('/home/reports')
+        setQueryParams({mode:'add',type:'report'})
+      }},
+      {img:'/doctorIcon.png',name:'View Doctors',onClick:()=>navigate(routeConfig.doctors)},
+      {img:'/facilityIcon.png',name:'View Facilites', onClick:()=>navigate(routeConfig.facility)},
+      {img:'/viewRequests.png',name:'View Requests',onClick:()=>navigate(routeConfig.viewRequests)},
     ],
-    doctor:[],
-    worker:[],
-    admin:[],
+    doctor:[
+      {img:'/reportIcon.png',name:'Reports',onClick:()=>navigate(routeConfig.reports)},
+      {icon:<NoteAddIcon/>,name:'Add Report',onClick:()=>{setQueryParams({mode:'add',type:'report'})}},
+      {icon:<NoteAddIcon/>,name:'Patient Report',onClick:()=>{navigate(routeConfig.reports);setQueryParams({type:'report',mode:'patient'})}},
+      {img:'/doctorIcon.png',name:'View Doctors',onClick:()=>navigate(routeConfig.doctors)},
+      {img:'/facilityIcon.png',name:'View Facilites', onClick:()=>navigate(routeConfig.facility)},
+      {img:'/viewRequests.png',name:'View Requests',onClick:()=>navigate(routeConfig.viewRequests)},
+    ],
+    worker:[
+      {img:'/reportIcon.png',name:'My Reports',onClick:()=>navigate(routeConfig.reports)},
+      {icon:<NoteAddIcon/>,name:'Add Report',onClick:()=>{setQueryParams({mode:'add',type:'report'})}},
+      {icon:<NoteAddIcon/>,name:'Upload Request',onClick:()=>{navigate(routeConfig.reports);setQueryParams({type:'report',mode:'patient'})}},
+      {img:'/doctorIcon.png',name:'View Doctors',onClick:()=>navigate(routeConfig.doctors)},
+      {img:'/facilityIcon.png',name:'View Facilites', onClick:()=>navigate(routeConfig.facility)},
+      {img:'/viewRequests.png',name:'View Requests',onClick:()=>navigate(routeConfig.viewRequests)},
+    ],
+    admin:[
+      {name:'My reports',onClick:()=>navigate(routeConfig.reports)},
+      {name:'Add Report',onClick:()=>navigate(routeConfig.reports)},
+      {name:'Add Facility',onClick:()=>navigate(routeConfig.viewRequests)},
+      {name:'Add Patient',onClick:()=>navigate(routeConfig.viewRequests)},
+      {name:'Add Worker',onClick:()=>navigate(routeConfig.viewRequests)},
+      {name:'Upload Request',onClick:()=>navigate(routeConfig.reports)},
+      {name:'Admin Request',onClick:()=>navigate(routeConfig.reports)},
+      {name:'Worker Requests',onClick:()=>navigate(routeConfig.doctors)},
+    ],
   } 
 
   const handleLogout = ()=>{
@@ -57,13 +80,7 @@ const SideNav = () => {
         </div>
         <div className="py-5 grow">
           {
-            [
-              {img:'/reportIcon.png',name:'Reports',onClick:()=>navigate(routeConfig.reports)},
-              {icon:<NoteAddIcon/>,name:'Add Report',onClick:()=>{setQueryParams({mode:'add',type:'report'})}},
-              {img:'/doctorIcon.png',name:'View Doctors',onClick:()=>navigate(routeConfig.doctors)},
-              {img:'/facilityIcon.png',name:'View Facilites', onClick:()=>navigate(routeConfig.facility)},
-              {img:'/viewRequests.png',name:'View Requests',onClick:()=>navigate(routeConfig.viewRequests)},
-            ].map((ele)=>(
+            role&&menuConfig[roleEnum[role]].map((ele)=>(
               <article key={ele.name} className="my-4">
                 <button onClick={ele.onClick} className="flex gap-2 text-[18px]">
                   {ele.icon&&ele.icon}

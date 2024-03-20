@@ -3,12 +3,16 @@ import { useWalletContext } from '../../store/walletProvider';
 import { LabeledInput, Button, LabeledSelect } from '../ui';
 import useContract from '../../hooks/useContract';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { BeatLoader } from 'react-spinners';
+import { useNotificationContext } from '../../store/notificationProvider';
 
 export const AddPatient:React.FC = () => {
   const {wallet} = useWalletContext();
+  const {updateNotification} = useNotificationContext()
   const contract = useContract(abi,networks)
   const navigate = useNavigate();
+  const params = useParams()
   const [loading,setLoading] = useState(false);
   const [patients,setPatients] = useState([])
 
@@ -17,12 +21,15 @@ export const AddPatient:React.FC = () => {
       e.preventDefault();
       // console.log(contract);
       if(contract) {
-        const {fname,lname,DoB,pincode,patientAddress,address,email} = e.target
-        console.log(fname,lname,DoB,pincode,patientAddress,address)
-        const [day,month,year] = DoB.value.split('-').map(ele=>Number(ele))
-        const transaction = await contract?.methods.createPatient(fname.value,lname.value,email.value,"1234567890",day,month,year,address.value,patientAddress.value).send({ from: wallet.accounts[1],gas:"1000000" });
-        // console.log(transaction)
-        navigate('/patient', { state: { patientAddress: patientAddress.value } });
+        const {fname,lname,DoB,phoneno,address,email,gender,height,weight} = e.target
+        const [day,month,year] = DoB.value.split('-').map(ele=>ele)
+        console.log(fname.value,lname.value,email.value,phoneno.value,day,month,year,address.value,params.id)
+        const transaction = await contract?.methods.createPatient(fname.value,lname.value,email.value,phoneno.value,day,month,year,address.value,params.id).send({ from: wallet.accounts[1],gas:"1000000" });
+        console.log(transaction)
+        const events = transaction.events
+        if(Object.keys(events).includes('PatientCreated')){
+          updateNotification({type:'success',message:"User created successfully"})
+        }
       }
     } catch (error) {
       console.error('Error submitting transaction', error);
@@ -39,7 +46,10 @@ export const AddPatient:React.FC = () => {
 
   return (
     <section className="m-auto flex items-center flex-col justify-center pt-10">
-    <form onSubmit={handleSubmit} className="flex flex-col bg-blue-200 gap-2 border-2 border-blue-500 shadow-lg py-5 rounded-2xl px-4">
+      <form onSubmit={handleSubmit} className="flex flex-col bg-blue-200 gap-2 border-2 border-blue-500 shadow-lg py-5 rounded-2xl px-4">
+            <div className='w-full flex items-center justify-center'>
+              <BeatLoader size={10} loading={loading} color='blue'/>
+            </div>
             <h1 className="text-4xl font-medium text-blue-800 pb-5 text-center">Add Details</h1>
             <div className="flex items-center justify-center">
                 <LabeledInput outlineColor="blue" textStyle="text-blue-700 capitalize" label="first name" name="fname"/>
@@ -48,7 +58,7 @@ export const AddPatient:React.FC = () => {
                 <LabeledInput textStyle="text-blue-700 capitalize" label="Email" name="email"/>
             
             <div className='flex gap-5'>
-              <LabeledInput textStyle='text-blue-700 capitalize' label='Gender' name='gender'/>
+              <LabeledSelect textStyle='text-blue-700 capitalize' name="Gender" label="gender" options={[{value:'M',name:'Male'},{value:'F',name:'female'}]} />
               <LabeledInput textStyle='text-blue-700 capitalize' label='Height' name='height'/>
               <LabeledInput textStyle='text-blue-700 capitalize' label='Weight' name='weight'/>
             </div>
@@ -60,12 +70,8 @@ export const AddPatient:React.FC = () => {
             <div className="flex items-center justify-center duration-500 flex-wrap md:flex-nowrap">
               <LabeledInput textStyle='text-blue-700 capitalize' name='address' label='Address'/>
             </div>
-            <div className="flex justify-center">
-                <LabeledSelect textStyle="text-blue-700 capitalize" name="patientAddress" label="walletAddress" options={wallet.accounts.map(ele=>({value:ele,name:ele}))} />
-            </div>
             <div className={`flex gap-3 justify-center pt-3`}>
                 <Button className="bg-blue-500 text-white hover:border-blue-700 hover:bg-blue-300" loader={loading}>Add Patient</Button>
-                <Button className="hover:border-blue-700 hover:text-blue-700" onClick={()=>navigate('/')}>Home</Button>
             </div>
     </form>
     <div className='flex'>

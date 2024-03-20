@@ -6,6 +6,7 @@ import { useSearchParams } from "react-router-dom";
 import { useWalletContext } from "../../store/walletProvider";
 import { Dialog, DialogContent } from "@mui/material";
 import { AddReport } from "../forms/addReport";
+import { BeatLoader } from 'react-spinners'
 import { useUserContext } from "../../store/userProvider";
 
 const PatientReports:React.FC = ()=>{
@@ -30,8 +31,6 @@ const PatientReports:React.FC = ()=>{
     async function fetchReports(){
       setLoading(true)
       const data = await reportContract?.methods.getPatientReports().call({from:wallet.accounts[0]})
-      console.log(data)
-      console.log(user)
       setReports(data)
       setLoading(false)
     }
@@ -41,9 +40,12 @@ const PatientReports:React.FC = ()=>{
   },[reportContract,wallet])
 
   return(
-    <div className="w-full flex gap-4">
+    <div className="w-full relative pt-4 flex gap-4">
+        <div className="w-full flex absolute top-2 left-1/2 -translate-x-1/2 items-center justify-center">
+          <BeatLoader loading={loading} size={10} color="blue"/>
+        </div>
         {reports.map((ele,index)=>(
-            <PatientReport tags={ele.tags} key={index} index={index} updateExpand={updateReportOpen} expand={reportExpand==index} disease={ele.problem} date={ele.date} />
+            <PatientReport verified={ele.isVerified} link={ele.attachements[0]} tags={ele.tags} key={index} index={index} updateExpand={updateReportOpen} expand={reportExpand==index} disease={ele.problem} date={ele.date} />
           ))}
         <Dialog
             PaperProps={{

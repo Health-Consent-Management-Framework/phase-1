@@ -1,4 +1,6 @@
+import Web3 from "web3";
 import { createContext, useContext, useEffect, useState } from "react";
+import detectEthereumProvider from '@metamask/detect-provider'
 
 interface Notification{
     type:"success"|"error"|"warning",
@@ -10,15 +12,104 @@ interface NotificationContextProps{
     updateNotification:(e:Notification)=>void
 }
 
-const NotificationContext = createContext<NotificationContextProps|null>(null)
+type User = {
+    email:string,
+    password:string,
+    username:string,
+    type:string,
+}
 
-export const NotifcationProvider:React.FC<{children:React.ReactNode}> = ({children}) => {
+interface UserContextInterface{
+    user:User|undefined,
+    updateUser:(ele:User)=>void,
+    role:number,
+    updateRole:(ele:number)=>void;
+}
+
+type walletType = {
+    accounts:string[],
+    balance?: string
+    chainId?: string
+}
+
+interface walletContextInterface{
+    hasProvider:boolean,
+    wallet:walletType,
+    networkId:string,
+    web3:Web3 | undefined
+}
+
+interface combinedContextProps extends NotificationContextProps{}
+interface combinedContextProps extends walletContextInterface{}
+interface combinedContextProps extends UserContextInterface{}
+
+
+const CombinedContext = createContext<combinedContextProps|null>(null)
+
+export const CombinedContextProvider:React.FC<{children:React.ReactNode}> = ({children}) => {
     const [notification,setNotification] = useState<Notification>({type:"success",message:"This is an Alert"})
     const [shownNotification,setShowNotification] = useState<boolean>(false)
+    const [user,setUser] = useState<User>()
+    const [role,setRole] = useState(()=>localStorage.getItem("role")?JSON.parse(localStorage.getItem("role") as string):'')
+    const [hasProvider, setHasProvider] = useState<boolean>(false)
+    const [wallet, setWallet] = useState<walletType>({accounts: []})
+    const [web3,setWeb3] = useState<Web3 | undefined>()
+    const [networkId,setNetworkId] = useState<string>("")
+
     const updateNotification = ({type,message}:Notification)=>{
         setShowNotification(true)
         setNotification({type,message})
     }
+
+    function updateUser(e){
+        setUser(e)
+    }
+
+    function updateRole(e:number){
+        setRole(role)
+        localStorage.setItem("role",JSON.stringify(e))
+    }
+
+
+
+    useEffect(() => {
+        const checkProvider = async ()=>{
+          const provider = await detectEthereumProvider()
+          const chainId = await provider?.request({
+            method: 'eth_chainId'
+          })
+          if(chainId) setHasProvider(true)
+        }
+        const initWeb3 = async () => {
+          try {
+              const devMode = Boolean(import.meta.env.VITE_DEV_MODE)
+              const provider = !devMode?window.ethereum:new Web3.providers.HttpProvider('http://localhost:7545')
+              const web3 = new Web3(provider);
+              setWeb3(web3)
+            } catch (error) {
+              console.error('Error loading accounts:', error);
+            }
+          };
+        checkProvider();
+        initWeb3();
+    }, []);
+
+    useEffect(()=>{
+        async function loadAccounts(){
+          if(web3){
+            const devMode = Boolean(import.meta.env.VITE_DEV_MODE)
+            const accounts = devMode? await web3.eth.getAccounts() : await web3.eth.requestAccounts();
+            console.log(accounts)
+            const chainId = await web3.eth.getChainId();
+            setWallet({ accounts: accounts,chainId:chainId.toString() });
+            const netId = await web3.eth.net.getId(); 
+            console.log(netId)
+            setNetworkId(netId?netId.toString():"start ganache")
+        }
+        
+        }
+      loadAccounts()
+    },[web3])
 
     useEffect(()=>{
         const timer = setTimeout(()=>{
@@ -33,7 +124,10 @@ export const NotifcationProvider:React.FC<{children:React.ReactNode}> = ({childr
     }
 
     return(
-        <NotificationContext.Provider value={{notification,updateNotification}}>
+        <CombinedContext.Provider value={{
+            notification,updateNotification,
+            updateRole,updateUser,role,wallet,networkId,user,hasProvider,web3
+            }}>
             <div className={`inline-block duration-300 p-2 absolute ${shownNotification?`translate-y-[100px]`:`translate-y-[0px]`} -top-[100px] -translate-x-1/2 left-1/2`}>
                 <article className="border-[1px] relative rounded-lg font-regular px-2 py-1 pr-6 w-[300px] text-center bg-white shadow-lg">
                     <p>{notification?.message}</p>
@@ -43,8 +137,8 @@ export const NotifcationProvider:React.FC<{children:React.ReactNode}> = ({childr
                 </article>
             </div>
             {children}
-        </NotificationContext.Provider>
+        </CombinedContext.Provider>
     )
 }
 
-export const useNotificationContext = () => useContext(NotificationContext) as NotificationContextProps
+export const useCombinedContext = () => useContext(CombinedContext) as NotificationContextProps

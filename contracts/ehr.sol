@@ -57,6 +57,7 @@ contract Report {
         string[] attachements;
         string[] diagnosis;
         string[] tags;
+        bool isVerified;
         string problem;
     }
     uint256 private nonce;
@@ -207,26 +208,6 @@ contract Report {
     }
 
 
-    // function createReport(string memory email,string memory problem) public onlyWorkerOrAdmin returns(bool){
-    //     (bool success,bytes memory data) = userContractAddress.delegatecall(abi.encodeWithSignature("emailToUser(string)", email));
-    //     if(!success) revert("delegate call failed");
-    //     address resultAddress = abi.decode(data, (address));
-    //     string memory reportId = generateRandomId(patientToReportMapping[resultAddress].length);
-    //     reportKeys.push(reportId);
-    //     // ReportType memory report;
-    //     // address[] memory accessedDoctors;
-    //     // uint createdAt = 0;
-    //     // uint updatedAt = 0;
-    //     // string[] memory attachements;
-    //     // string[] memory diagnosis;
-    //     // string[] memory tags;
-    //     ReportType memory report = ReportType(reportId,resultAddress,new address[](0),new string[](0),new string[](0),new string[](0),problem);
-    //     reports[reportId] = report;
-    //     patientToReportMapping[resultAddress].push(reportId);
-    //     emit reportCreated(reportId);
-    //     return true;
-    // }
-
     function createTempReport(string memory problem,string[] memory attachement,string[] memory tags) public returns(bool){
         string memory reportId = randomString(15);
         reportKeys.push(reportId);
@@ -234,7 +215,7 @@ contract Report {
         // uint createdAt = 0;
         // uint updatedAt = 0;
         string[] memory diagnosis;
-        ReportType memory report = ReportType(reportId,msg.sender,accessedDoctors,attachement,diagnosis,tags,problem);
+        ReportType memory report = ReportType(reportId,msg.sender,accessedDoctors,attachement,diagnosis,tags,false,problem);
         reports[reportId] = report;
         patientToReportMapping[msg.sender].push(reportId);
         emit reportCreated(reportId);

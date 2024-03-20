@@ -7,158 +7,138 @@ import "./worker.sol";
 
 contract User{
 
-    enum type_of_user{admin,worker,doctor,patient}
-    mapping(address=>string) userToEmail; // to ensure one email has one address
-    mapping(string=>address) emailToUser; // to ensure emails are unique
+    enum type_of_user{dummy,admin,worker,doctor,patient}
+    enum verificationStatus {notVerfied,verfied,rejected}
 
-    mapping(address => userToken) private userTokens;
+    event loginStatus(bool, string);
+    event signupStatus(bool, string);
 
-    enum verficationStatus {notVerfied,verfied,rejected}
+    address patientAddress;
+    address adminAddress;
+    address workerAddress;
+    address doctorAddress;
 
-
-    modifier authorize(){
-        require(userTokens[msg.sender].exists,"user not authorized");
-        require(userTokens[msg.sender].time == 0 ,"session expired!");
-        _;
+    string [] superKeys = [
+        'key1',
+        'key2',
+        'key3',
+        'key4'
+    ];
+    
+    struct roleEle{
+        type_of_user role;
+        bool exists;
+        verificationStatus isVerfied;
     }
 
+    struct userRoleInfo{
+        address id;
+        roleEle roleInfo;
+    }
+
+    mapping(address=>roleEle) addressToRoles;
+    mapping(string=>address) emailToAddress;
+
+    userRoleInfo[] users;
+
+
     modifier onlyAdmin(){
-        require(adminContract.checkIfAdmin(msg.sender),"only admin can access the feature");
+        require(addressToRoles[msg.sender].role==type_of_user.admin && addressToRoles[msg.sender].isVerfied==verificationStatus.verfied);
         _;
     }
 
     modifier onlyWorker(){
-        require(workerContract.checkIfWorker(msg.sender),"only worker can access the feature");
+        require(addressToRoles[msg.sender].role==type_of_user.worker && addressToRoles[msg.sender].isVerfied==verificationStatus.verfied);
         _;
     }
 
-    struct userToken{
-        bool exists;
-        uint time;
-        string email;
-        bytes32 token;
-    }
-
-    struct Date{
-        uint date;
-        uint month;
-        uint year;
-    }
-
-    struct Location{
-        string street;
-        string district;
-        string state;
-    }
-
-    struct UserType{
-        string fname;
-        string lname;
-        string username;
-        string password;
-        address walletAddress; 
-        Date DoB;
-    }
-
-    Admin adminContract;
-    Worker workerContract;
-    Doctor doctorContract;
-    Patient patientContract;
-
-    address adminAddress;
     event logBytes(bytes32);
     event logAddress(address);
     uint totalUsers;
 
     constructor(address patient,address doctor,address worker,address admin){
-        totalUsers = 0;        
-        adminAddress = admin;
-        patientContract = Patient(patient);
-        doctorContract = Doctor(doctor);
-        adminContract = Admin(admin);
-        workerContract = Worker (worker);
+        totalUsers = 0;     
+        patientAddress = patient;
+        doctorAddress = doctor;
+        workerAddress = worker;
+        adminAddress = admin;   
     }
 
     function signup(
-        string memory fname,
-        string memory lname,
-        string memory email,
-        string memory password,
-        type_of_user givenType,
-        uint day,uint month,uint year
-    ) public returns(bool){
-        bool success;
-        require(emailToUser[email] == address(0),"User with given mail already exists");
-        require(bytes(userToEmail[msg.sender]).length<=0,"user with given wallet already exist");
-
-        if(givenType==type_of_user.admin){
-            success = adminContract.createAdminRequest(fname,lname,email,password,msg.sender,day,month,year);
-        }else if(givenType==type_of_user.worker){
-            success = workerContract.createWorkerRequest(fname,lname,email,password,msg.sender,day,month,year);
-        }else if(givenType==type_of_user.doctor){
-            success = doctorContract.createDoctor(fname,lname,email,password,msg.sender,day,month,year);
-        }else if(givenType==type_of_user.patient){    
-            success = patientContract.createPatient(fname,lname,email,password,day,month,year,"location-1",msg.sender);     
+        type_of_user role
+    ) public returns(bool,string memory){
+        if(addressToRoles[msg.sender].role==role){
+            if(addressToRoles[msg.sender].isVerfied==verificationStatus.verfied) revert('User alreadt exits and is verfied');
+            else{
+                emit signupStatus(false,'user exits and is not verfied');
+                revert('user exits and is not verfied');
+            }
+        }else{
+            roleEle memory ele;
+            if(role==type_of_user.patient){
+                ele = roleEle(role,true,verificationStatus.verfied);
+                addressToRoles[msg.sender] = ele;            
+            }else{
+                ele = roleEle(role,true,verificationStatus.notVerfied);
+                addressToRoles[msg.sender] = ele;
+            }
+            userRoleInfo memory userInfo;
+            userInfo.id = msg.sender;
+            userInfo.roleInfo = ele;
+            users.push(userInfo);
+            emit signupStatus(true,'user creation successful');
+            return (true,'user creation successful');
         }
-        if(!success){
-            revert("failed to create user");
-        }
-        emailToUser[email] = msg.sender;
-        userToEmail[msg.sender] = email;
-        return success;
     }  
 
-    function setUpPassword(string memory password,string memory email,type_of_user givenType) public pure returns (bool){
-        bytes32 salt = bytes32(abi.encodePacked(email));
-        bytes32 hashedPassword = keccak256(abi.encodePacked(password, salt));
-        return true;
-    }
-
-    function hashPassword(string memory password, bytes32 salt) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked(password, salt));
-    }
-
-    function verifyToken(bytes32 messageHash,uint8 v,bytes32 r,bytes32 s) public view returns (bool){
-        address signer = ecrecover(messageHash, v, r, s);
-        return msg.sender == signer;
-    }
-
-    function login(string memory username,string memory password,address walletAddress,type_of_user givenType) public returns(bool,string memory){
-        bool exists = false; 
-        string memory isVerifed = 'verified';
-        if(keccak256(abi.encodePacked(userToEmail[msg.sender]))!=keccak256(abi.encodePacked(username)))
-            return (false,"invalid credential");
-        if(givenType==type_of_user.admin){
-            (exists,isVerifed) = adminContract.login(username,password,walletAddress);
+    function checkUserRole(type_of_user role,address userAddress) public view returns(bool,bool,string memory){
+        if(addressToRoles[msg.sender].role==role){
+            if(addressToRoles[msg.sender].isVerfied==verificationStatus.verfied){
+                return(true,true,'User login successful');
+            }else{
+                return(true,false,'Please wait for verification');
+            }
+        }else{
+            return (false,false,'invalid credentials');
         }
-        else if (givenType==type_of_user.worker){
-            (exists,isVerifed) = workerContract.login(username,password,walletAddress);
+    }
+
+    function checkIfUserExists(address userAddress) public view returns(bool,bool,string memory,type_of_user){
+        if(addressToRoles[userAddress].exists){
+            if(addressToRoles[userAddress].isVerfied==verificationStatus.verfied){
+                return(true,true,'User login successful',addressToRoles[userAddress].role);
+            }else{
+                return(true,false,'Please wait for verification',addressToRoles[userAddress].role);
+            }
+        }else{
+            return (false,false,'invalid credentials',type_of_user.patient);
         }
-        else if(givenType==type_of_user.doctor){
-            (exists,isVerifed) = doctorContract.login(username,password,walletAddress);
+    }
+
+    function signUpWithKey(string memory key) public returns(bool,string memory){
+        bool isKey = false;
+        
+        for(uint i=0;i<superKeys.length;i++){
+            if(keccak256(abi.encodePacked(superKeys[i])) == keccak256(abi.encodePacked(key))){
+                isKey = true;
+                break;
+            }
         }
-        else if(givenType==type_of_user.patient)
-            (exists,isVerifed) = patientContract.login(username,password,walletAddress);
-        if(!exists) revert("Please check the given credentials");
-        return (exists,isVerifed);
-    }
+        
+        if(!isKey) return(false,'not a valid key');
 
-    function forgotPassword(string memory email,address accountAddress) public returns (bool){
-
-    }
-
-    function checkAddressByEmail(string memory email) public view returns(bool) {
-        if(emailToUser[email]!=address(0)) return true;
-        return false;
-    }
-
-    function changeEmail(string memory newEmail,string memory oldEmail,string memory password) public returns(bool){
-        if(keccak256(abi.encodePacked(oldEmail)) != keccak256(abi.encodePacked(userToEmail[msg.sender]))) revert("oldEmail doesn't match");
-        if(msg.sender!=emailToUser[oldEmail]) revert("something went wrong");
-        userToEmail[msg.sender] = newEmail;
-        delete emailToUser[oldEmail];
-        emailToUser[newEmail] =msg.sender;
-        return true;
+        if(
+            addressToRoles[msg.sender].role==type_of_user.patient ||
+            addressToRoles[msg.sender].role==type_of_user.doctor ||
+            addressToRoles[msg.sender].role==type_of_user.worker
+        ){
+            emit signupStatus(false,'user signed for another role. request for promotion');
+            return (false,'user signed for another role. request for promotion');
+        }else{
+            addressToRoles[msg.sender] = roleEle(type_of_user.admin,true,verificationStatus.verfied);
+            emit signupStatus(true,"Admin created and verified successfully");
+            return (true,"Admin created and verified successfully");
+        }
     }
 
 }

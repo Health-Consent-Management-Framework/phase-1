@@ -14,6 +14,8 @@ contract Admin{
     _;    
     }
 
+    address userContractAddress;
+
     address[] public adminKeys;
     mapping(address => AdminType) public adminAddresses;
     address[] public adminRequestkeys;

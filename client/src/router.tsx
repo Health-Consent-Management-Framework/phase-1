@@ -1,9 +1,12 @@
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import HomeMiddleware from "./components/middleware/home.middleware";
-import { AddAdmin, AddFacility, AddReport, AddWorker, Facilities, Home, Login, PageNotFound, Signup } from "./components";
+import { AddAdmin, AddFacility, AddReport, AddWorker, DashBoard, Facilities, Home, Login, PageNotFound, Signup } from "./components";
 import AuthMiddleware from "./components/middleware/auth.middlewate";
 import { AddDoctor } from "./components/forms/addDoctor";
 import PatientReports from "./components/report/ReportsSection";
+import { ListDoctors } from "./components/doctorsLister.tsx/listDoctors";
+import AddDetails from "./components/forms/addDetails";
+import PatientPage from "./components/BasePage";
 
 const router = createBrowserRouter([
  {
@@ -17,56 +20,66 @@ const router = createBrowserRouter([
     children:[
         {
             path:'',
-            element:<Navigate to={'/home/reports'} replace/>
+            element:<DashBoard/>,
+            children:[
+                {
+                    path:'info',
+                    element:<Home/>
+                },
+                {
+                    path:'reports',
+                    element:<PatientReports/>
+                },
+                {
+                    path:'doctors',
+                    element:<ListDoctors/>
+                },
+                {
+                    path:'report/:id',
+                    element:<h1>Complete report info here</h1>
+                },
+                {
+                    path:'profile',
+                    element:<h1>Profile page here</h1>
+                },
+                {
+                    path:'facilites',
+                    element:<Facilities/>
+                },
+                {
+                    path:'facilites/add',
+                    element:<AddFacility/>,
+                },
+                {
+                    path:'facilites/edit',
+                    element:<AddFacility/>
+                },
+                {
+                    path:'report/edit',
+                    element:<AddReport/>
+                },
+                {
+                    path:'report/add',
+                    element:<AddReport/>
+                },
+                {
+                    path:'doctor/add',
+                    element:<AddDoctor/>
+                },
+                {
+                    path:'worker/add',
+                    element:<AddWorker/>
+                },
+                {
+                    path:'admin/add',
+                    element:<AddAdmin/>
+                }
+            ]
         },
         {
             path:'info',
             element:<Home/>
         },
-        {
-            path:'reports',
-            element:<PatientReports/>
-        },
-        {
-            path:'report/:id',
-            element:<h1>Complete report info here</h1>
-        },
-        {
-            path:'profile',
-            element:<h1>Profile page here</h1>
-        },
-        {
-            path:'facilites',
-            element:<Facilities/>
-        },
-        {
-            path:'facilites/add',
-            element:<AddFacility/>,
-        },
-        {
-            path:'facilites/edit',
-            element:<AddFacility/>
-        },
-        {
-            path:'report/edit',
-            element:<AddReport/>
-        },
-        {
-            path:'report/add',
-            element:<AddReport/>
-        },
-        {
-            path:'doctor/add',
-            element:<AddDoctor/>
-        },
-        {
-            path:'worker/add',
-            element:<AddWorker/>
-        },
-        {
-            path:'admin/add',
-            element:<AddAdmin/>
-        }
     ],
  },
  {
@@ -97,7 +110,7 @@ export const routeConfig = {
     addAdmin:'/admin/add',
     addWorker:'admin/worker',
     addReport:'/reports/add',
-    viewRequests:'/requests',
+    viewRequests:'/home/requests',
     addFacility:(id:string|number)=>`/home/facilites/${id}`,
     editFacility:(id:string|number)=>`home/facilites/${id}`,
     editReport:(id:string|number)=>`/reports/edit/${id}`,

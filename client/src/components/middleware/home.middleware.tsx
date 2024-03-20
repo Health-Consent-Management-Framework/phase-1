@@ -1,11 +1,15 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Outlet, useNavigate } from "react-router-dom"
 import SideNav from "../ui/SideNav"
-import Patient from "../ProfileDetails"
+import ProfileDetails from "../ProfileDetails"
 import styled from "styled-components";
-import { AddReport } from "..";
-import { Dialog,DialogContent } from "@mui/material";
+import { useUserContext } from "../../store/userProvider";
 
+import {abi as PatientAbi,networks as PatientNetwork} from '../../contracts/Patient.json'
+import {abi as DoctorAbi,networks as DoctorNetwork} from '../../contracts/Doctor.json'
+import {abi as WorkerAbi,networks as WorkerNetwork} from '../../contracts/Worker.json'
+import {abi as AdminAbi,networks as AdminNetwork} from '../../contracts/Admin.json'
+import useContract from "../../hooks/useContract";
 
 const Container = styled.div`
   background-color: #faf7f5;
@@ -27,30 +31,63 @@ const Hr = styled.hr`
 
 const HomeMiddleware = ()=>{
     const navigate = useNavigate()
+    // const {updateUser} = useUserContext()
+    const [loading, setLoading] = useState(true);
+    const patientContract = useContract(PatientAbi,PatientNetwork)
+    const workerContract = useContract(WorkerAbi,WorkerNetwork)
+    const adminContract = useContract(AdminAbi,AdminNetwork)
+    const doctorContract = useContract(DoctorAbi,DoctorNetwork)
 
-    useEffect(()=>{
-        if(localStorage.getItem('access_token')){
-            const role = localStorage.getItem('role');
-            if(!role) navigate('/auth')
-        }else navigate('/auth')
+    function handleNavigate(data){
+        if(!data||data&&!data.walletAddress||data&&data.walletAddress.toLowerCase() === '0x0000000000000000000000000000000000000000'){
+            navigate(`/details/add/${wallet}`)
+        }else{
+            // updateUser(data)
+        }
+    }
+
+
+    useEffect(() => {
+        async function fetchUserDetails() {
+            const wallet = localStorage.getItem('walletId');
+            const role = parseInt(localStorage.getItem('role'));
+            console.log(role, wallet);
+
+            if (role && wallet) {
+                let data;
+
+                if (role == 4) {
+                    data = await patientContract?.methods.getPatient(wallet).call();
+                } else if (role == 3) {
+                    data = await doctorContract?.methods.getDoctors(wallet).call();
+                } else if (role == 2) {
+                    data = await workerContract?.methods.getSelfDetails(wallet).call();
+                } else if (role == 1) {
+                    data = await adminContract?.methods.getSelfDetails(wallet).call();
+                }
+
+                console.log(data);
+                setLoading(false)
+                if (data) {
+                    if(!loading) handleNavigate(data);
+                }
+            }
+        }
+
+        if (!localStorage.getItem('role') || !localStorage.getItem('walletId')) {
+            navigate('/auth');
+        } else {
+            fetchUserDetails();
+        }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [patientContract, doctorContract, workerContract, adminContract, handleNavigate]);
+
+    
+    useEffect(()=>{
     },[])
 
-    function handleReportPopUpClose(index:number){
-        setQueryParams()
-    }
-      
     return(
-        <section className="h-screen flex">
-            <SideNav/>
-            <Container>
-                <Patient/>
-                <Hr />
-                <Wrapper>
-                    <Outlet/>
-                </Wrapper>
-            </Container>
-        </section>
+        <Outlet/>
     )
 }
 

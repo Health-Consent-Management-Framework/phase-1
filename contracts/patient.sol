@@ -12,6 +12,7 @@ contract Patient {
 
     enum status{pending,accepted,rejeceted}
     string patientSecret = 'patient_123';
+
     struct Date{
         uint date;
         uint month;
@@ -28,11 +29,10 @@ contract Patient {
         string fname;
         string lname;
         string email;
-        bytes32 password;
         string location;
         Date DoB;
+        string mobileNo;
         address walletAddress;
-        bool verfiedEmailAddress;
     }
 
     struct PatientDeleteRequest{
@@ -77,8 +77,10 @@ contract Patient {
     }
 
     function createPatient(
-        string memory fname,string memory lname,
-        string memory email,string memory password,
+        string memory fname,
+        string memory lname,
+        string memory email,
+        string memory mobileNo,
         uint day,uint month, uint year,
         string memory location,
         address patientAddress
@@ -90,11 +92,9 @@ contract Patient {
             emit PatientNotFound(patientAddress);
         }
         Date memory date = Date(day,month,year);
-        // Location memory location = Location(street,district,state);
         patientKeys.push(patientAddress);
         totalPatients =patientKeys.length ;
-        bytes32 hashedPassword = hashPasswordWithSecret(password,patientSecret);
-        patients[patientAddress] = PatientType(fname,lname,email,hashedPassword,location,date,patientAddress,false);
+        patients[patientAddress] = PatientType(fname,lname,email,location,date,mobileNo,patientAddress);
         emit PatientCreated(totalPatients, email);
         return true;
     }
@@ -104,30 +104,17 @@ contract Patient {
         return true;
     }
 
-    function verifyPatientEmail() public isOwner returns(bool){
-        patients[msg.sender].verfiedEmailAddress = true;
-        emit PatientVerified(msg.sender,patients[msg.sender].verfiedEmailAddress);
-        return true;
-    }
-
     function deletePatient(address patientAddress) public isOwner{
         delete patients[patientAddress];
         emit PatientDeleted(patientAddress);
     }
 
-    function getSelfDetails() public view returns(PatientType memory){
-        require(patients[msg.sender].walletAddress==msg.sender,"User doesn't exists as patient");
-        return patients[msg.sender];
+    function getSelfDetails(address walletAddress) public view returns(PatientType memory){
+        require(patients[walletAddress].walletAddress==walletAddress,"User doesn't exists as patient");
+        return patients[walletAddress];
     }
 
-    // function deletePatient(address patientAddress) public isOwner() {
-    //     require(patients[patientAddress].active, "Patient does not exist");
-    //     patients[patientAddress].active = false;
-    //     totalPatients-=1;
-    //     emit PatientDeleted(patientAddress);
-    // }
-
-    function getPatient(address patientAddress) external view returns (PatientType memory) {
+    function getPatient(address patientAddress) public view returns (PatientType memory) {
         return patients[patientAddress];
     }
 
@@ -139,23 +126,4 @@ contract Patient {
         return allPatients;
     }
 
-    function login(string memory email,string memory password,address walletAddress) public returns (bool,string memory){
-        bool exists = true;
-        for(uint i=0;i<totalPatients;i++){
-            if(patientKeys[i]==walletAddress) exists = true;
-        }
-        bytes32 hashedPassword = hashPasswordWithSecret(password, patientSecret);
-        if(exists){
-            emit PatientFound(walletAddress);
-        }else emit PatientNotFound(walletAddress);
-        if(!compareString(patients[walletAddress].email,email) || patients[walletAddress].password != hashedPassword)
-            return (false,"invalid credentials");
-        return (exists,"user logged in successfully");
-    }
-
-    function hashPasswordWithSecret(string memory password, string memory secret) public pure returns (bytes32) {
-        bytes memory passwordBytes = bytes(password);
-        bytes memory secretBytes = bytes(secret);
-        return keccak256(abi.encodePacked(passwordBytes, secretBytes));
-    }
 }

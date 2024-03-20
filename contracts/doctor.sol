@@ -18,12 +18,11 @@ contract Doctor{
         string designation;
         string[] degree;
         string email;
-        bytes32 password;
-        bool verifiedEmail;
+        string mobileNo;
         bool doctorVerified;
         address walletAddress; 
         Date DoB;
-        address[] patients; // Patients treated by this doctor
+        address[] patients; 
     }
 
     struct DoctorInfo{
@@ -35,10 +34,12 @@ contract Doctor{
     }
 
     mapping(address => DoctorType) public doctors;
+    address[] private doctorKeys;
     mapping(address => mapping(address => bool)) public patientRequests; // Mapping to track patient requests sent by doctors
 
     event DoctorCreated(address indexed doctorAddress);
     event DoctorUpdated(address indexed doctorAddress);
+    event DoctorNotFound(address indexed doctorAddress);
     event DoctorRemoved(address indexed doctorAddress);
     event PatientRequestSent(address indexed doctorAddress, address indexed patientAddress);
     event PatientRequestAccepted(address indexed doctorAddress, address indexed patientAddress);
@@ -56,7 +57,6 @@ contract Doctor{
         doctors[msg.sender].designation = designation;
         doctors[msg.sender].degree = degree;
         doctors[msg.sender].email = email;
-        // doctors[msg.sender].password = password;
         doctors[msg.sender].DoB = Date(day, month, year);
         emit DoctorUpdated(msg.sender);
         return true;
@@ -69,15 +69,25 @@ contract Doctor{
         return true;
     }
 
-    function createDoctor(string memory fname, string memory lname, string memory email,string memory password,address walletAddress, uint day, uint month, uint year) public returns(bool) {
+    function createDoctor(string memory fname, 
+                            string memory lname, 
+                            string memory email,
+                            string memory mobileNo, 
+                            string memory designation, 
+                            string[] memory degree, 
+                            uint day, uint month, uint year,
+                            address walletAddress
+                        ) public returns(bool) {
+        if(doctors[walletAddress].walletAddress==address(0)){
+            emit DoctorNotFound(walletAddress);
+        }
         require(doctors[walletAddress].walletAddress == address(0), "Doctor with provided wallet address already exists");
-        bytes32 hashedPassword = hashPasswordWithSecret(password,doctorSecret);
         address[] memory patientAddress = new address[](0);
-        string[] memory degrees = new string[](0);
-        doctors[walletAddress] = DoctorType(fname, lname, '', degrees, email,hashedPassword,false, false, walletAddress, Date(day, month, year),patientAddress);
+        doctors[walletAddress] = DoctorType(fname, lname, designation, degree, email, mobileNo, false, walletAddress, Date(day, month, year),patientAddress);
         emit DoctorCreated(walletAddress);
         return true;
     }
+
 
     function addPatientToDoctor(address doctorAddress, address patientAddress) public onlyDoctor returns(bool) {
         require(doctors[doctorAddress].walletAddress != address(0), "Invalid doctor address");
@@ -129,30 +139,28 @@ contract Doctor{
         return doctorInfo;
     }
 
+    function getDoctors(address doctorAddress) public view returns (DoctorType memory){
+        return doctors[doctorAddress];
+    }
+
     function checkIfDoctor(address doctorAddress) public view returns(bool) {
         return doctors[doctorAddress].walletAddress != address(0);
     }
 
-    
-    function hashPasswordWithSecret(string memory password, string memory secret) public pure returns (bytes32) {
-        bytes memory passwordBytes = bytes(password);
-        bytes memory secretBytes = bytes(secret);
-        return keccak256(abi.encodePacked(passwordBytes, secretBytes));
+    function getAllDoctors() public view returns (DoctorType[] memory){
+        DoctorType[] memory doctorsData = new DoctorType[](doctorKeys.length);
+        uint index = 0;
+        for(uint i=0;i<doctorKeys.length;i++){
+            if(doctorKeys[i]!=address(0)){
+                doctorsData[index] = doctors[doctorKeys[i]];
+                index++;
+            }
+        }
+        return doctorsData;
     }
 
     function compareString(string memory str1, string memory str2) public pure returns (bool) {
         return keccak256(abi.encodePacked(str1)) == keccak256(abi.encodePacked(str2));
     }
 
-    function login(string memory email,string memory password,address walletAddress) public view returns (bool,string memory){
-        bool exists = true;
-            if(doctors[walletAddress].walletAddress==walletAddress) exists = true;
-            bytes32 hashedPassword = hashPasswordWithSecret(password, doctorSecret);
-        if(exists){ 
-            if(!compareString(doctors[walletAddress].email,email) || doctors[walletAddress].password != hashedPassword)
-                return (false,"check your credentials");
-            if(doctors[walletAddress].doctorVerified) return (true,"verfied");
-            else return (true,"not verifed");
-        }else return(false,"not verfied");
-    }
 }

@@ -5,9 +5,9 @@ import {storage} from '../../firebaseconfig'
 import { useNotificationContext } from "../../store/notificationProvider";
 import useContract from "../../hooks/useContract";
 import { abi as reportAbi, networks as reportNetworks} from '../../contracts/Report.json';
-import { useNavigate } from "react-router-dom";
 import { Autocomplete, Chip, TextField } from "@mui/material";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { BeatLoader } from "react-spinners";
 
 interface Report{
     diagnoisedDoctor?:string,
@@ -24,7 +24,6 @@ export const AddReport:React.FC = ()=>{
     const {wallet} = useWalletContext();
     const {updateNotification} = useNotificationContext()
     const reportContract = useContract(reportAbi,reportNetworks)
-    const navigate = useNavigate();
     const [loading,setLoading] = useState(false)
     const [tags,setTags] = useState<string[]>([])
 
@@ -68,6 +67,9 @@ export const AddReport:React.FC = ()=>{
     return(
             <form onSubmit={handleSubmit} 
                 className="flex flex-col bg-blue-200 gap-2 border-2 border-blue-500 shadow-lg py-5 rounded-2xl px-4">
+                    <div className="items-center w-full justify-center">
+                        <BeatLoader loading={loading} size={10}/>
+                    </div>
                     <h1 className="text-4xl font-medium text-blue-800 pb-5 text-center">Add Report</h1>
                     <div className="flex items-center justify-center gap-5">
                         <LabeledInput outlineColor="blue" textStyle="text-blue-700 capitalize" label="Problem" name="problem"/>

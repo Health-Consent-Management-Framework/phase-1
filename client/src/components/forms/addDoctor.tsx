@@ -3,36 +3,61 @@ import { useWalletContext } from '../../store/walletProvider';
 import { LabeledInput, Button, LabeledSelect } from '../ui';
 import useContract from '../../hooks/useContract';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useNotificationContext } from '../../store/notificationProvider';
+import { Autocomplete, Chip, TextField } from '@mui/material';
 
 export const AddDoctor:React.FC = () => {
-  const {wallet} = useWalletContext();
+
   const contract = useContract(abi,networks)
   const navigate = useNavigate();
   const [loading,setLoading] = useState(false);
+  const [degrees,setDegrees] = useState<string[]>([])
+  const {updateNotification} = useNotificationContext()
+  const params = useParams()
 
   const handleSubmit = async (e) => {
     try {
+      setLoading(true)
       e.preventDefault();
       if(contract) {
-        const {fname,lname,DoB,doctorAddress,email,phoneno,designation} = e.target
-        const [day,month,year] = DoB.value.split('-').map(ele=>Number(ele))
-        const transaction = await contract?.methods.createDoctor(fname.value,lname.value,designation.value,email.value,doctorAddress.value,day,month,year).send({ from: wallet.accounts[0],gas:"1000000" });
+        const {fname,lname,DoB,email,phoneno,designation} = e.target
+        const [year,month,day] = DoB.value.split('-').map(ele=>Number(ele))
+        console.log(
+          fname.value,
+          lname.value,
+          email.value,
+          phoneno.value,
+          designation.value,
+          degrees,
+          day,month,year,
+          params.id          
+        )
+        const transaction = await contract?.methods.createDoctor(
+                                                    fname.value,
+                                                    lname.value,
+                                                    email.value,
+                                                    phoneno.value,
+                                                    designation.value,
+                                                    degrees,
+                                                    day,month,year,
+                                                    params.id
+                                                    )
+                                                  .send({ from: params.id,gas:"1000000" });
         // navigate('/patient', { state: { patientAddress: patientAddress.value } });
-        navigate('/doctor', { state: { doctorAddress: doctorAddress.value } });
+        const events = transaction.events;
+        if(Object.keys(events).includes('DoctorCreated')){
+          updateNotification({type:'success',message:"Doctor Created Successfu;;y"})
+          navigate('/')
+        }
       }
+      setLoading(false)
     } catch (error) {
       console.error('Error submitting transaction', error);
     }
   };
 
-//   useEffect(()=>{
-//     async function getPatients(){
-//       const transaction = await contract?.methods.getAllPatient().call({from:wallet.accounts[0]})
-//       console.log(transaction)
-//     }
-//     getPatients()
-//   },[contract])
+
 
   return (
     <section className="m-auto flex items-center flex-col justify-center pt-10">
@@ -50,12 +75,39 @@ export const AddDoctor:React.FC = () => {
               <LabeledInput textStyle="text-blue-700 capitalize" type="text" name="phoneno" label="phone number"/>
               <LabeledInput textStyle="text-blue-700 capitalize" type="date" name="DoB" label="date of birth"/>
             </div>
-            <div className="flex justify-center">
-                <LabeledSelect textStyle="text-blue-700 capitalize" name="doctorAddress" label="walletAddress" options={wallet.accounts.map(ele=>({value:ele,name:ele}))} />
-            </div>
+              <LabeledInput textStyle="text-blue-700 capitalize" type="text" name="phoneno" label="phone number"/>
+              <div className="flex justify-evenly">
+                    <Autocomplete
+                        clearIcon={false}
+                        options={degrees}
+                        freeSolo
+                        fullWidth
+                        multiple
+                        renderTags={(value, props) =>{
+                            setDegrees(value)
+                            return value.map((ele, index) => {
+                            return <Chip label={ele} {...props({ index })} />
+                            })
+                        }}
+                        renderInput={(params) => 
+                        <div className="px-1">
+                            <label className="pb-1 text-sm self-start">Tags</label>
+                            <TextField  sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    padding:0,
+                                    border:'1px solid black',
+                                },
+                                '& .MuiOutlinedInput-notchedOutline': {
+                                    borderRight:"10px"
+                                },
+                            }} className={`border-[1px] w-full p-1 rounded-md border-black outline-none focus-within:outline-1 duration-200`} {...params} />
+                        </div>
+                        }/>
+                        
+                        {/* <LabeledInput /> */}
+                    </div>
             <div className={`flex gap-3 justify-center pt-3`}>
                 <Button className="bg-blue-500 text-white hover:border-blue-700 hover:bg-blue-300" loader={loading}>Add Doctor</Button>
-                <Button className="hover:border-blue-700 hover:text-blue-700" onClick={()=>navigate('/')}>Home</Button>
             </div>
     </form>
 </section>

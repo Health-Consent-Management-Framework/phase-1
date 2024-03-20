@@ -8,6 +8,7 @@ import useContract from "../hooks/useContract";
 import { abi, networks } from "../contracts/Patient.json";
 import { useWalletContext } from "../store/walletProvider";
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useUserContext } from "../store/userProvider";
 
 const Container = styled.div`
   display: flex;
@@ -30,7 +31,7 @@ const Name = styled.span`
   font-weight: 500;
 `;
 
-const Date = styled.span`
+const DateComponent = styled.span`
   font-size: 17px;
   font-weight: 400;
   color: ${({ theme }) => theme.textSoft};
@@ -74,96 +75,101 @@ const DoctorDetails = styled.div`
   flex-direction: column;
 `;
 
-const ProfileDetails = () => {
+const ProfileDetails = (props) => {
   const [patient, setPatient] = useState({});
-  const { wallet } = useWalletContext();
-  const contract = useContract(abi, networks);
-  const location = useLocation();
-  const navigate = useNavigate();
-  const patientAddress = location.state?.patientAddress;
-  // console.log(patientAddress);
-  useEffect(() => {
-    async function getPatient() {
-      const transaction = await contract?.methods.getPatient(patientAddress).call({ from: wallet.accounts[0] });
-      setPatient(transaction || {});
-      // console.log(patient);
-    }
-    getPatient();
-  },[contract, wallet]);
+  const {role} = useUserContext();
+  // const navigate = useNavigate();
+  
+  // useEffect(() => {
+  //   async function getPatient() {
+  //     const transaction = await contract?.methods.getPatient(patientAddress).call({ from: wallet.accounts[0] });
+  //     setPatient(transaction || {});
+  //   }
+  //   getPatient();
+  // },[contract, wallet]);
 
-  if (!patient) {
-    return null;
+  // if (!patient) {
+  //   return null;
+  // }
+
+  // const handleClick = async (e) => {
+  //   try {
+  //     e.preventDefault();
+  //     if (contract) {
+  //       await contract.methods.deletePatient(patientAddress).send({ from: wallet.accounts[0] });
+  //       console.log('Patient deleted successfully');
+  //       navigate("/");
+  //     }
+  //   } catch (error) {
+  //     console.error('Error deleting data', error);
+  //   }
+  // };
+
+  function calculateAge(year){
+    const curr_year = new Date()
+    return curr_year.getFullYear() - year;
   }
-
-  const handleClick = async (e) => {
-    try {
-      e.preventDefault();
-      if (contract) {
-        await contract.methods.deletePatient(patientAddress).send({ from: wallet.accounts[0] });
-        console.log('Patient deleted successfully');
-        navigate("/");
-      }
-    } catch (error) {
-      console.error('Error deleting data', error);
-    }
-  };
 
   return (
     <Container>
       <Avatar src="https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png" />
       <Details>
-        <Name>{patient.fname} {patient.lname}</Name>
+        <Name>{props.fname} {props.lname}</Name>
         <Data>
           <InternalData>
-            <LocalPhoneIcon /> +91 9876543210
+            <LocalPhoneIcon /> {props.mobileno}
           </InternalData>
           <InternalData>
             <MailIcon />
-            {patient.email}
+            {props.email}
           </InternalData>
           <InternalData>
             <CalendarMonthIcon />
-            20-09-2023
+            {props.date}-{props.month}-{props.year}
           </InternalData>
         </Data>
         <PatientDetails>
           <Text>
             <span style={{ color: "#aaaaaa", fontWeight: "600" }}>GENDER </span>{" "}
-            <span>Male</span>
+            <span>{props.gender=='F'?"Female":"Male"}</span>
           </Text>
           <Text>
             <span style={{ color: "#aaaaaa", fontWeight: "600" }}>AGE </span>{" "}
-            <span>25</span>
+            <span>{calculateAge(props.year)}</span>
           </Text>
           <Text>
             <span style={{ color: "#aaaaaa", fontWeight: "600" }}>HEIGHT </span>{" "}
-            <span>180cm</span>
+            <span>{props.height||'180cm'}</span>
           </Text>
           <Text>
             <span style={{ color: "#aaaaaa", fontWeight: "600" }}>WEIGHT </span>{" "}
-            <span>72kg</span>
+            <span>{props.weight||'82kg'}</span>
           </Text>
-          {/* <Text>
-            <span style={{ color: "#aaaaaa", fontWeight: "600" }}>BMI </span>{" "}
-            <span>23.3</span>
-          </Text> */}
-          <button className="hover:border-blue-700 hover:text-blue-700" onClick={handleClick}>Delete</button>
+          {/* <button className="hover:border-blue-700 hover:text-blue-700" onClick={handleClick}>Delete</button> */}
         </PatientDetails>
       </Details>
-      <Doctor>
-        <Avatar
-          style={{ height: "50px", width: "50px" }}
-          src="https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png"
-        />
-        <DoctorDetails>
-          <span>Dr. John Doe</span>
-          <span
-            style={{ color: "#aaaaaa", fontWeight: "500", fontSize: "15px" }}
-          >
-            Cardiologist
-          </span>
-        </DoctorDetails>
-      </Doctor>
+      {
+        role==2&&(
+          <Doctor>
+          <Avatar
+            style={{ height: "50px", width: "50px" }}
+            src="https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png"
+          />
+          <DoctorDetails>
+            <span
+              style={{ color: "#aaaaaa", fontWeight: "500", fontSize: "15px" }}
+            >
+              {props.designation}
+            </span>
+            <article>
+              {props.degrees.map(ele=>(
+              <span>{ele}</span>
+              ))}
+            </article>
+          </DoctorDetails>
+          </Doctor>
+        )
+      }
     </Container>
   );
 };
