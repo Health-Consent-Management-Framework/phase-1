@@ -4,7 +4,7 @@ import { AddAdmin, AddFacility, AddReport, AddWorker, DashBoard, Facilities, Hom
 import AuthMiddleware from "./components/middleware/auth.middlewate";
 import { AddDoctor } from "./components/forms/addDoctor";
 import PatientReports from "./components/report/ReportsSection";
-import { ListDoctors } from "./components/doctorsLister.tsx/listDoctors";
+import  ListDoctors  from "./components/listDoctors";
 import AddDetails from "./components/forms/addDetails";
 
 const router = createBrowserRouter([
