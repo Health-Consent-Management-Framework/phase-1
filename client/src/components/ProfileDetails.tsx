@@ -3,12 +3,8 @@ import styled from "styled-components";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import MailIcon from "@mui/icons-material/Mail";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import { useEffect, useState } from "react";
-import useContract from "../hooks/useContract";
-import { abi, networks } from "../contracts/Patient.json";
-import { useWalletContext } from "../store/walletProvider";
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useUserContext } from "../store/userProvider";
+import { useEffect } from "react";
+import { useCombinedContext } from "../store";
 
 const Container = styled.div`
   display: flex;
@@ -29,13 +25,6 @@ const Details = styled.div`
 const Name = styled.span`
   font-size: 23px;
   font-weight: 500;
-`;
-
-const DateComponent = styled.span`
-  font-size: 17px;
-  font-weight: 400;
-  color: ${({ theme }) => theme.textSoft};
-  margin-left: 5px;
 `;
 
 const Text = styled.span`
@@ -75,97 +64,82 @@ const DoctorDetails = styled.div`
   flex-direction: column;
 `;
 
-const ProfileDetails = (props) => {
-  const [patient, setPatient] = useState({});
-  const {role} = useUserContext();
-  // const navigate = useNavigate();
-  
-  // useEffect(() => {
-  //   async function getPatient() {
-  //     const transaction = await contract?.methods.getPatient(patientAddress).call({ from: wallet.accounts[0] });
-  //     setPatient(transaction || {});
-  //   }
-  //   getPatient();
-  // },[contract, wallet]);
+const ProfileDetails = () => {
+  const {role,user} = useCombinedContext();
 
-  // if (!patient) {
-  //   return null;
-  // }
-
-  // const handleClick = async (e) => {
-  //   try {
-  //     e.preventDefault();
-  //     if (contract) {
-  //       await contract.methods.deletePatient(patientAddress).send({ from: wallet.accounts[0] });
-  //       console.log('Patient deleted successfully');
-  //       navigate("/");
-  //     }
-  //   } catch (error) {
-  //     console.error('Error deleting data', error);
-  //   }
-  // };
+  useEffect(()=>{
+    console.log(user)
+  },[user])
 
   function calculateAge(year){
+    const givenYear = Number(year)
     const curr_year = new Date()
-    return curr_year.getFullYear() - year;
+    console.log(curr_year.getFullYear(),year)
+    return curr_year.getFullYear() - givenYear;
   }
 
   return (
     <Container>
       <Avatar src="https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png" />
       <Details>
-        <Name>{props.fname} {props.lname}</Name>
+        <Name>{user.fname} {user.lname}</Name>
         <Data>
           <InternalData>
-            <LocalPhoneIcon /> {props.mobileno}
+            <LocalPhoneIcon /> {user.mobileNo}
           </InternalData>
           <InternalData>
             <MailIcon />
-            {props.email}
+            {user.email}
           </InternalData>
           <InternalData>
             <CalendarMonthIcon />
-            {props.date}-{props.month}-{props.year}
+            {user.DoB?`${Number(user.DoB[2])}-${Number(user.DoB[1])}-${Number(user.DoB[0])}`:'--/--/--'}
+            {/* {user.date}-{user.month}-{user.year} */}
           </InternalData>
         </Data>
         <PatientDetails>
           <Text>
             <span style={{ color: "#aaaaaa", fontWeight: "600" }}>GENDER </span>{" "}
-            <span>{props.gender=='F'?"Female":"Male"}</span>
+            <span>{user.gender=='F'?"Female":"Male"}</span>
           </Text>
           <Text>
             <span style={{ color: "#aaaaaa", fontWeight: "600" }}>AGE </span>{" "}
-            <span>{calculateAge(props.year)}</span>
+            <span>{calculateAge(user.DoB?user.DoB[0]:2024)}</span>
           </Text>
           <Text>
             <span style={{ color: "#aaaaaa", fontWeight: "600" }}>HEIGHT </span>{" "}
-            <span>{props.height||'180cm'}</span>
+            <span>{user.height||'180cm'}</span>
           </Text>
           <Text>
             <span style={{ color: "#aaaaaa", fontWeight: "600" }}>WEIGHT </span>{" "}
-            <span>{props.weight||'82kg'}</span>
+            <span>{user.weight||'82kg'}</span>
           </Text>
           {/* <button className="hover:border-blue-700 hover:text-blue-700" onClick={handleClick}>Delete</button> */}
         </PatientDetails>
       </Details>
       {
-        role==2&&(
+        role==3&&(
           <Doctor>
           <Avatar
             style={{ height: "50px", width: "50px" }}
             src="https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png"
           />
           <DoctorDetails>
-            <span
-              style={{ color: "#aaaaaa", fontWeight: "500", fontSize: "15px" }}
-            >
-              {props.designation}
-            </span>
-            <article>
-              {props.degrees.map(ele=>(
-              <span>{ele}</span>
-              ))}
-            </article>
+            {user.length&&(
+              <>
+              
+              <span
+                style={{ color: "#aaaaaa", fontWeight: "500", fontSize: "15px" }}
+              >
+                {user.designation}
+              </span>
+              <article>
+                {user&&user?.degree.map(ele=>(
+                  <span className="bg-blue-200 mx-2 brder-blue-600 rounded-md px-[2px] py-[1px] text-sm text-blue-700">{ele}</span>
+                ))}
+              </article>
+              </>
+            )}
           </DoctorDetails>
           </Doctor>
         )

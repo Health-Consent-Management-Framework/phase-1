@@ -1,14 +1,14 @@
 import { useNavigate } from "react-router-dom"
 import { LabeledInput, LabeledSelect,Button } from "../ui"
-import { useWalletContext } from "../../store/walletProvider"
 import { useState } from "react"
 import {abi ,networks } from '../../contracts/Admin.json'
 import useContract from "../../hooks/useContract"
+import { useCombinedContext } from "../../store"
 
 
 export const AddAdmin:React.FC = ()=>{
     const navigate = useNavigate()
-    const {wallet} = useWalletContext()
+    const {wallet} = useCombinedContext()
     const contract = useContract(abi,networks)
     const [loading,setLoading] = useState(false)
    

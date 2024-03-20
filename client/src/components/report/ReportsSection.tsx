@@ -3,19 +3,17 @@ import {abi as ReportAbi,networks as ReportNetwork} from '../../contracts/Report
 import PatientReport from "./ReportCardElement";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useWalletContext } from "../../store/walletProvider";
 import { Dialog, DialogContent } from "@mui/material";
 import { AddReport } from "../forms/addReport";
 import { BeatLoader } from 'react-spinners'
-import { useUserContext } from "../../store/userProvider";
+import { useCombinedContext } from "../../store";
 
 const PatientReports:React.FC = ()=>{
   const reportContract = useContract(ReportAbi,ReportNetwork);
   const [reports,setReports] = useState([])
-  const {wallet} = useWalletContext()
+  const {selectedWallet,updateNotification} = useCombinedContext()
   const [searchParams,setSearchPrams] = useSearchParams()
   const [loading,setLoading] = useState(false)
-  const {user} = useUserContext()
   const [reportExpand,setReportExpand] = useState(-1); 
 
   function updateReportOpen(index:number){
@@ -30,17 +28,22 @@ const PatientReports:React.FC = ()=>{
   useEffect(()=>{
     async function fetchReports(){
       setLoading(true)
-      const data = await reportContract?.methods.getPatientReports().call({from:wallet.accounts[0]})
-      setReports(data)
+      const data = await reportContract?.methods.getPatientReports().call({from:selectedWallet})
+      if(data){
+        setReports(data)
+      }else {
+        updateNotification({type:"succes",message:"Failed to fetch reports"})
+      }
       setLoading(false)
     }
-    if(reportContract&&wallet.accounts) {
+    if(reportContract&&selectedWallet) {
      fetchReports()
     }
-  },[reportContract,wallet])
+  },[reportContract,selectedWallet])
 
   return(
     <div className="w-full relative pt-4 flex gap-4">
+        <p className="text-center w-full">These are your Reports</p>
         <div className="w-full flex absolute top-2 left-1/2 -translate-x-1/2 items-center justify-center">
           <BeatLoader loading={loading} size={10} color="blue"/>
         </div>

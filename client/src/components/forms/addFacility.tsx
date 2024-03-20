@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { LabeledInput, LabeledSelect,Button } from "../ui"
 import {abi ,networks} from '../../contracts/Facility.json'
-import { useWalletContext } from "../../store/walletProvider";
-import { useNotificationContext } from "../../store/notificationProvider";
 import useContract from "../../hooks/useContract";
 import { useNavigate } from "react-router-dom";
+import { useCombinedContext } from "../../store";
 
 
 interface facility{
@@ -19,14 +18,14 @@ interface facility{
 
 export const AddFacility:React.FC = ()=>{
     const [facilty,setFacility] = useState<facility|null>()
-    const {wallet} = useWalletContext();
+    const {wallet,updateNotification} = useCombinedContext();
     const contract = useContract(abi,networks)
-    const {updateNotification} = useNotificationContext()
     const [loading,setLoading] = useState(false)
     const navigate = useNavigate()
 
     const handleSubmit = (e)=>{
         e.preventDefault();
+        setLoading(true)
         const {name,type,street,pincode,state,district} = e.target;
         console.log(name.value)
         setFacility({
@@ -43,6 +42,7 @@ export const AddFacility:React.FC = ()=>{
     
     useEffect(()=>{
         async function createFacility(){
+            setLoading(true)
             if(facilty){
                 console.log(facilty)
                 const transaction = await contract?.methods.createFacility(
@@ -54,6 +54,7 @@ export const AddFacility:React.FC = ()=>{
                     updateNotification({type:"success",message:"Failed to create facility"})
                 else updateNotification({type:"success",message:"Facilty Created"})
             }
+            setLoading(false)
         }
         createFacility()
     // eslint-disable-next-line react-hooks/exhaustive-deps

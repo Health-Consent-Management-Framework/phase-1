@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react"
-import { useNotificationContext } from "../store/notificationProvider"
-import { useWalletContext } from "../store/walletProvider"
+import { useCombinedContext } from "../store"
 import { Contract } from "web3"
 
 export default function useContract(abi,networks){
     const [contract,setContract] = useState<Contract<typeof abi>>()
-    const {web3,networkId} = useWalletContext()
-    const {updateNotification} = useNotificationContext();
+    const {web3,networkId,updateNotification} = useCombinedContext()
     useEffect(()=>{
         const initContract = async () => {
             try {

@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { LabeledInput, Button } from "../ui"
-import { useWalletContext } from "../../store/walletProvider";
 import {storage} from '../../firebaseconfig'
-import { useNotificationContext } from "../../store/notificationProvider";
+import { useCombinedContext } from "../../store";
 import useContract from "../../hooks/useContract";
 import { abi as reportAbi, networks as reportNetworks} from '../../contracts/Report.json';
 import { Autocomplete, Chip, TextField } from "@mui/material";
@@ -21,8 +20,7 @@ interface Report{
 
 
 export const AddReport:React.FC = ()=>{
-    const {wallet} = useWalletContext();
-    const {updateNotification} = useNotificationContext()
+    const {updateNotification,wallet} = useCombinedContext()
     const reportContract = useContract(reportAbi,reportNetworks)
     const [loading,setLoading] = useState(false)
     const [tags,setTags] = useState<string[]>([])

@@ -1,7 +1,4 @@
-import React from 'react'
 import styled from 'styled-components'
-import ReportDetails from './ReportDetails'
-import FinalVerdict from '../FinalVerdict'
 import MoreVertIcon from '@mui/icons-material/MoreVert'; 
 
 const Container=styled.div`

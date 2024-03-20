@@ -64,8 +64,7 @@ const SideNav = () => {
   } 
 
   const handleLogout = ()=>{
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('role');
+    localStorage.clear()
     navigate(routeConfig.login)
   }
 

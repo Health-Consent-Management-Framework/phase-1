@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import {abi ,networks} from '../contracts/Facility.json'
-import { useWalletContext } from "../store/walletProvider";
-import { useNotificationContext } from "../store/notificationProvider";
 import useContract from "../hooks/useContract";
+import { useCombinedContext } from "../store";
 
 interface facility{
     facilityName:string,
@@ -13,9 +12,8 @@ interface facility{
 export const Facilities:React.FC = ()=>{
 
     const [facilties,setFacilites] = useState<facility[]>([])
-    const {wallet} = useWalletContext();
+    const {wallet,updateNotification} = useCombinedContext();
     const contract = useContract(abi,networks)
-    const {updateNotification} = useNotificationContext()
 
     useEffect(()=>{
         console.log("called")

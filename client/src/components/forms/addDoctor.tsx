@@ -1,10 +1,9 @@
 import {abi,networks} from '../../contracts/Doctor.json';
-import { useWalletContext } from '../../store/walletProvider';
-import { LabeledInput, Button, LabeledSelect } from '../ui';
+import { LabeledInput, Button } from '../ui';
 import useContract from '../../hooks/useContract';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useNotificationContext } from '../../store/notificationProvider';
+import { useCombinedContext } from '../../store';
 import { Autocomplete, Chip, TextField } from '@mui/material';
 
 export const AddDoctor:React.FC = () => {
@@ -13,7 +12,7 @@ export const AddDoctor:React.FC = () => {
   const navigate = useNavigate();
   const [loading,setLoading] = useState(false);
   const [degrees,setDegrees] = useState<string[]>([])
-  const {updateNotification} = useNotificationContext()
+  const {updateNotification} = useCombinedContext()
   const params = useParams()
 
   const handleSubmit = async (e) => {

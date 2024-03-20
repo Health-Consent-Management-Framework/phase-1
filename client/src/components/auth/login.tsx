@@ -1,17 +1,13 @@
 import { Button, LabeledSelect } from "../ui"
 import {Link, useNavigate } from "react-router-dom"
-import { useWalletContext } from "../../store/walletProvider"
-import { useUserContext } from "../../store/userProvider"
 import {abi as UserAbi,networks as UserNetwork} from '../../contracts/User.json'
-import { useNotificationContext } from "../../store/notificationProvider"
 import useContract from "../../hooks/useContract"
 import { routeConfig } from "../../router"
+import { useCombinedContext } from "../../store"
 
 export const Login:React.FC = ()=>{
     const navigate = useNavigate()
-    const {wallet} = useWalletContext()
-    const {updateRole} = useUserContext()
-    const {updateNotification} = useNotificationContext()
+    const {wallet,updateNotification,updateRole,updateWallet} = useCombinedContext()
     const contract = useContract(UserAbi,UserNetwork)
 
     const handleSubmit = async(e)=>{
@@ -26,10 +22,9 @@ export const Login:React.FC = ()=>{
                     updateNotification({type:"success",message:data[2]})
                     navigate('/')
                     updateRole(Number(data[3]))
-                    localStorage.setItem('walletId',walletId.value)
-                    localStorage.setItem('role',JSON.stringify(Number(data[3])))
+                    updateWallet(walletId.value)
                 }else{
-                    updateNotification({type:"error",message:data[1]||"Unable to create transaction"})
+                    updateNotification({type:"error",message:data[2]||"Unable to create transaction"})
                 }
             }
         }catch(err){

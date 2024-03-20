@@ -1,7 +1,7 @@
-import { useWalletContext } from '../store/walletProvider'
+import { useCombinedContext } from '../store'
 
 export const Home:React.FC = ()=>{
-    const {wallet,hasProvider,networkId} = useWalletContext()
+    const {wallet,hasProvider,networkId} = useCombinedContext()
 
     // async function decodeSignature(data) {
     //     try {

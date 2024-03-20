@@ -2,7 +2,6 @@ import { Outlet } from "react-router-dom"
 import styled from "styled-components";
 import ProfileDetails from "./ProfileDetails"
 import SideNav from "./ui/SideNav"
-import { useCombinedContext } from "../store/notificationProvider";
 
 const Container = styled.div`
   background-color: #faf7f5;

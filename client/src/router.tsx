@@ -6,7 +6,6 @@ import { AddDoctor } from "./components/forms/addDoctor";
 import PatientReports from "./components/report/ReportsSection";
 import { ListDoctors } from "./components/doctorsLister.tsx/listDoctors";
 import AddDetails from "./components/forms/addDetails";
-import PatientPage from "./components/BasePage";
 
 const router = createBrowserRouter([
  {
@@ -75,6 +74,10 @@ const router = createBrowserRouter([
                     element:<AddAdmin/>
                 }
             ]
+        },
+        {
+            path:'addDetails/:id',
+            element:<AddDetails/>
         },
         {
             path:'info',

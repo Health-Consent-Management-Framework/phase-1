@@ -1,10 +1,10 @@
-import { useEffect } from "react"
+import { useState } from "react"
 import { AddAdmin, AddDoctor, AddWorker } from "."
 import { AddPatient } from "./addPatient"
 
 const AddDetails:React.FC = ()=>{
-    const role = JSON.parse(localStorage.getItem('role'))
-    useEffect(()=>{},[role])
+    const [role,] = useState(JSON.parse(localStorage.getItem('role')))
+    // useEffect(()=>{},[role])
     return(
         <>
             {role==4&&<AddPatient/>}

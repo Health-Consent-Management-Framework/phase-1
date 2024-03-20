@@ -1,37 +1,31 @@
 import {abi,networks} from '../../contracts/Doctor.json';
-import { useWalletContext } from '../../store/walletProvider';
-import { LabeledInput, Button, LabeledSelect } from '../ui';
+import { Button, LabeledSelect } from '../ui';
 import useContract from '../../hooks/useContract';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useCombinedContext } from '../../store';
 
 export const AddDoctorPatient:React.FC = () => {
-  const {wallet} = useWalletContext();
+  const {wallet} = useCombinedContext();
   const contract = useContract(abi,networks)
   const navigate = useNavigate();
   const [loading,setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     try {
+      setLoading(true)
       e.preventDefault();
       if(contract) {
         const {doctorAddress,patientAddress} = e.target;
         const transaction = await contract?.methods.addPatientToDoctor(doctorAddress.value,patientAddress.value).send({ from: wallet.accounts[0],gas:"1000000" });
-        // navigate('/doctor', { state: { patientAddress: patientAddress.value, doctorAddress: doctorAddress.value } });
-        navigate('/doctor', { state: { doctorAddress: doctorAddress.value } });
+        console.log(transaction)
+        setLoading(false)
       }
     } catch (error) {
       console.error('Error submitting transaction', error);
     }
   };
 
-//   useEffect(()=>{
-//     async function getPatients(){
-//       const transaction = await contract?.methods.getAllPatient().call({from:wallet.accounts[0]})
-//       console.log(transaction)
-//     }
-//     getPatients()
-//   },[contract])
 
   return (
     <section className="m-auto flex items-center flex-col justify-center pt-10">

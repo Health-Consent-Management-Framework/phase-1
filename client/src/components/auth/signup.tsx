@@ -1,19 +1,17 @@
 import {  useState } from "react"
 import { Button, LabeledSelect } from "../ui"
 import { useNavigate } from "react-router-dom"
-import { useNotificationContext } from "../../store/notificationProvider"
-import { useWalletContext } from "../../store/walletProvider"
 import {abi as UserAbi,networks as UserNetwork} from '../../contracts/User.json'
 import useContract from "../../hooks/useContract"
 import { routeConfig } from "../../router"
 import roleEnum from "../utils/enums"
+import { useCombinedContext } from "../../store"
 
 
 export const Signup:React.FC = ()=>{
     const navigate = useNavigate()
     const [loading,setLoading] = useState(false)
-    const {wallet} = useWalletContext();
-    const {updateNotification} = useNotificationContext()
+    const {updateNotification,wallet} = useCombinedContext()
     const contract = useContract(UserAbi,UserNetwork) 
 
     const handleSubmit = async(e)=>{

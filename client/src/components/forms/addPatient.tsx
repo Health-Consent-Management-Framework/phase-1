@@ -1,24 +1,22 @@
 import {abi,networks} from '../../contracts/Patient.json';
-import { useWalletContext } from '../../store/walletProvider';
 import { LabeledInput, Button, LabeledSelect } from '../ui';
 import useContract from '../../hooks/useContract';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BeatLoader } from 'react-spinners';
-import { useNotificationContext } from '../../store/notificationProvider';
+import { useCombinedContext } from '../../store';
 
 export const AddPatient:React.FC = () => {
-  const {wallet} = useWalletContext();
-  const {updateNotification} = useNotificationContext()
+  const {wallet,updateNotification} = useCombinedContext();
   const contract = useContract(abi,networks)
-  const navigate = useNavigate();
   const params = useParams()
+  const navigate = useNavigate()
   const [loading,setLoading] = useState(false);
-  const [patients,setPatients] = useState([])
 
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
+      setLoading(true)
       // console.log(contract);
       if(contract) {
         const {fname,lname,DoB,phoneno,address,email,gender,height,weight} = e.target
@@ -29,20 +27,15 @@ export const AddPatient:React.FC = () => {
         const events = transaction.events
         if(Object.keys(events).includes('PatientCreated')){
           updateNotification({type:'success',message:"User created successfully"})
+          navigate('/')
         }
       }
     } catch (error) {
       console.error('Error submitting transaction', error);
     }
+    setLoading(false)
   };
 
-  useEffect(()=>{
-    async function getPatients(){
-      const transaction = await contract?.methods.getAllPatient().call({from:wallet.accounts[0]})
-      console.log(transaction)
-    }
-    getPatients()
-  },[contract])
 
   return (
     <section className="m-auto flex items-center flex-col justify-center pt-10">
@@ -74,9 +67,6 @@ export const AddPatient:React.FC = () => {
                 <Button className="bg-blue-500 text-white hover:border-blue-700 hover:bg-blue-300" loader={loading}>Add Patient</Button>
             </div>
     </form>
-    <div className='flex'>
-
-    </div>
 </section>
   );
 };
