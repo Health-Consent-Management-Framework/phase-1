@@ -43,7 +43,7 @@ const PatientReports:React.FC = ()=>{
 
   return(
     <div className="w-full relative pt-4 flex gap-4">
-        <p className="text-center w-full">These are your Reports</p>
+        {!reports.length&&<p className="text-center w-full">These are your Reports</p>}
         <div className="w-full flex absolute top-2 left-1/2 -translate-x-1/2 items-center justify-center">
           <BeatLoader loading={loading} size={10} color="blue"/>
         </div>
