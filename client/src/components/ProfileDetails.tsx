@@ -5,10 +5,12 @@ import MailIcon from "@mui/icons-material/Mail";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { useEffect } from "react";
 import { useCombinedContext } from "../store";
+import { Button } from "./ui";
 
 const Container = styled.div`
   display: flex;
   gap: 25px;
+  justify-content:space-evenly;
   margin: 30px 0px;
 `;
 const Avatar = styled.img`
@@ -108,11 +110,11 @@ const ProfileDetails = () => {
           </Text>
           <Text>
             <span style={{ color: "#aaaaaa", fontWeight: "600" }}>HEIGHT </span>{" "}
-            <span>{user.height||'180cm'}</span>
+            <span>{user.height?Number(user.height):'180cm'}</span>
           </Text>
           <Text>
             <span style={{ color: "#aaaaaa", fontWeight: "600" }}>WEIGHT </span>{" "}
-            <span>{user.weight||'82kg'}</span>
+            <span>{user.weight?Number(user.weight):'82kg'}</span>
           </Text>
           {/* <button className="hover:border-blue-700 hover:text-blue-700" onClick={handleClick}>Delete</button> */}
         </PatientDetails>

@@ -4,6 +4,7 @@ import {abi ,networks} from '../../contracts/Facility.json'
 import useContract from "../../hooks/useContract";
 import { useNavigate } from "react-router-dom";
 import { useCombinedContext } from "../../store";
+import { Dialog, DialogContent } from "@mui/material";
 
 
 interface facility{
@@ -16,7 +17,7 @@ interface facility{
 }
 
 
-export const AddFacility:React.FC = ()=>{
+export const AddFacility:React.FC<propTypes> = ()=>{
     const [facilty,setFacility] = useState<facility|null>()
     const {wallet,updateNotification} = useCombinedContext();
     const contract = useContract(abi,networks)
@@ -37,7 +38,6 @@ export const AddFacility:React.FC = ()=>{
             pincode:pincode.value
         })
     }
-    
 
     
     useEffect(()=>{
@@ -60,29 +60,34 @@ export const AddFacility:React.FC = ()=>{
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[facilty])
     
+    function handleClose(){
+        navigate('/home/reports')
+    }
 
-        return(
-            <section className="w-full h-full items-center justify-center flex mt-16">
-            <form onSubmit={handleSubmit} 
-            className="flex flex-col bg-blue-200 gap-2 border-2 border-blue-500 shadow-lg py-5 rounded-2xl px-4">
-                    <h1 className="text-4xl font-medium text-blue-800 pb-5 text-center">Add Facility</h1>
-                    <div className="flex items-center justify-center gap-5">
-                        <LabeledInput outlineColor="blue" textStyle="text-blue-700 capitalize" label="Facility Name" name="name"/>
-                        <LabeledSelect textStyle="text-blue-700 capitalize" label="Facility Type" name="type" options={[{value:0,name:"Local"},{value:1,name:"State"},{value:2,name:"National"}]}/>
-                    </div>
-                    <div className="flex items-center justify-center duration-500 flex-wrap md:flex-nowrap">
-                        <LabeledInput outlineColor="blue" textStyle="text-blue-700 capitalize" label="Street" name="street"/>
-                        <LabeledInput outlineColor="blue" textStyle="text-blue-700 capitalize" label="Pincode" name="pincode"/>
-                    </div>
-                    <div className="flex justify-evenly">
-                        <LabeledSelect textStyle="text-blue-700 capitalize" name="district" label="district" options={[{value:"District-1",name:"District-1"},{value:"District-2",name:"District-2"},{value:"District-3",name:"District-3"}]} />
-                        <LabeledSelect textStyle="text-blue-700 capitalize" label="state" name="state" options={[{value:"state-1",name:"state-1"},{value:"state-2",name:"state-2"},{value:"state-3",name:"state-3"}]}/>
-                    </div>
-                    <div className={`flex gap-3 justify-center pt-3`}>
-                        <Button className="bg-blue-500 hover:outline-blue-700 text-white hover:border-blue-700 hover:bg-blue-300" loader={loading}>Add Facility</Button>
-                        <Button className="hover:border-blue-700 hover:text-blue-700" onClick={()=>navigate('/login')}>Clear</Button>
-                    </div>
-            </form>
-        </section>
+    return(
+      
+                <section className="w-full h-full items-center justify-center flex mt-16">
+                <form onSubmit={handleSubmit} 
+                className="flex flex-col bg-blue-200 gap-2 border-2 border-blue-500 shadow-lg py-5 rounded-2xl px-4">
+                        <h1 className="text-4xl font-medium text-blue-800 pb-5 text-center">Add Facility</h1>
+                        <div className="flex items-center justify-center gap-5">
+                            <LabeledInput outlineColor="blue" textStyle="text-blue-700 capitalize" label="Facility Name" name="name"/>
+                            <LabeledSelect textStyle="text-blue-700 capitalize" label="Facility Type" name="type" options={[{value:0,name:"Local"},{value:1,name:"State"},{value:2,name:"National"}]}/>
+                        </div>
+                        <div className="flex items-center justify-center duration-500 flex-wrap md:flex-nowrap">
+                            <LabeledInput outlineColor="blue" textStyle="text-blue-700 capitalize" label="Street" name="street"/>
+                            <LabeledInput outlineColor="blue" textStyle="text-blue-700 capitalize" label="Pincode" name="pincode"/>
+                        </div>
+                        <div className="flex justify-evenly">
+                            <LabeledSelect textStyle="text-blue-700 capitalize" name="district" label="district" options={[{value:"District-1",name:"District-1"},{value:"District-2",name:"District-2"},{value:"District-3",name:"District-3"}]} />
+                            <LabeledSelect textStyle="text-blue-700 capitalize" label="state" name="state" options={[{value:"state-1",name:"state-1"},{value:"state-2",name:"state-2"},{value:"state-3",name:"state-3"}]}/>
+                        </div>
+                        <div className={`flex gap-3 justify-center pt-3`}>
+                            <Button className="bg-blue-500 hover:outline-blue-700 text-white hover:border-blue-700 hover:bg-blue-300" loader={loading}>Add Facility</Button>
+                            <Button className="hover:border-blue-700 hover:text-blue-700" onClick={handleClose}>Close</Button>
+                        </div>
+                </form>
+                </section>
+
     )
 }

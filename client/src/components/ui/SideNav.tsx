@@ -1,15 +1,24 @@
 // import { MdSpaceDashboard } from "react-icons/md";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import roleEnum from "../utils/enums";
 import { routeConfig } from "../../router";
+import InfoIcon from '@mui/icons-material/Info';
 import { SlMenu } from "react-icons/sl";
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
-import { Button } from ".";
+import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import { useNavigate, useSearchParams } from "react-router-dom";
+import {useCombinedContext} from "../../store"
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
-const SideNav = () => {
+interface propType{
+  requestVerification:()=>void,
+  deleteAccount:()=>void,
+}
+
+const SideNav:React.FC<propType> = (props) => {
   const [isOpen, setisOpen] = useState(false);
   const navigate = useNavigate();
+  const {user} = useCombinedContext();
   const [role,setRole] = useState(()=>localStorage.getItem('role'))
   const [,setQueryParams] = useSearchParams()
   const [profileExpand,setProfileExpand] = useState(false)
@@ -52,14 +61,14 @@ const SideNav = () => {
       {img:'/viewRequests.png',name:'View Requests',onClick:()=>navigate(routeConfig.viewRequests)},
     ],
     admin:[
-      {name:'My reports',onClick:()=>navigate(routeConfig.reports)},
-      {name:'Add Report',onClick:()=>navigate(routeConfig.reports)},
-      {name:'Add Facility',onClick:()=>navigate(routeConfig.viewRequests)},
-      {name:'Add Patient',onClick:()=>navigate(routeConfig.viewRequests)},
-      {name:'Add Worker',onClick:()=>navigate(routeConfig.viewRequests)},
-      {name:'Upload Request',onClick:()=>navigate(routeConfig.reports)},
-      {name:'Admin Request',onClick:()=>navigate(routeConfig.reports)},
-      {name:'Worker Requests',onClick:()=>navigate(routeConfig.doctors)},
+      {img:'/reportIcon.png',name:'Reports',onClick:()=>navigate(routeConfig.reports)},
+      {icon:<NoteAddIcon/>,name:'Add Report',onClick:()=>{
+        navigate('/home/reports')
+        setQueryParams({mode:'add',type:'report'})
+      }},
+      {img:'/facilityIcon.png', name:'View Facilites', onClick:()=>navigate(routeConfig.facility)},
+      {icon:<PersonAddAltIcon/>, name:'Add User',onClick:()=>navigate(routeConfig.addUser)},
+      {icon:<InfoIcon/>,name:'Requests',onClick:()=>navigate(routeConfig.viewRequests)},
     ],
   } 
 
@@ -72,11 +81,9 @@ const SideNav = () => {
   return (
     <>
       <div className="bg-slate-50 border-2 h-screen border-slate-400 pt-10 w-[300px] px-10 text-left  flex flex-col min-h-screen">
-        <div>
-          <Button className="text-xl font-medium bg-[#4864d6] text-white">
-            Start new Chat
-          </Button>
-        </div>
+        <span className="font-medium text-2xl text-[#4864d6]">
+            Report Dash
+        </span>
         <div className="py-5 grow">
           {
             role&&menuConfig[roleEnum[role]].map((ele)=>(
@@ -92,14 +99,20 @@ const SideNav = () => {
         </div>
         <div className="relative" id="profile-section">
             <article className="py-8">
-              <button onClick={handleLogout} className="flex gap-2 text-[18px]">
+              <button onClick={()=>{setProfileExpand(prev=>!prev)}} className="flex gap-2 text-[18px]">
                 <img src="/user.png" className="w-5 h-5"/>
-                Log Out
+                {user?user.fname+user.lname:""}
+                <span className={`duration-300 ${profileExpand?"rotate-180":""}`}>
+                  <KeyboardArrowDownIcon/>  
+                </span>
               </button>
             </article>
-            <article className={`bottom-10 bg-white ${profileExpand?'h-24':'h-0'} duration-300 overflow-hidden w-full left-10 absolute rounded-md shadow-md`}>
+            <article className={` bg-blue-200 ${profileExpand?'h-fit':'h-0'} duration-300 overflow-hidden w-full  z-10 bottom-20 absolute rounded-md shadow-md`}>
+              {!user.isVerified&&(
+                <button className="py-3 w-full duration-300 hover:text-white font-medium rounded-md mt-1 text-black text-center hover:bg-[#4864d697]">Request Verification</button>
+              )}
               <button className="py-3 w-full duration-300 hover:text-white font-medium rounded-md mt-1 text-black text-center hover:bg-[#4864d697]">Delete Account</button>
-              <button className="py-3 w-full duration-300 hover:text-white font-medium rounded-md mt-1 text-black text-center hover:bg-[#4864d697]">Log Out</button>
+              <button className="py-3 w-full duration-300 hover:text-white font-medium rounded-md mt-1 text-black text-center hover:bg-[#4864d697]" onClick={handleLogout}>Log Out</button>
             </article>
         </div>
       </div>

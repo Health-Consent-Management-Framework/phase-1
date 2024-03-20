@@ -40,13 +40,13 @@ export const Login:React.FC = ()=>{
                 <img src="/login.png" className="max-w-sm "/>
             </div>
             <div className="right-side w-full sm:w-1/2 flex flex-col justify-center items-center">
-                <form onSubmit={handleSubmit} className="flex flex-col items-center gap-2 border-[1px] border-red-500 sm:bg-transparent shadow-sm shadow-red-400 sm:shadow-none sm:border-0 py-5 rounded-2xl px-4">
+                <form onSubmit={handleSubmit} className="flex flex-col items-center gap-2 border-[1px] border-red-500 bg-red-300 sm:bg-transparent shadow-sm shadow-red-400 sm:shadow-none sm:border-0 py-5 rounded-2xl px-4">
                     <h1 className="text-4xl font-bold pb-5 text-center sm:text-left">Login</h1>
                     <LabeledSelect name="walletId" label="account" options={wallet.accounts.map(ele=>({value:ele,name:ele}))} />
                     <div className="pt-1">
                         <p className="text-center p-0 m-0 text-sm">Not a user?
                             <Link to={routeConfig.signup}>
-                                <span className="text-red-400 pl-1 hover:text-red-600 hover:underline duration-200 ">Signup</span>
+                                <span className="sm:text-red-400 text-white pl-1 hover:text-red-600 hover:underline duration-200 ">Signup</span>
                             </Link>
                         </p>
                     </div>

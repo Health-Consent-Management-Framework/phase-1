@@ -1,11 +1,14 @@
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import HomeMiddleware from "./components/middleware/home.middleware";
-import { AddAdmin, AddFacility, AddReport, AddWorker, DashBoard, Facilities, Home, Login, PageNotFound, Signup } from "./components";
+import { AddAdmin, AddFacility, AddReport, AddWorker, Facilities, Home, Login, PageNotFound, Signup } from "./components";
 import AuthMiddleware from "./components/middleware/auth.middlewate";
+import ChangeRole from './components/auth/changeRole'
 import { AddDoctor } from "./components/forms/addDoctor";
-import PatientReports from "./components/report/ReportsSection";
+import PatientReports from "./components/ReportsSection";
 import  ListDoctors  from "./components/listDoctors";
 import AddDetails from "./components/forms/addDetails";
+import AddUser from './components/forms/addUser'
+import RequestSection from "./components/allReportRequests";
 
 const router = createBrowserRouter([
  {
@@ -18,73 +21,79 @@ const router = createBrowserRouter([
     element:<HomeMiddleware/>,
     children:[
         {
-            path:'',
-            element:<DashBoard/>,
-            children:[
-                {
-                    path:'info',
-                    element:<Home/>
-                },
-                {
-                    path:'reports',
-                    element:<PatientReports/>
-                },
-                {
-                    path:'doctors',
-                    element:<ListDoctors/>
-                },
-                {
-                    path:'report/:id',
-                    element:<h1>Complete report info here</h1>
-                },
-                {
-                    path:'profile',
-                    element:<h1>Profile page here</h1>
-                },
-                {
-                    path:'facilites',
-                    element:<Facilities/>
-                },
-                {
-                    path:'facilites/add',
-                    element:<AddFacility/>,
-                },
-                {
-                    path:'facilites/edit',
-                    element:<AddFacility/>
-                },
-                {
-                    path:'report/edit',
-                    element:<AddReport/>
-                },
-                {
-                    path:'report/add',
-                    element:<AddReport/>
-                },
-                {
-                    path:'doctor/add',
-                    element:<AddDoctor/>
-                },
-                {
-                    path:'worker/add',
-                    element:<AddWorker/>
-                },
-                {
-                    path:'admin/add',
-                    element:<AddAdmin/>
-                }
-            ]
+            path:'info',
+            element:<Home/>
         },
         {
-            path:'addDetails/:id',
-            element:<AddDetails/>
+            path:'reports',
+            element:<PatientReports/>
+        },
+        {
+            path:'doctors',
+            element:<ListDoctors/>
+        },
+        {
+            path:'addUser',
+            element:<AddUser/>
+        },
+        {
+            path:'facilites',
+            element:<Facilities/>
+        },
+        {
+            path:'requests/report/:id',
+            element:<RequestSection/>
+        },
+        {
+            path:'report/:id',
+            element:<h1>Complete report info here</h1>
+        },
+        {
+            path:'profile',
+            element:<h1>Profile page here</h1>
+        },
+        {
+            path:'doctor/add',
+            element:<AddDoctor/>
+        },
+        {
+            path:'worker/add',
+            element:<AddWorker/>
+        },
+        {
+            path:'admin/add',
+            element:<AddAdmin/>
+        },
+        {
+            path:'requests',
+            element:<RequestSection/>
         },
         {
             path:'info',
             element:<Home/>
         },
+        {
+            path:'facilites/add',
+            element:<AddFacility/>,
+        },
+        {
+            path:'report/edit',
+            element:<AddReport/>
+        },
+        {
+            path:'report/add',
+            element:<AddReport/>
+        },
+        {
+            path:'changeRole',
+            element:<ChangeRole/>
+        }
     ],
  },
+ {
+    path:'addDetails/:id',
+    element:<AddDetails/>
+},
  {
     path:'/auth',
     element:<AuthMiddleware/>,
@@ -103,18 +112,16 @@ const router = createBrowserRouter([
 export const routeConfig = {
     login:'/auth',
     signup:'/auth/signup',
-    resetPassword:(token:string)=>`/auth/${token}`,
-    forgotPassword:(token:string)=>`/auth/${token}`,
+    changeRole:'/auth/changeRole',
     dashboard:'/home',
     reports:'/home/reports',
     facility:'/home/facilites',
     doctors:'/home/doctors',
-    report:(id:string|number)=>`/home/report/${id}`,
     addAdmin:'/admin/add',
-    addWorker:'admin/worker',
-    addReport:'/reports/add',
+    addWorker:'/admin/worker',
+    addUser:'/home/addUser',
     viewRequests:'/home/requests',
-    addFacility:(id:string|number)=>`/home/facilites/${id}`,
+    report:(id:string|number)=>`/home/report/${id}`,
     editFacility:(id:string|number)=>`home/facilites/${id}`,
     editReport:(id:string|number)=>`/reports/edit/${id}`,
     deleteReport:(id:string|number)=>`/reports/delete/${id}`,

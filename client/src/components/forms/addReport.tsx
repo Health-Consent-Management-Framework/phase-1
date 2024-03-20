@@ -20,7 +20,7 @@ interface Report{
 
 
 export const AddReport:React.FC = ()=>{
-    const {updateNotification,wallet} = useCombinedContext()
+    const {updateNotification,selectedWallet} = useCombinedContext()
     const reportContract = useContract(reportAbi,reportNetworks)
     const [loading,setLoading] = useState(false)
     const [tags,setTags] = useState<string[]>([])
@@ -37,7 +37,6 @@ export const AddReport:React.FC = ()=>{
         }
       };
     const handleSubmit = async(e)=>{
-        console.log(wallet.accounts[0])
         try{
             setLoading(true)
             e.preventDefault();
@@ -50,7 +49,7 @@ export const AddReport:React.FC = ()=>{
                 problem.value,
                 downloadUrl,
                 tags
-            ).send({from:wallet.accounts[0]})
+            ).send({from:selectedWallet})
             if(Number(data?.status)){
                 updateNotification({type:'success',message:"Created report successfully"})
             }
@@ -65,7 +64,7 @@ export const AddReport:React.FC = ()=>{
     return(
             <form onSubmit={handleSubmit} 
                 className="flex flex-col bg-blue-200 gap-2 border-2 border-blue-500 shadow-lg py-5 rounded-2xl px-4">
-                    <div className="items-center w-full justify-center">
+                    <div className="items-center flex w-full justify-center">
                         <BeatLoader loading={loading} size={10}/>
                     </div>
                     <h1 className="text-4xl font-medium text-blue-800 pb-5 text-center">Add Report</h1>

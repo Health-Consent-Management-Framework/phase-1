@@ -1,12 +1,12 @@
-import useContract from "../../hooks/useContract";
-import {abi as ReportAbi,networks as ReportNetwork} from '../../contracts/Report.json'
-import PatientReport from "./ReportCardElement";
+import useContract from "../hooks/useContract";
+import {abi as ReportAbi,networks as ReportNetwork} from '../contracts/Report.json'
+import PatientReport from "./ui/ReportCardElement";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Dialog, DialogContent } from "@mui/material";
-import { AddReport } from "../forms/addReport";
+import { AddReport } from "./forms/addReport";
 import { BeatLoader } from 'react-spinners'
-import { useCombinedContext } from "../../store";
+import { useCombinedContext } from "../store";
 
 const PatientReports:React.FC = ()=>{
   const reportContract = useContract(ReportAbi,ReportNetwork);
@@ -16,10 +16,13 @@ const PatientReports:React.FC = ()=>{
   const [loading,setLoading] = useState(false)
   const [reportExpand,setReportExpand] = useState(-1); 
 
+  const navigate = useNavigate();
+  
   function updateReportOpen(index:number){
     if(index==reportExpand) setReportExpand(-1)
     else setReportExpand(index)
   }
+
 
   function handleReportPopUpClose(){
     setSearchPrams()
@@ -28,7 +31,8 @@ const PatientReports:React.FC = ()=>{
   useEffect(()=>{
     async function fetchReports(){
       setLoading(true)
-      const data = await reportContract?.methods.getPatientReports().call({from:selectedWallet})
+      const data = await reportContract?.methods.getPatientReports(selectedWallet).call({from:selectedWallet})
+      console.log(data)
       if(data){
         setReports(data)
       }else {
@@ -37,9 +41,20 @@ const PatientReports:React.FC = ()=>{
       setLoading(false)
     }
     if(reportContract&&selectedWallet) {
-     fetchReports()
+      fetchReports()
     }
-  },[reportContract,selectedWallet])
+  },[reportContract, selectedWallet, updateNotification])
+
+  async function requestVerification(reportId){
+    const data = await reportContract?.methods.createVerificationRequest(reportId).send({from:selectedWallet});
+    console.log(data)
+  }
+
+  async function viewReportRequests(reportId){
+    navigate(`/home/requests/report/${reportId}`)
+  }
+
+  function deleteReport(){}
 
   return(
     <div className="w-full relative pt-4 flex gap-4">
@@ -48,7 +63,7 @@ const PatientReports:React.FC = ()=>{
           <BeatLoader loading={loading} size={10} color="blue"/>
         </div>
         {reports.map((ele,index)=>(
-            <PatientReport verified={ele.isVerified} link={ele.attachements[0]} tags={ele.tags} key={index} index={index} updateExpand={updateReportOpen} expand={reportExpand==index} disease={ele.problem} date={ele.date} />
+            <PatientReport viewRequests={viewReportRequests} reportId={ele.reportId} requestVerification={requestVerification} verified={ele.isVerified} link={ele.attachements[0]} tags={ele.tags} key={index} index={index} updateExpand={updateReportOpen} expand={reportExpand==index} disease={ele.problem} date={ele.date} />
           ))}
         <Dialog
             PaperProps={{

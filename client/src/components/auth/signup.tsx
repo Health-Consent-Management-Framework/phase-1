@@ -24,6 +24,7 @@ export const Signup:React.FC = ()=>{
             console.log(transaction)
             if(Number(transaction?.status)){
                 const msg = `User with role ${roleEnum[type.value]} created`;
+                navigate('/')
                 updateNotification({type:"success",message:msg})
             }
         }catch(err){
@@ -31,6 +32,7 @@ export const Signup:React.FC = ()=>{
             updateNotification({type:"error",message:"User creation failed"})
         }
     }
+    
     return(
         <section className="w-screen min-h-screen h-dvh flex items-center justify-center">
             <div className="left-side hidden sm:flex sm:w-1/2 bg-red-300 items-center justify-center h-full">

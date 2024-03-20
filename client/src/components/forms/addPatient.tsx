@@ -1,7 +1,7 @@
 import {abi,networks} from '../../contracts/Patient.json';
 import { LabeledInput, Button, LabeledSelect } from '../ui';
 import useContract from '../../hooks/useContract';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BeatLoader } from 'react-spinners';
 import { useCombinedContext } from '../../store';
@@ -13,16 +13,26 @@ export const AddPatient:React.FC = () => {
   const navigate = useNavigate()
   const [loading,setLoading] = useState(false);
 
+  useEffect(()=>{
+    async function fetchPatient() {
+      const data = await contract?.methods.getPatient(params.id).call()
+      console.log(data)
+      if(data&&data.walletAddress!='0x0000000000000000000000000000000000000000'){
+        navigate('/home')
+      }
+    }
+    if(contract) fetchPatient()
+  },[contract])
+
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
       setLoading(true)
-      // console.log(contract);
       if(contract) {
         const {fname,lname,DoB,phoneno,address,email,gender,height,weight} = e.target
         const [day,month,year] = DoB.value.split('-').map(ele=>ele)
         console.log(fname.value,lname.value,email.value,phoneno.value,day,month,year,address.value,params.id)
-        const transaction = await contract?.methods.createPatient(fname.value,lname.value,email.value,phoneno.value,day,month,year,address.value,params.id).send({ from: wallet.accounts[1],gas:"1000000" });
+        const transaction = await contract?.methods.createPatient(fname.value,lname.value,email.value,phoneno.value,gender.value,height.value,weight.value,day,month,year,address.value,params.id).send({ from: wallet.accounts[1],gas:"1000000" });
         console.log(transaction)
         const events = transaction.events
         if(Object.keys(events).includes('PatientCreated')){
@@ -54,7 +64,7 @@ export const AddPatient:React.FC = () => {
                 <LabeledInput textStyle="text-blue-700 capitalize" label="Email" name="email"/>
             
             <div className='flex gap-5'>
-              <LabeledSelect textStyle='text-blue-700 capitalize' name="Gender" label="gender" options={[{value:'M',name:'Male'},{value:'F',name:'female'}]} />
+              <LabeledSelect textStyle='text-blue-700 capitalize' name="gender" label="gender" options={[{value:'M',name:'Male'},{value:'F',name:'female'}]} />
               <LabeledInput textStyle='text-blue-700 capitalize' label='Height' name='height'/>
               <LabeledInput textStyle='text-blue-700 capitalize' label='Weight' name='weight'/>
             </div>

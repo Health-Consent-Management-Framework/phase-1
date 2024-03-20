@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import {abi ,networks} from '../contracts/Facility.json'
 import useContract from "../hooks/useContract";
 import { useCombinedContext } from "../store";
+import { Button } from "./ui";
+import { AddFacility } from "./forms/addFacility";
+import { Dialog, DialogContent } from "@mui/material";
 
 interface facility{
     facilityName:string,
@@ -12,8 +15,9 @@ interface facility{
 export const Facilities:React.FC = ()=>{
 
     const [facilties,setFacilites] = useState<facility[]>([])
-    const {wallet,updateNotification} = useCombinedContext();
+    const {wallet,updateNotification,role} = useCombinedContext();
     const contract = useContract(abi,networks)
+    const [openPopup,setOpenPopUp] = useState(false)
 
     useEffect(()=>{
         console.log("called")
@@ -43,9 +47,15 @@ export const Facilities:React.FC = ()=>{
         }
     }
 
+    function handleClose(){
+        setOpenPopUp(false);
+    }
 
     return(
-        <section>
+        <section className="w-full">
+            {role==1&&(<div className="w-full flex justify-end px-10 py-2">
+                <Button onClick={()=>{setOpenPopUp(true)}} buttonType="dark" type="button">Add Facility</Button>
+            </div>)}
             <div className="p-3" id="facilities-wrapper">
                 <p className="text-center pb-4">These are facilities</p>
                 <div className="flex justify-evenly">
@@ -63,7 +73,20 @@ export const Facilities:React.FC = ()=>{
                     </article>
                 ))}
                 </div>
+                <></>
             </div>
+            <Dialog
+                PaperProps={{
+                    style: {
+                    backgroundColor: 'transparent',
+                    boxShadow: 'none',
+                    },
+                }}
+                open={openPopup} onClose={handleClose}>
+                <DialogContent>   
+                    <AddFacility/>
+                </DialogContent>
+                </Dialog>
         </section>
     )
 }

@@ -102,8 +102,6 @@ export const AddDoctor:React.FC = () => {
                             }} className={`border-[1px] w-full p-1 rounded-md border-black outline-none focus-within:outline-1 duration-200`} {...params} />
                         </div>
                         }/>
-                        
-                        {/* <LabeledInput /> */}
                     </div>
             <div className={`flex gap-3 justify-center pt-3`}>
                 <Button className="bg-blue-500 text-white hover:border-blue-700 hover:bg-blue-300" loader={loading}>Add Doctor</Button>
