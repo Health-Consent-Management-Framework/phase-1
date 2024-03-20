@@ -28,6 +28,9 @@ export const AddPatient:React.FC = () => {
         if(Object.keys(events).includes('PatientCreated')){
           updateNotification({type:'success',message:"User created successfully"})
           navigate('/')
+        }else if(Object.keys(events).includes('PatientFound')){
+          updateNotification({type:'success',message:"Patient already has found"})
+          navigate('/')
         }
       }
     } catch (error) {

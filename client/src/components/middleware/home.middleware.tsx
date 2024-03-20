@@ -10,47 +10,47 @@ import { useCombinedContext } from "../../store";
 
 const HomeMiddleware = ()=>{
     const navigate = useNavigate()
-    const {updateUser,role,selectedWallet} = useCombinedContext()
-    const [isCompleted, setIsCompleted] = useState(false);
-    const [loading,setLoading] = useState(true)
+    const {updateUser,role,selectedWallet,user} = useCombinedContext()
     const patientContract = useContract(PatientAbi,PatientNetwork)
     const workerContract = useContract(WorkerAbi,WorkerNetwork)
     const adminContract = useContract(AdminAbi,AdminNetwork)
     const doctorContract = useContract(DoctorAbi,DoctorNetwork)
 
-    function handleNavigate(data,wallet){
-        if(!data||data&&!data.walletAddress||data&&data.walletAddress.toLowerCase() === '0x0000000000000000000000000000000000000000'){
+    function handleNavigate(wallet){
+        if(user.walletAddress === '0x0000000000000000000000000000000000000000'){
             navigate(`/home/addDetails/${wallet}`)
-        }else{
-            setIsCompleted(true)
-            updateUser(data)
         }
     }
 
+    useEffect(()=>{
+        if(user){
+            handleNavigate(selectedWallet)
+        }
+    },[user])
 
-    useEffect(() => {
-        
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [role,patientContract,adminContract,workerContract,doctorContract]);
+    async function fetchUserDetails() {
+        if (role == 4) {
+            const Patientdata = await patientContract?.methods.getPatient(selectedWallet).call();
+            console.log(Patientdata)
+            updateUser(Patientdata); 
+        } else if (role == 3) {
+            const doctorData = await doctorContract?.methods.getDoctors(selectedWallet).call();
+            updateUser(doctorData); 
+        } else if (role == 2) {
+           const workerData = await workerContract?.methods.getWorker(selectedWallet).call();
+           updateUser(workerData); 
+        } else if (role == 1) {
+            const adminData = await adminContract?.methods.getSelfDetails(selectedWallet).call();
+            updateUser(adminData); 
+        }
+    }
 
+    useEffect(()=>{
+        if(patientContract&&doctorContract&&adminContract&&workerContract) fetchUserDetails()
+    },[patientContract,doctorContract,adminContract,workerContract])
     
     useEffect(()=>{
-        async function fetchUserDetails() {
-            let data;
-            if (role == 4) {
-                data = await patientContract?.methods.getPatient(selectedWallet).call();
-            } else if (role == 3) {
-                data = await doctorContract?.methods.getDoctors(selectedWallet).call();
-            } else if (role == 2) {
-                data = await workerContract?.methods.getSelfDetails(selectedWallet).call();
-            } else if (role == 1) {
-                data = await adminContract?.methods.getSelfDetails(selectedWallet).call();
-            }
-            handleNavigate(data,selectedWallet);
-        }
-        if (!localStorage.getItem('role') || !localStorage.getItem('walletId')) {
-            navigate('/auth');
-        }else fetchUserDetails()
+        if (!localStorage.getItem('role') || !localStorage.getItem('walletId')) navigate('/auth');
     },[])
 
     return(

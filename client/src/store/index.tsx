@@ -64,12 +64,20 @@ export const CombinedContextProvider:React.FC<{children:React.ReactNode}> = ({ch
     }
 
     function updateUser(e){
+        const stringifiedUser = JSON.stringify(e,(key, value) => {
+            if (typeof value === 'bigint') {
+              return value.toString();
+            }
+            return value;
+          })
+        localStorage.setItem('user',stringifiedUser)
         setUser(e)
     }
 
     function updateRole(e:number){
         setRole(role)
-        localStorage.setItem("role",JSON.stringify(e))
+        console.log(e)
+        localStorage.setItem("role",e)
     }
 
     function updateWallet(e){

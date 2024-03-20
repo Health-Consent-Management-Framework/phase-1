@@ -32,7 +32,7 @@ const PatientReports:React.FC = ()=>{
       if(data){
         setReports(data)
       }else {
-        updateNotification({type:"succes",message:"Failed to fetch reports"})
+        updateNotification({type:"success",message:"Failed to fetch reports"})
       }
       setLoading(false)
     }
