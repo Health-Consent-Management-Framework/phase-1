@@ -1,10 +1,8 @@
-import useContract from "../../hooks/useContract"
 import { useCombinedContext } from "../../store"
 import { Button } from "../ui"
 
 const ProfileActions:React.FC = ()=>{
-    const {role,user} = useCombinedContext()
-    const adminContract = useContract(AdminAbi,AdminNetwork)
+    const {user} = useCombinedContext()
     // function createVerficationRequest(){
     //     if(role==2){
 

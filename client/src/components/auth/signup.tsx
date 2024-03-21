@@ -1,5 +1,5 @@
 import {  useState } from "react"
-import { Button, LabeledSelect } from "../ui"
+import { Button, LabeledInput, LabeledSelect } from "../ui"
 import { useNavigate } from "react-router-dom"
 import {abi as UserAbi,networks as UserNetwork} from '../../contracts/User.json'
 import useContract from "../../hooks/useContract"
@@ -11,6 +11,7 @@ import { useCombinedContext } from "../../store"
 export const Signup:React.FC = ()=>{
     const navigate = useNavigate()
     const [loading,setLoading] = useState(false)
+    const [type,setType] = useState()
     const {updateNotification,wallet} = useCombinedContext()
     const contract = useContract(UserAbi,UserNetwork) 
 
@@ -18,20 +19,41 @@ export const Signup:React.FC = ()=>{
         try{
             e.preventDefault();
             setLoading(true);
-            const {walletId,type} = e.target
-            const transaction = await contract?.methods.signup(type.value).send({from:walletId.value});
-            setLoading(false)
-            console.log(transaction)
-            if(Number(transaction?.status)){
-                const msg = `User with role ${roleEnum[type.value]} created`;
-                navigate('/')
-                updateNotification({type:"success",message:msg})
+            const {walletId,type,AdminKey} = e.target
+            const key = AdminKey?.value||''
+            if(key){
+                console.log(key)
+                const transaction = await contract?.methods.signUpWithKey(key).send({from:walletId.value});
+                // console.log(transaction)
+                const events = transaction?.events;
+                console.log(transaction)
+                if(Object.keys(events).includes('UserCreated')){
+                    const msg = `User with role ${roleEnum[type.value]} created`;
+                    navigate('/')
+                    updateNotification({type:"success",message:msg})
+                }else{
+                    updateNotification({type:"error",message:"failed to create the user"})
+                }
+            }else{
+                const transaction = await contract?.methods.signup(type.value).send({from:walletId.value});
+                const events = transaction?.events;
+                console.log(transaction)
+                if(Object.keys(events).includes('UserCreated')){
+                    const msg = `User with role ${roleEnum[type.value]} created`;
+                    navigate('/')
+                    updateNotification({type:"success",message:msg})
+                }else{
+                    updateNotification({type:"error",message:"failed to create the user"})
+                }    
             }
+
+            setLoading(false)
         }catch(err){
             console.error(err)
             updateNotification({type:"error",message:"User creation failed"})
         }
     }
+
     
     return(
         <section className="w-screen min-h-screen h-dvh flex items-center justify-center">
@@ -45,7 +67,12 @@ export const Signup:React.FC = ()=>{
                         <LabeledSelect name="walletId" label="account" options={wallet.accounts.map(ele=>({value:ele,name:ele}))} />
                     </div>
                     <div className="flex items-center justify-center duration-500 flex-wrap md:flex-nowrap">
-                        <LabeledSelect label="user type" name="type" options={[{name:"patient",value:4},{name:"worker",value:2},{name:"admin",value:1},{name:"doctor",value:3}]}/>
+                        {type==1&&(
+                            <LabeledInput label="Admin Key"  name="AdminKey"/>
+                        )}
+                    </div>
+                    <div className="flex items-center justify-center duration-500 flex-wrap md:flex-nowrap">
+                        <LabeledSelect label="user type" name="type" onChange={(e)=>{setType(e.target.value)}} options={[{name:"patient",value:4},{name:"worker",value:2},{name:"admin",value:1},{name:"doctor",value:3}]}/>
                     </div>
                     <div className={`flex gap-3 justify-center pt-3`}>
                         <Button type={'submit'} buttonType="primary" loader={loading}>Signup</Button>

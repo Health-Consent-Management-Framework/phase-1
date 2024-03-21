@@ -7,7 +7,7 @@ import { BeatLoader } from 'react-spinners';
 import { useCombinedContext } from '../../store';
 
 export const AddPatient:React.FC = () => {
-  const {wallet,updateNotification} = useCombinedContext();
+  const {selectedWallet,updateNotification} = useCombinedContext();
   const contract = useContract(abi,networks)
   const params = useParams()
   const navigate = useNavigate()
@@ -22,7 +22,8 @@ export const AddPatient:React.FC = () => {
       }
     }
     if(contract) fetchPatient()
-  },[contract])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[contract,params])
 
   const handleSubmit = async (e) => {
     try {
@@ -30,9 +31,9 @@ export const AddPatient:React.FC = () => {
       setLoading(true)
       if(contract) {
         const {fname,lname,DoB,phoneno,address,email,gender,height,weight} = e.target
-        const [day,month,year] = DoB.value.split('-').map(ele=>ele)
-        console.log(fname.value,lname.value,email.value,phoneno.value,day,month,year,address.value,params.id)
-        const transaction = await contract?.methods.createPatient(fname.value,lname.value,email.value,phoneno.value,gender.value,height.value,weight.value,day,month,year,address.value,params.id).send({ from: wallet.accounts[1],gas:"1000000" });
+        const date = new Date(DoB.value).getTime()
+        console.log(fname.value,lname.value,email.value,phoneno.value,date,address.value,params.id)
+        const transaction = await contract?.methods.createPatient(fname.value,lname.value,email.value,phoneno.value,gender.value,height.value,weight.value,day,month,year,selectedWallet,params.id).send({ from: selectedWallet,gas:"1000000" });
         console.log(transaction)
         const events = transaction.events
         if(Object.keys(events).includes('PatientCreated')){

@@ -38,7 +38,10 @@ export const AddWorker:React.FC = ()=>{
                     .send({ from: wallet.accounts[1],gas:"1000000" });
             console.log(transaction)
             const events = transaction.events
-            if(events&&Object.keys(events).includes('PatientCreated')){
+            if(events&&Object.keys(events).includes('WorkerCreated')){
+              updateNotification({type:'success',message:"User created successfully"})
+              navigate('/')
+            }else if(events&&Object.keys(events).includes('WorkerFound')){
               updateNotification({type:'success',message:"User created successfully"})
               navigate('/')
             }

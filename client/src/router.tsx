@@ -8,7 +8,9 @@ import PatientReports from "./components/ReportsSection";
 import  ListDoctors  from "./components/listDoctors";
 import AddDetails from "./components/forms/addDetails";
 import AddUser from './components/forms/addUser'
-import RequestSection from "./components/allReportRequests";
+import RequestSection from "./components/requests/reportRequests";
+import ReportRequest from "./components/requests/reportRequests";
+import RequestsMiddleware from "./components/middleware/request.middleware";
 
 const router = createBrowserRouter([
  {
@@ -41,8 +43,18 @@ const router = createBrowserRouter([
             element:<Facilities/>
         },
         {
-            path:'requests/report/:id',
-            element:<RequestSection/>
+            path:"requests",
+            element:<RequestsMiddleware/>,
+            children:[
+                {
+                    path:'report',
+                    element:<ReportRequest/>
+                },
+                {
+                    path:'verify',
+                    element:<ReportRequest/>
+                },
+            ]
         },
         {
             path:'report/:id',

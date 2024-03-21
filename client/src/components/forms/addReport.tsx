@@ -8,15 +8,15 @@ import { Autocomplete, Chip, TextField } from "@mui/material";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { BeatLoader } from "react-spinners";
 
-interface Report{
-    diagnoisedDoctor?:string,
-    doctorId:string[],
-    attachements?:string[],
-    diagnosis:string[],
-    tags:string[]
-    createdAt:Date,
-    updatedAt:Date
-}
+// interface Report{
+//     diagnoisedDoctor?:string,
+//     doctorId:string[],
+//     attachements?:string[],
+//     diagnosis:string[],
+//     tags:string[]
+//     createdAt:Date,
+//     updatedAt:Date
+// }
 
 
 export const AddReport:React.FC = ()=>{
@@ -106,7 +106,7 @@ export const AddReport:React.FC = ()=>{
                     </div>
                     <div className={`flex gap-3 justify-center pt-3`}>
                         <Button className="bg-blue-500 text-white hover:border-blue-700 hover:bg-blue-300" loader={loading}>Add Report</Button>
-                        <Button className="hover:border-blue-700 hover:text-blue-700" type="'reset">Clear</Button>
+                        <Button className="hover:border-blue-700 hover:text-blue-700" type="reset">Clear</Button>
                     </div>
             </form>
     )

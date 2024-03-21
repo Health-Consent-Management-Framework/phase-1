@@ -9,7 +9,7 @@ import {abi as PatientAbi,networks as PatientNetwork} from '../../contracts/Pati
 import {abi as DoctorAbi,networks as DoctorNetwork} from '../../contracts/Doctor.json'
 import {abi as WorkerAbi,networks as WorkerNetwork} from '../../contracts/Worker.json'
 import {abi as AdminAbi,networks as AdminNetwork} from '../../contracts/Admin.json'
-import {abi as UserAbi,networks as UserNetwork} from '../../contracts/User.json'
+// import {abi as UserAbi,networks as UserNetwork} from '../../contracts/User.json'
 
 import useContract from "../../hooks/useContract";
 import { useCombinedContext } from "../../store";
@@ -35,12 +35,12 @@ const Hr = styled.hr`
 
 const HomeMiddleware = ()=>{
     const navigate = useNavigate()
-    const {updateUser,role,selectedWallet,user} = useCombinedContext()
+    const {updateUser,role,selectedWallet} = useCombinedContext()
     const patientContract = useContract(PatientAbi,PatientNetwork)
     const workerContract = useContract(WorkerAbi,WorkerNetwork)
     const adminContract = useContract(AdminAbi,AdminNetwork)
     const doctorContract = useContract(DoctorAbi,DoctorNetwork)
-    const userContract = useContract(UserAbi,UserNetwork)
+    // const userContract = useContract(UserAbi,UserNetwork)
 
     function handleNavigate(data){
         if(data.walletAddress === '0x0000000000000000000000000000000000000000'){
@@ -69,21 +69,41 @@ const HomeMiddleware = ()=>{
 
     useEffect(()=>{
         if(patientContract&&doctorContract&&adminContract&&workerContract&&selectedWallet) fetchUserDetails()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     },[patientContract,doctorContract,adminContract,workerContract,selectedWallet])
     
     useEffect(()=>{
         if (!localStorage.getItem('role') || !localStorage.getItem('walletId')) navigate('/auth');
     },[])
 
-    function createVerificationMessage(){}
 
-    function DeleteMessage(){}
 
-    function changeRole(){}
+    function requestVerification(){
+        const selectedWallet = localStorage.getItem('walletId')
+        const role = localStorage.getItem('role')
+        const createdAt = new Date().getTime()
+        console.log(role)
+        if(selectedWallet){
+            if(role=='3'){
+                const doctorData = doctorContract?.methods.createVerificationRequest(createdAt).send({from:selectedWallet});
+                console.log(doctorData)
+            }else if(role=='2'){
+                const workerData = workerContract?.methods.createRequest(createdAt).send({from:selectedWallet})
+                console.log(workerData)
+            }else if(role=='1'){
+                const adminData = adminContract?.methods.createVerificationRequest(createdAt).send({from:selectedWallet})
+                console.log(adminData)
+            }
+        }
+    }
+
+    function deleteAccount(){
+
+    }
 
     return(
         <section className="h-screen flex">
-            <SideNav requestVerification={()=>{}} deleteAccount={()=>{}}/>
+            <SideNav requestVerification={requestVerification} deleteAccount={deleteAccount}/>
             <Container>
                 <ProfileDetails />
                 <Hr />

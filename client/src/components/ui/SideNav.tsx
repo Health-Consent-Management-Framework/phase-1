@@ -58,7 +58,8 @@ const SideNav:React.FC<propType> = (props) => {
       {icon:<NoteAddIcon/>,name:'Upload Request',onClick:()=>{navigate(routeConfig.reports);setQueryParams({type:'report',mode:'patient'})}},
       {img:'/doctorIcon.png',name:'View Doctors',onClick:()=>navigate(routeConfig.doctors)},
       {img:'/facilityIcon.png',name:'View Facilites', onClick:()=>navigate(routeConfig.facility)},
-      {img:'/viewRequests.png',name:'View Requests',onClick:()=>navigate(routeConfig.viewRequests)},
+      {img:'/me.png',name:'My Requests',onClick:()=>navigate(routeConfig.viewRequests)},
+      {img:'/viewRequests.png',name:'Others Requests',onClick:()=>navigate(routeConfig.viewRequests)},
     ],
     admin:[
       {img:'/reportIcon.png',name:'Reports',onClick:()=>navigate(routeConfig.reports)},
@@ -109,9 +110,9 @@ const SideNav:React.FC<propType> = (props) => {
             </article>
             <article className={` bg-blue-200 ${profileExpand?'h-fit':'h-0'} duration-300 overflow-hidden w-full  z-10 bottom-20 absolute rounded-md shadow-md`}>
               {!user.isVerified&&(
-                <button className="py-3 w-full duration-300 hover:text-white font-medium rounded-md mt-1 text-black text-center hover:bg-[#4864d697]">Request Verification</button>
+                <button onClick={props.requestVerification} className="py-3 w-full duration-300 hover:text-white font-medium rounded-md mt-1 text-black text-center hover:bg-[#4864d697]">Request Verification</button>
               )}
-              <button className="py-3 w-full duration-300 hover:text-white font-medium rounded-md mt-1 text-black text-center hover:bg-[#4864d697]">Delete Account</button>
+              <button onClick={props.deleteAccount} className="py-3 w-full duration-300 hover:text-white font-medium rounded-md mt-1 text-black text-center hover:bg-[#4864d697]">Delete Account</button>
               <button className="py-3 w-full duration-300 hover:text-white font-medium rounded-md mt-1 text-black text-center hover:bg-[#4864d697]" onClick={handleLogout}>Log Out</button>
             </article>
         </div>

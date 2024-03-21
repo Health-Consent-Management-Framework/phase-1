@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom"
 import { LabeledInput, LabeledSelect,Button } from "../ui"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {abi as workerABI,networks as workerNetwork} from '../../contracts/Admin.json'
 import useContract from "../../hooks/useContract"
 import { useCombinedContext } from "../../store"
@@ -8,10 +8,22 @@ import { useCombinedContext } from "../../store"
 
 export const AddAdmin:React.FC = ()=>{
     const navigate = useNavigate()
-    const {wallet,updateNotification} = useCombinedContext()
+    const {selectedWallet,updateNotification} = useCombinedContext()
     const contract = useContract(workerABI,workerNetwork)
     const [loading,setLoading] = useState(false)
     const params = useParams();
+
+    useEffect(()=>{
+      async function fetchPatient() {
+        const data = await contract?.methods.getAdmin(params.id).call()
+        console.log(data)
+        if(data&&data.walletAddress!='0x0000000000000000000000000000000000000000'){
+          navigate('/home')
+        }
+      }
+      if(contract) fetchPatient()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[contract,params])
 
 
     const handleSubmit = async (e) => {
@@ -20,9 +32,9 @@ export const AddAdmin:React.FC = ()=>{
           setLoading(true)
           // console.log(contract);
           if(contract) {
-            const {fname,lname,DoB,phoneno,address,email,gender,height,weight} = e.target
-            const [day,month,year] = DoB.value.split('-').map(ele=>ele)
-            console.log(day,month,year)
+            const {fname,lname,DoB,phoneno,email,gender,height,weight} = e.target
+            const date = new Date(DoB.value).getTime()
+            console.log(date)
             console.log(fname.value,
                 lname.value,
                 email.value,
@@ -30,7 +42,7 @@ export const AddAdmin:React.FC = ()=>{
                 gender.value,
                 height.value,
                 weight.value,
-                day,month,year,
+                date,
                 params.id)
             const transaction = await contract?.methods.createAdmin(
                                         fname.value,
@@ -40,10 +52,10 @@ export const AddAdmin:React.FC = ()=>{
                                         gender.value,
                                         height.value,
                                         weight.value,
-                                        year,month,day,
+                                        date,
                                         params.id
                                       )
-                    .send({ from: wallet.accounts[1],gas:"1000000" });
+                    .send({ from: selectedWallet });
             console.log(transaction)
             const events = transaction.events
             if(events&&Object.keys(events).includes('PatientCreated')){

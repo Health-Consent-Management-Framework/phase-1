@@ -46,12 +46,14 @@ const PatientReports:React.FC = ()=>{
   },[reportContract, selectedWallet, updateNotification])
 
   async function requestVerification(reportId){
-    const data = await reportContract?.methods.createVerificationRequest(reportId).send({from:selectedWallet});
+    const date = new Date();
+    const seconds = date.getTime();
+    const data = await reportContract?.methods.createVerificationRequest(reportId,seconds).send({from:selectedWallet});
     console.log(data)
   }
 
   async function viewReportRequests(reportId){
-    navigate(`/home/requests/report/${reportId}`)
+    navigate(`/home/requests/report?&id=${reportId}`)
   }
 
   function deleteReport(){}

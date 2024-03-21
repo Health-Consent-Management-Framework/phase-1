@@ -74,10 +74,22 @@ const ProfileDetails = () => {
   },[user])
 
   function calculateAge(year){
-    const givenYear = Number(year)
+    const givenYear = Date(year)
     const curr_year = new Date()
     console.log(curr_year.getFullYear(),year)
     return curr_year.getFullYear() - givenYear;
+  }
+
+  function getDoB(dob){
+    const date = new Date(Number(dob));
+    return `${date.getDate()}-${date.getMonth()}-${date.getFullYear()}`
+  }
+
+  function getRole(){
+    if(role==1) return 'Admin'
+    else if(role==2) return 'Worker'
+    else if(role==3) return 'Doctor'
+    else return 'Patient'
   }
 
   return (
@@ -85,6 +97,10 @@ const ProfileDetails = () => {
       <Avatar src="https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png" />
       <Details>
         <Name>{user.fname} {user.lname}</Name>
+        <article>
+          <span>{getRole()}</span>
+          <span className={`w-3 h-3 mx-2 inline-block rounded-md ${user.isVerified?"bg-green-500":"bg-red-500"}`}></span>
+        </article>
         <Data>
           <InternalData>
             <LocalPhoneIcon /> {user.mobileNo}
@@ -95,7 +111,7 @@ const ProfileDetails = () => {
           </InternalData>
           <InternalData>
             <CalendarMonthIcon />
-            {user.DoB?`${Number(user.DoB[2])}-${Number(user.DoB[1])}-${Number(user.DoB[0])}`:'--/--/--'}
+            {user.DoB?`${getDoB(user.DoB)}`:'--/--/--'}
             {/* {user.date}-{user.month}-{user.year} */}
           </InternalData>
         </Data>
