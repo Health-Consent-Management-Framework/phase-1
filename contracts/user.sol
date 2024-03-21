@@ -12,11 +12,13 @@ contract User{
 
     event loginStatus(bool, string);
     event signupStatus(bool, string);
-
-    address patientAddress;
-    address adminAddress;
-    address workerAddress;
-    address doctorAddress;
+    event NotValidKey();
+    event KeyFound();
+    event isVerfied();
+    event isNotVerfied();
+    event invalidRole();
+    event UserCreated();
+    event userCreationFailed();
 
     string [] superKeys = [
         'key1',
@@ -28,7 +30,7 @@ contract User{
     struct roleEle{
         type_of_user role;
         bool exists;
-        verificationStatus isVerfied;
+        verificationStatus isVerified;
     }
 
     struct userRoleInfo{
@@ -43,12 +45,12 @@ contract User{
 
 
     modifier onlyAdmin(){
-        require(addressToRoles[msg.sender].role==type_of_user.admin && addressToRoles[msg.sender].isVerfied==verificationStatus.verfied);
+        require(addressToRoles[msg.sender].role==type_of_user.admin && addressToRoles[msg.sender].isVerified==verificationStatus.verfied);
         _;
     }
 
     modifier onlyWorker(){
-        require(addressToRoles[msg.sender].role==type_of_user.worker && addressToRoles[msg.sender].isVerfied==verificationStatus.verfied);
+        require(addressToRoles[msg.sender].role==type_of_user.worker && addressToRoles[msg.sender].isVerified==verificationStatus.verfied);
         _;
     }
 
@@ -56,19 +58,15 @@ contract User{
     event logAddress(address);
     uint totalUsers;
 
-    constructor(address patient,address doctor,address worker,address admin){
+    constructor(){
         totalUsers = 0;     
-        patientAddress = patient;
-        doctorAddress = doctor;
-        workerAddress = worker;
-        adminAddress = admin;   
     }
 
     function signup(
         type_of_user role
     ) public returns(bool,string memory){
-        if(addressToRoles[msg.sender].role==role){
-            if(addressToRoles[msg.sender].isVerfied==verificationStatus.verfied) revert('User alreadt exits and is verfied');
+        if(addressToRoles[msg.sender].exists){
+            if(addressToRoles[msg.sender].isVerified==verificationStatus.verfied) revert('User alreadt exits and is verfied');
             else{
                 emit signupStatus(false,'user exits and is not verfied');
                 revert('user exits and is not verfied');
@@ -92,8 +90,8 @@ contract User{
     }  
 
     function checkUserRole(type_of_user role,address userAddress) public view returns(bool,bool,string memory){
-        if(addressToRoles[msg.sender].role==role){
-            if(addressToRoles[msg.sender].isVerfied==verificationStatus.verfied){
+        if(addressToRoles[userAddress].role==role){
+            if(addressToRoles[userAddress].isVerified==verificationStatus.verfied){
                 return(true,true,'User login successful');
             }else{
                 return(true,false,'Please wait for verification');
@@ -105,7 +103,7 @@ contract User{
 
     function checkIfUserExists(address userAddress) public view returns(bool,bool,string memory,type_of_user){
         if(addressToRoles[userAddress].exists){
-            if(addressToRoles[userAddress].isVerfied==verificationStatus.verfied){
+            if(addressToRoles[userAddress].isVerified==verificationStatus.verfied){
                 return(true,true,'User login successful',addressToRoles[userAddress].role);
             }else{
                 return(true,false,'Please wait for verification',addressToRoles[userAddress].role);
@@ -125,20 +123,42 @@ contract User{
             }
         }
         
-        if(!isKey) return(false,'not a valid key');
+        if(!isKey){
+            emit NotValidKey();
+            emit userCreationFailed();
+            return(false,'not a valid key');
+        }else{
+            emit KeyFound();
+        }
 
         if(
             addressToRoles[msg.sender].role==type_of_user.patient ||
             addressToRoles[msg.sender].role==type_of_user.doctor ||
             addressToRoles[msg.sender].role==type_of_user.worker
         ){
-            emit signupStatus(false,'user signed for another role. request for promotion');
+            // emit signupStatus(false,'user signed for another role. request for promotion');
+            emit userCreationFailed();
             return (false,'user signed for another role. request for promotion');
         }else{
             addressToRoles[msg.sender] = roleEle(type_of_user.admin,true,verificationStatus.verfied);
+            emit UserCreated();
             emit signupStatus(true,"Admin created and verified successfully");
             return (true,"Admin created and verified successfully");
         }
     }
 
+    function getVerificationStatus(address userAddress,uint role) public view returns(bool){
+        if(addressToRoles[userAddress].exists){
+            if(
+                role==1&&addressToRoles[userAddress].role==type_of_user.admin ||
+                role==2&&addressToRoles[userAddress].role==type_of_user.worker ||
+                role==3&&addressToRoles[userAddress].role==type_of_user.doctor ||
+                role==4&&addressToRoles[userAddress].role==type_of_user.patient
+            ){
+                if(addressToRoles[userAddress].isVerified==verificationStatus.verfied){
+                    return true;
+                } else return false;
+            }else return false;
+        }else return false;
+    }
 }

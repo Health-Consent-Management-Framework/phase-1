@@ -21,7 +21,7 @@ contract Doctor{
         string mobileNo;
         bool doctorVerified;
         address walletAddress; 
-        Date DoB;
+        uint DoB;
         address[] patients; 
     }
 
@@ -50,14 +50,14 @@ contract Doctor{
         _;
     }
 
-    function editDoctor(string memory fname, string memory lname, string memory designation, string[] memory degree, string memory email,uint day, uint month, uint year) public onlyDoctor returns (bool) {
+    function editDoctor(string memory fname, string memory lname, string memory designation, string[] memory degree, string memory email,uint date) public onlyDoctor returns (bool) {
         // Implement editing functionality
         doctors[msg.sender].fname = fname;
         doctors[msg.sender].lname = lname;
         doctors[msg.sender].designation = designation;
         doctors[msg.sender].degree = degree;
         doctors[msg.sender].email = email;
-        doctors[msg.sender].DoB = Date(day, month, year);
+        doctors[msg.sender].DoB = date;
         emit DoctorUpdated(msg.sender);
         return true;
     }
@@ -75,7 +75,7 @@ contract Doctor{
                             string memory mobileNo, 
                             string memory designation, 
                             string[] memory degree, 
-                            uint day, uint month, uint year,
+                            uint date,
                             address walletAddress
                         ) public returns(bool) {
         if(doctors[walletAddress].walletAddress==address(0)){
@@ -83,7 +83,7 @@ contract Doctor{
         }
         require(doctors[walletAddress].walletAddress == address(0), "Doctor with provided wallet address already exists");
         address[] memory patientAddress = new address[](0);
-        doctors[walletAddress] = DoctorType(fname, lname, designation, degree, email, mobileNo, false, walletAddress, Date(day, month, year),patientAddress);
+        doctors[walletAddress] = DoctorType(fname, lname, designation, degree, email, mobileNo, false, walletAddress,date,patientAddress);
         emit DoctorCreated(walletAddress);
         return true;
     }

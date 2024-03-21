@@ -6,6 +6,7 @@
    */
 pragma solidity ^0.8.21;
 
+import './user.sol';
 
 contract Admin{
 
@@ -14,18 +15,17 @@ contract Admin{
     _;    
     }
 
-    address userContractAddress;
+    User userContract;
 
     address[] public adminKeys;
     mapping(address => AdminType) public adminAddresses;
     address[] public adminRequestkeys;
     mapping(address => AdminRequest) public adminRequests;
     uint totalAdminCount = 0;
-    uint totalRequestCount = 0;
 
-    event logAdmin(uint number,string data);
-    event logAddress(uint number,address data);
-
+    event AdminFound(address);
+    event AdminCreated(address);
+    event delegateCallFailed();
     enum RequestStatusType {pending,approved,rejected}
     address public masterAdmin;
 
@@ -45,46 +45,41 @@ contract Admin{
         string fname;
         string lname;
         string email;
-        string password;
+        string mobileNo;
+        string gender;
+        bool isVerified;        
+        uint height;
+        uint weight;
         address walletAddress; 
-        Date DoB;
-        bool verified;
+        uint DoB;
     }
 
     struct AdminRequest{
         address walletAddress;
+        string email;
+        uint created_at;
         RequestStatusType requestStatus; 
     }
 
-    constructor(){
+    constructor(address userContractAddress){
         masterAdmin = msg.sender;
+        userContract = User(userContractAddress);
         totalAdminCount = 1;
     }
 
     function createAdminRequest(
-        string memory fname,
-        string memory lname,
         string memory email,
-        string memory password,
         address fromAddress,
-        uint day, uint month, uint year
+        uint date
     ) public returns (bool) {
         if(adminAddresses[fromAddress].walletAddress==address(0)){
-            Date memory date = Date(day, month, year);
-            AdminType memory newAdmin = adminAddresses[fromAddress];
-            newAdmin.fname = fname;
-            newAdmin.lname = lname;
-            newAdmin.email = email;
-            newAdmin.password = password;
-            newAdmin.DoB = date;
-            newAdmin.verified = false;
-            adminAddresses[fromAddress] = newAdmin;
-            // AdminType memory newAdmin = AdminType(fname, lname, email, password, fromAddress, date, false);
             adminRequestkeys.push(fromAddress);
-            totalRequestCount += 1;
-            // adminAddresses[fromAddress] = newAdmin;
+        }else{
+            emit AdminFound(fromAddress);
+            return false;
         }
-        AdminRequest memory newRequest = AdminRequest(fromAddress, RequestStatusType.pending);
+
+        AdminRequest memory newRequest = AdminRequest(fromAddress,email,date,RequestStatusType.pending);
         adminRequests[fromAddress] = newRequest;
         return true;
     }
@@ -93,7 +88,6 @@ contract Admin{
     function getTotalAdminCount() public view returns (uint256){
         return totalAdminCount;
     }
-
 
     function getAdmins() public view returns (address[] memory) {
         address[] memory admins = new address[](totalAdminCount);
@@ -106,38 +100,22 @@ contract Admin{
     }
 
     function checkIfAdmin(address _adminAddress) public view returns(bool){
-        if(adminAddresses[_adminAddress].verified) return true;
+        if(adminAddresses[_adminAddress].isVerified) return true;
         return false;
     }
 
-    function login(string memory email,string memory password,address walletAddress) public view returns (bool,string memory){
-        if(checkIfAdmin(walletAddress)){
-            if(
-                   !compareString(adminAddresses[walletAddress].email,email)
-                || !compareString(adminAddresses[walletAddress].password,password)) 
-                    return (false,"invalid credentials");
-            return (true,"admin logged in successfully");
-        }else revert('user is not an admin');
-    }
-
-    function hashPasswordWithSecret(string memory password, string memory secret) public pure returns (bytes32) {
-        bytes memory passwordBytes = bytes(password);
-        bytes memory secretBytes = bytes(secret);
-        return keccak256(abi.encodePacked(passwordBytes, secretBytes));
-    }
 
     function acceptAdminRequest(address newAdmin) public returns (address newAdminAddress){
         require(msg.sender==masterAdmin || bytes(adminAddresses[msg.sender].email).length>0,"only master admin can add the user");
         if(bytes(adminAddresses[msg.sender].email).length==0){
             revert("user doesn't exist");
         }
-        adminAddresses[newAdmin].verified = true;
+        adminAddresses[newAdmin].isVerified = true;
         adminRequests[newAdmin].requestStatus = RequestStatusType.approved;
         adminKeys.push(newAdmin);
         totalAdminCount+=1;
         return newAdmin;
     }
-
 
     function declineAdminRequest(address newAdmin) public returns (address rejectedAddress){
         require(msg.sender==masterAdmin || bytes(adminAddresses[msg.sender].email).length>0,"only master admin can add the user");
@@ -149,8 +127,8 @@ contract Admin{
     }
 
     function getAdminRequests()public view returns (AdminRequest[] memory){
-        AdminRequest[] memory requests = new AdminRequest[](totalRequestCount);
-        for(uint i=0;i<totalRequestCount;i++){
+        AdminRequest[] memory requests = new AdminRequest[](adminRequestkeys.length);
+        for(uint i=0;i<adminRequestkeys.length;i++){
             requests[i] = adminRequests[adminRequestkeys[i]];
         }
         return requests;
@@ -179,6 +157,32 @@ contract Admin{
 
     function compareString(string memory str1, string memory str2) public pure returns (bool) {
         return keccak256(abi.encodePacked(str1)) == keccak256(abi.encodePacked(str2));
+    }
+
+    function getAdmin(address id) public view returns (AdminType memory){
+        return adminAddresses[id];
+    }
+
+    function createAdmin(
+        string memory fname,
+        string memory lname,
+        string memory email,
+        string memory mobileNo,
+        string memory gender,
+        uint height,
+        uint weight,
+        uint dob,
+        address walletAddress
+    ) public returns (bool){
+        if(adminAddresses[walletAddress].walletAddress!=address(0)){
+            emit AdminFound(walletAddress);
+            return false;
+        }
+        bool isVerified = userContract.getVerificationStatus(msg.sender, 1);
+        AdminType memory admin = AdminType(fname,lname,email,mobileNo,gender,isVerified,height,weight,walletAddress,dob);
+        adminAddresses[walletAddress] = admin;
+        emit AdminCreated(walletAddress);
+        return true;
     }
 
 }

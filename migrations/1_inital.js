@@ -11,19 +11,18 @@ const fs = require('fs')
 module.exports = async function(deployer,network,accounts) {
   const deployerAddress = accounts[0]; 
   await deployer.deploy(UtilsLibrary,{ from: deployerAddress });
-  await deployer.deploy(Admin,{from:deployerAddress});
+  await deployer.deploy(User,{from:deployerAddress})
+  await deployer.deploy(Admin,User.address,{from:deployerAddress});
   await deployer.deploy(Doctor,{from:deployerAddress});
   await deployer.link(UtilsLibrary, Facility);
-  
+
   const adminContract = await Admin.deployed();
   const doctorContract = await Doctor.deployed();
   const patientContract = await Patient.deployed();
   
   console.log(Patient)
-
   await deployer.deploy(Worker,Admin.address,{from:deployerAddress})
   await deployer.deploy(Facility,Admin.address,{from:deployerAddress})
-  await deployer.deploy(Patient,Admin.address,Worker.address,{from:deployerAddress});
-  await deployer.deploy(User,Patient.address,Doctor.address,Worker.address,Admin.address)
+  await deployer.deploy(Patient,User.address,{from:deployerAddress});
   await deployer.deploy(Report,Patient.address,Doctor.address,Worker.address,User.address)
 };

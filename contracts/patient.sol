@@ -5,11 +5,8 @@ import './worker.sol';
 import './admin.sol';
 
 contract Patient {
-
-    Worker workerContract;
-    Admin  adminContract;
     uint totalPatients = 0;
-
+    address userAddress;
     enum status{pending,accepted,rejeceted}
     string patientSecret = 'patient_123';
 
@@ -30,7 +27,11 @@ contract Patient {
         string lname;
         string email;
         string location;
-        Date DoB;
+        string gender;
+        bool isVerified;
+        uint height;
+        uint weight;
+        uint DoB;
         string mobileNo;
         address walletAddress;
     }
@@ -43,13 +44,14 @@ contract Patient {
         string reason;
     }
 
-    constructor(address workerAddress,address adminAddress){
-        workerContract = Worker(workerAddress);
-        adminContract = Admin(adminAddress);
+    constructor(address userContractAddress){
+        userAddress = userContractAddress;
     }
 
     modifier isWorker(){
-        require(workerContract.checkIfWorker(msg.sender),"only worker can access the feature");
+        (bool success, bytes memory data) = userAddress.delegatecall(
+            abi.encodeWithSignature("getData()")
+        );
         _;
     }
 
@@ -81,7 +83,9 @@ contract Patient {
         string memory lname,
         string memory email,
         string memory mobileNo,
-        uint day,uint month, uint year,
+        string memory gender,
+        uint height,uint weight,
+        uint date,
         string memory location,
         address patientAddress
         ) public returns (bool) {
@@ -91,10 +95,9 @@ contract Patient {
         }else{
             emit PatientNotFound(patientAddress);
         }
-        Date memory date = Date(day,month,year);
         patientKeys.push(patientAddress);
         totalPatients =patientKeys.length ;
-        patients[patientAddress] = PatientType(fname,lname,email,location,date,mobileNo,patientAddress);
+        patients[patientAddress] = PatientType(fname,lname,email,location,gender,true,height,weight,date,mobileNo,patientAddress);
         emit PatientCreated(totalPatients, email);
         return true;
     }

@@ -6,6 +6,13 @@ pragma solidity ^0.8.21;
 
 contract Worker{
 
+    event WorkerFound(address);
+    event WorkerCreated(address);
+    event RequestCreated();
+    event RequestAlreadyCreated();
+    event RequestApproved();
+    event RequestRejected();
+
     struct Date{
         uint date;
         uint month;
@@ -18,19 +25,32 @@ contract Worker{
         string state;
     }
 
-    struct UserType{
+    struct workerType{
         string fname;
         string lname;
         string email;
-        bytes32 password;
+        string mobileNo;
+        string gender;
+        bool isVerified;
+        uint height;
+        uint weight;
         address walletAddress; 
-        Date DoB;
+        uint date;
     }
 
-    mapping(uint=>address) internal workersKeys;
-    mapping(address=>UserType) workerData;
-    mapping(address=>UserType) workerRequests;
+    struct workerRequestType{
+        address walletAddress;
+        string email;
+        verficationStatus isVerfied;
+        string requestType;
+        uint created_at;
+    }
+
+    mapping(address=>workerType) workerData;
+    mapping(address=>workerRequestType) workerRequests;
     address[] internal workerRequestKeys;
+    address[] internal workersKeys;
+    uint totalWorkers =0;
     Admin adminContract;
 
     enum verficationStatus{verified,notVerfied,rejected}
@@ -53,7 +73,6 @@ contract Worker{
         _;
     }
 
-    uint totalWorkers;
     string workerSecret = 'worker_123';
 
     constructor(address admin){
@@ -65,22 +84,43 @@ contract Worker{
         return workerData[senderAddress].walletAddress == senderAddress;
     }
 
-    function createWorkerRequest(
-        string memory fname,
-        string memory lname,
-        string memory username,
-        string memory password,
-        address workerAddress,
-        uint day, uint month, uint year
+    function createRequest(
+        string memory email,
+        string memory requestType,
+        uint date
         ) public returns (bool){
         for(uint i=0;i<workerRequestKeys.length;i++){
-            if(workersKeys[i]==workerAddress || workerRequestKeys[i]==workerAddress) return true;
+            if(workerRequestKeys[i]==msg.sender){
+                emit RequestAlreadyCreated();
+                return false;
+            }
         }
-        Date memory date = Date(day,month,year); 
-        bytes32 hashedPassword = hashPasswordWithSecret(password, workerSecret);
-        UserType memory user = UserType(fname,lname,username,hashedPassword,workerAddress,date); 
-        workerRequestKeys.push(workerAddress);
-        workerRequests[workerAddress] = user;
+        workerRequestType memory user = workerRequestType(msg.sender,email,verficationStatus.notVerfied,requestType,date); 
+        workerRequestKeys.push(msg.sender);
+        workerRequests[msg.sender] = user;
+        return true;
+    }
+
+    function createWorker(
+        string memory fname,
+        string memory lname,
+        string memory email,
+        string memory mobileNo,
+        string memory gender,
+        uint height,
+        uint weight,
+        uint date,
+        address workerAddress
+        ) public returns (bool){
+        //
+        if(workerData[workerAddress].walletAddress!=address(0)){
+            emit WorkerFound(workerAddress);
+            return false;
+        }
+        workerType memory user = workerType(fname,lname,email,mobileNo,gender,false,height,weight,workerAddress,date); 
+        workersKeys.push(workerAddress);
+        workerData[workerAddress] = user;
+        emit WorkerCreated(workerAddress);
         return true;
     }
 
@@ -112,7 +152,8 @@ contract Worker{
             }
         }
         if(exists){
-            workerData[workerAddress] = workerRequests[workerAddress];
+            workerData[workerAddress].isVerified = true;
+            workerRequests[workerAddress];
             delete workerRequestKeys[index];
             delete workerRequests[workerAddress];
             return true;        
@@ -130,8 +171,8 @@ contract Worker{
             }
         }
         if(exists){
-            workerRequestKeys[index];
-            delete workerRequests[workerRequestAddress];
+            delete workerRequestKeys[index];
+            workerRequests[workerRequestAddress].isVerfied = verficationStatus.notVerfied;
             return true;        
         }
         return true;
@@ -155,38 +196,13 @@ contract Worker{
         return true;
     }
 
-    function login(string memory email,string memory password,address walletAddress) public view returns (bool,string memory){
-        bool exists = false;
-        for(uint i=0;i<totalWorkers;i++){
-            if(workersKeys[i]==walletAddress){ 
-                exists = true;
-                break;
-            }
-        }
-        bytes32 hashedPassword = hashPasswordWithSecret(password, workerSecret);
-        if(exists){    
-            if(!compareString(workerData[walletAddress].email,email) || workerData[walletAddress].password != hashedPassword)
-                return (true,'please check yyour credentials');
-            return (true,"verfied");
-        }else{
-            for(uint i=0;i<workerRequestKeys.length;i++){
-                if(workerRequestKeys[i]==walletAddress){
-                    exists = true;
-                    break;
-                }
-            }
-            if(exists) return (true,"not verifed");
-            else return (false,"check credentials");
-        }
-    }
 
     function compareString(string memory str1, string memory str2) public pure returns (bool) {
         return keccak256(abi.encodePacked(str1)) == keccak256(abi.encodePacked(str2));
     }
 
-    function hashPasswordWithSecret(string memory password, string memory secret) public pure returns (bytes32) {
-        bytes memory passwordBytes = bytes(password);
-        bytes memory secretBytes = bytes(secret);
-        return keccak256(abi.encodePacked(passwordBytes, secretBytes));
+
+    function getWorker(address workerAddress) public view returns(workerType memory){
+        return workerData[workerAddress];
     }
 }
