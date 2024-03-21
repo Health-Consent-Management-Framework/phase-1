@@ -122,7 +122,7 @@ const ProfileDetails = () => {
           </Text>
           <Text>
             <span style={{ color: "#aaaaaa", fontWeight: "600" }}>AGE </span>{" "}
-            <span>{calculateAge(user.DoB?user.DoB[0]:2024)}</span>
+            <span>{calculateAge(user.DoB?Number(user.DoB):2024)}</span>
           </Text>
           <Text>
             <span style={{ color: "#aaaaaa", fontWeight: "600" }}>HEIGHT </span>{" "}

@@ -35,7 +35,7 @@ contract Worker{
         uint height;
         uint weight;
         address walletAddress; 
-        uint date;
+        uint DoB;
     }
 
     struct workerRequestType{

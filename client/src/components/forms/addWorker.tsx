@@ -22,8 +22,9 @@ export const AddWorker:React.FC = ()=>{
           if(contract) {
             const {fname,lname,DoB,phoneno,address,email,gender,height,weight} = e.target
             const [day,month,year] = DoB.value.split('-').map(ele=>ele)
+            const date = new Date(DoB.value).getTime()
             console.log(day,month,year)
-            console.log(fname.value,lname.value,email.value,phoneno.value,day,month,year,address.value,params.id)
+            console.log(fname.value,lname.value,email.value,phoneno.value,date,address.value,params.id)
             const transaction = await contract?.methods.createWorker(
                                         fname.value,
                                         lname.value,
@@ -32,7 +33,7 @@ export const AddWorker:React.FC = ()=>{
                                         gender.value,
                                         height.value,
                                         weight.value,
-                                        day,month,year,
+                                        date,
                                         params.id
                                       )
                     .send({ from: wallet.accounts[1],gas:"1000000" });

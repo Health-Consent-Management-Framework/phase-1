@@ -33,7 +33,7 @@ export const AddPatient:React.FC = () => {
         const {fname,lname,DoB,phoneno,address,email,gender,height,weight} = e.target
         const date = new Date(DoB.value).getTime()
         console.log(fname.value,lname.value,email.value,phoneno.value,date,address.value,params.id)
-        const transaction = await contract?.methods.createPatient(fname.value,lname.value,email.value,phoneno.value,gender.value,height.value,weight.value,day,month,year,selectedWallet,params.id).send({ from: selectedWallet,gas:"1000000" });
+        const transaction = await contract?.methods.createPatient(fname.value,lname.value,email.value,phoneno.value,gender.value,height.value,weight.value,date,selectedWallet,params.id).send({ from: selectedWallet,gas:"1000000" });
         console.log(transaction)
         const events = transaction.events
         if(Object.keys(events).includes('PatientCreated')){

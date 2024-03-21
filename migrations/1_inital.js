@@ -16,13 +16,13 @@ module.exports = async function(deployer,network,accounts) {
   await deployer.deploy(Doctor,{from:deployerAddress});
   await deployer.link(UtilsLibrary, Facility);
 
-  const adminContract = await Admin.deployed();
-  const doctorContract = await Doctor.deployed();
-  const patientContract = await Patient.deployed();
+  // const adminContract = await Admin.deployed();
+  // const doctorContract = await Doctor.deployed();
+  // const patientContract = await Patient.deployed();
   
-  console.log(Patient)
+  // console.log(Patient)
   await deployer.deploy(Worker,Admin.address,{from:deployerAddress})
   await deployer.deploy(Facility,Admin.address,{from:deployerAddress})
   await deployer.deploy(Patient,User.address,{from:deployerAddress});
-  await deployer.deploy(Report,Patient.address,Doctor.address,Worker.address,User.address)
+  await deployer.deploy(Report,Patient.address,Doctor.address,Worker.address,User.address,{from:deployerAddress})
 };
