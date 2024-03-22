@@ -1,4 +1,5 @@
 import { useEffect } from "react"
+import { useAuthenticate } from '../../hooks/useAuthenticate'
 import { Outlet, useNavigate } from "react-router-dom"
 
 import styled from "styled-components";

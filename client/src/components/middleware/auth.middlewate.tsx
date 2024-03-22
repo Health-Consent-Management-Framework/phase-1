@@ -1,14 +1,12 @@
-import { useEffect } from "react"
 import { Outlet,useNavigate } from "react-router-dom"
+import { useHandleLogin } from "../../hooks/useHandleLogin"
+import { useAuthenticate } from "../../hooks/useAuthenticats"
 
 const AuthMiddleware = ()=>{
-    const navigate = useNavigate()
-    useEffect(()=>{
-        if(localStorage.getItem('access_token')&&localStorage.getItem('role')){
-            navigate('/home')
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[])
+    // const navigate = useNavigate()
+    
+    // const {authenticate} = useAuthenticate();
+
     return(
         <Outlet/>
     )

@@ -143,7 +143,7 @@ export const CombinedContextProvider:React.FC<{children:React.ReactNode}> = ({ch
             notification,updateNotification,selectedWallet,updateWallet,
             updateRole,updateUser,role,wallet,networkId,user,hasProvider,web3
             }}>
-            <div className={`inline-block duration-300 p-2 absolute ${shownNotification?`translate-y-[100px]`:`translate-y-[0px]`} -top-[100px] -translate-x-1/2 left-1/2`}>
+            <div className={`inline-block duration-300 p-2 z-10 absolute ${shownNotification?`translate-y-[100px]`:`translate-y-[0px]`} -top-[100px] -translate-x-1/2 left-1/2`}>
                 <article className="border-[1px] relative rounded-lg font-regular px-2 py-1 pr-6 w-[300px] text-center bg-white shadow-lg">
                     <p>{notification?.message}</p>
                     <button onClick={()=>{closeInvitation()}} className="absolute border-[1px] h-fit duration-300 rounded-2xl px-1 inline-block right-0 hover:border-red-500 top-1/2 -translate-y-1/2">

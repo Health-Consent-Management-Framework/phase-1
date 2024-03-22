@@ -13,17 +13,17 @@ export const AddPatient:React.FC = () => {
   const navigate = useNavigate()
   const [loading,setLoading] = useState(false);
 
-  useEffect(()=>{
-    async function fetchPatient() {
-      const data = await contract?.methods.getPatient(params.id).call()
-      console.log(data)
-      if(data&&data.walletAddress!='0x0000000000000000000000000000000000000000'){
-        navigate('/home')
-      }
-    }
-    if(contract) fetchPatient()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[contract,params])
+  // useEffect(()=>{
+  //   async function fetchPatient() {
+  //     const data = await contract?.methods.getPatient(params.id).call()
+  //     console.log(data)
+  //     if(data&&data.walletAddress!='0x0000000000000000000000000000000000000000'){
+  //       navigate('/home')
+  //     }
+  //   }
+  //   if(contract) fetchPatient()
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // },[contract,params])
 
   const handleSubmit = async (e) => {
     try {

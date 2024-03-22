@@ -1,6 +1,5 @@
-// import { MdSpaceDashboard } from "react-icons/md";
-import React, { useEffect, useState } from "react";
-import roleEnum from "../utils/enums";
+import React, { useState } from "react";
+import {roleEnum} from "../utils/enums";
 import { routeConfig } from "../../router";
 import InfoIcon from '@mui/icons-material/Info';
 import { SlMenu } from "react-icons/sl";
@@ -18,16 +17,11 @@ interface propType{
 const SideNav:React.FC<propType> = (props) => {
   const [isOpen, setisOpen] = useState(false);
   const navigate = useNavigate();
-  const {user} = useCombinedContext();
-  const [role,setRole] = useState(()=>localStorage.getItem('role'))
+  const {user,role} = useCombinedContext();
+  // const [role,setRole] = useState(()=>localStorage.getItem('role'))
   const [,setQueryParams] = useSearchParams()
   const [profileExpand,setProfileExpand] = useState(false)
   const [expand,setExpand] = useState(false)
-  interface menuElement{
-    name:string,
-    onClick:(props:any)=>void
-  }
-  
 
   const togglefunction = () => {
     setisOpen(!isOpen);

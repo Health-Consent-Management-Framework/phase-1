@@ -7,6 +7,7 @@
 pragma solidity ^0.8.21;
 
 import './user.sol';
+import './requests.sol';
 
 contract Admin{
 
@@ -16,7 +17,7 @@ contract Admin{
     }
 
     User userContract;
-
+    Request requestContract;
     address[] public adminKeys;
     mapping(address => AdminType) public adminAddresses;
     address[] public adminRequestkeys;
@@ -54,6 +55,7 @@ contract Admin{
         uint DoB;
     }
 
+
     struct AdminRequest{
         address walletAddress;
         string email;
@@ -61,9 +63,10 @@ contract Admin{
         RequestStatusType requestStatus; 
     }
 
-    constructor(address userContractAddress){
+    constructor(address userContractAddress,address requestContractAddress){
         masterAdmin = msg.sender;
         userContract = User(userContractAddress);
+        requestContract = Request(requestContractAddress);
         totalAdminCount = 1;
     }
 
@@ -183,6 +186,22 @@ contract Admin{
         adminAddresses[walletAddress] = admin;
         emit AdminCreated(walletAddress);
         return true;
+    }
+
+    function updateAccountRequest(string memory requestId,uint requestStatus) public returns(bool){
+        bool exists = requestContract.checkIfRequest(requestId);
+        if(!exists){
+            // emit requestContract.RequestNotFound(requestId);
+            return false;
+        }
+        bool updated = requestContract.EditAccountStatus(requestId, requestStatus);
+        if(updated){
+            // emit requestContract.RequestUpdated(requestId);
+        }else{
+            // emit requestContract.RequestNotUpdated(requestId);
+        }
+        return updated;
+
     }
 
 }

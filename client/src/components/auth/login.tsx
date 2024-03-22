@@ -4,38 +4,43 @@ import {abi as UserAbi,networks as UserNetwork} from '../../contracts/User.json'
 import useContract from "../../hooks/useContract"
 import { routeConfig } from "../../router"
 import { useCombinedContext } from "../../store"
+import { useHandleLogin } from "../../hooks/useHandleLogin"
+import { BeatLoader } from "react-spinners"
 
 export const Login:React.FC = ()=>{
-    const navigate = useNavigate()
-    const {wallet,updateNotification,updateRole,updateWallet} = useCombinedContext()
+    const {wallet,updateNotification} = useCombinedContext()
     const contract = useContract(UserAbi,UserNetwork)
+    const {handleLogin,loading,setLoading} = useHandleLogin();
 
     const handleSubmit = async(e)=>{
         try{
             console.log(e)
             e.preventDefault();
+            setLoading(true);
             const {walletId} = e.target;
             const data = await contract?.methods.checkIfUserExists(walletId.value).call();
             console.log(data)
-            if(data){
-                if(data[0]){
-                    updateNotification({type:"success",message:data[2]})
-                    navigate('/')
-                    updateRole(Number(data[3]))
-                    updateWallet(walletId.value)
-                }else{
-                    updateNotification({type:"error",message:data[2]||"Unable to create transaction"})
-                }
+            if(data[0]){
+                console.log("inside")
+                // data[3] gives role 
+                await handleLogin(Number(data[3]),walletId.value);
+                setLoading(false)
+            }else{
+                updateNotification({type:"error",message:"Invalid credentials"})
             }
         }catch(err){
             updateNotification({type:"error",message:"Unable to create transaction"})
+            setLoading(false);
             console.log(err.message)
         }
     }
 
 
     return(
-        <section className="w-screen min-h-[100vh] h-1 flex items-center justify-center">
+        <section className="w-screen relative min-h-[100vh] h-1 flex items-center justify-center">
+            <div className="absolute top-4 left-1/2 -translate-x-1/2">
+                <BeatLoader loading={loading} size={10} color="red"/>
+            </div>
             <div className="left-side hidden sm:flex sm:w-1/2 bg-red-300 items-center justify-center h-full">
                 <img src="/login.png" className="max-w-sm "/>
             </div>
