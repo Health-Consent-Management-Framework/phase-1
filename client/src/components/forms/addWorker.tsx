@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom"
 import { LabeledInput, LabeledSelect,Button } from "../ui"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {abi as workerABI,networks as workerNetwork} from '../../contracts/Worker.json'
 import useContract from "../../hooks/useContract"
 import { useCombinedContext } from "../../store"
@@ -13,6 +13,17 @@ export const AddWorker:React.FC = ()=>{
     const [loading,setLoading] = useState(false)
     const params = useParams();
 
+    useEffect(()=>{
+      async function fetchPatient() {
+        const data = await contract?.methods.getWorker(params.id).call()
+        console.log(data)
+        if(data&&data.walletAddress!='0x0000000000000000000000000000000000000000'){
+          navigate('/home')
+        }
+      }
+      if(contract) fetchPatient()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[contract,params])
 
     const handleSubmit = async (e) => {
         try {

@@ -10,7 +10,7 @@ import AddDetails from "./components/forms/addDetails";
 import AddUser from './components/forms/addUser'
 import RequestSection from "./components/requests/reportRequests";
 import ReportRequest from "./components/requests/reportRequests";
-import RequestsMiddleware from "./components/middleware/request.middleware";
+import RequestsMiddleware from "./components/requests/RquestsPage";
 
 const router = createBrowserRouter([
  {
@@ -43,18 +43,19 @@ const router = createBrowserRouter([
             element:<Facilities/>
         },
         {
-            path:"requests",
+            path:'requests',
             element:<RequestsMiddleware/>,
-            children:[
+            children:[ 
                 {
-                    path:'report',
+                    path:'',
                     element:<ReportRequest/>
                 },
                 {
-                    path:'verify',
+                    path:'other',
                     element:<ReportRequest/>
-                },
-            ]
+                }
+            ],
+            errorElement:<PageNotFound/>            
         },
         {
             path:'report/:id',
@@ -133,6 +134,7 @@ export const routeConfig = {
     addWorker:'/admin/worker',
     addUser:'/home/addUser',
     viewRequests:'/home/requests',
+    otherRequests:'/home/requests/other',
     report:(id:string|number)=>`/home/report/${id}`,
     editFacility:(id:string|number)=>`home/facilites/${id}`,
     editReport:(id:string|number)=>`/reports/edit/${id}`,

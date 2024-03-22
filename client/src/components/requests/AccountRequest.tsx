@@ -1,21 +1,17 @@
-import { useSearchParams } from "react-router-dom";
 import useContract from "../../hooks/useContract";
 import React, { useEffect, useState } from "react";
 import { useCombinedContext } from "../../store";
 import {abi as ReportAbi,networks as ReportNetwork} from '../../contracts/Report.json'
-import { BeatLoader } from "react-spinners";
+import { LabeledSelect } from "../ui";
 
-interface propType{
-    requests:any,
-    loading:boolean
-}
+// interface propType{
+// }
 
-const ReportRequest:React.FC<propType> = (props)=>{
+const AccountRequest:React.FC<propType> = (props)=>{
     const {selectedWallet} = useCombinedContext()
-    const reportContract = useContract(ReportAbi,ReportNetwork)
-    const [verficationRequests,setVerificationRequests] = useState([])
-    const [searchParams] = useSearchParams()
-    
+    const [accountRequests,setAccountRequests] = useState([])
+
+
     function getDate(number){
         console.log(number)
         if(number==0) return '-'
@@ -27,7 +23,7 @@ const ReportRequest:React.FC<propType> = (props)=>{
         if(status==0){
             return `pending`
         }else if(status==1){
-            
+            // return type=='access'?"approved":"verfied"
         }else if(status==2){
             return "rejected"
         }
@@ -41,16 +37,16 @@ const ReportRequest:React.FC<propType> = (props)=>{
                 <thead>
                     <tr>
                         <th className="px-4 py-2 bg-gray-200 text-center"></th>
-                        <th className="px-4 py-2 bg-gray-200 text-center">Report ID</th>
+                        <th className="px-4 py-2 bg-gray-200 text-center">Request Type</th>
                         <th className="px-4 py-2 bg-gray-200 text-center">Created At</th>
                         <th className="px-4 py-2 bg-gray-200 text-center">Status</th>
-                        <th className="px-4 py-2 bg-gray-200 text-center">UpdatedBy</th>
-                        <th className="px-4 py-2 bg-gray-200 text-center">UpdatedAt</th>
+                        <th className="px-4 py-2 bg-gray-200 text-center">Updated By</th>
+                        <th className="px-4 py-2 bg-gray-200 text-center">Updated At</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {props.loading&&<BeatLoader size={10} color="blue" loading={props.loading}></BeatLoader>}
-                    {/* {props.requests.length&&props.requests?.map((ele,index)=>(
+                    
+                    {props.requests?.map((ele,index)=>(
                         <tr>
                             <td className="px-4 py-2 bg-gray-200 text-center">{index}</td>
                             <td className="px-4 py-2 bg-gray-200 text-center">
@@ -69,7 +65,7 @@ const ReportRequest:React.FC<propType> = (props)=>{
                                 {getDate(Number(ele.updatedAt))}
                             </td>
                         </tr>
-                    ))} */}
+                    ))}
                 </tbody>
                 </table>
             </div>
@@ -77,4 +73,4 @@ const ReportRequest:React.FC<propType> = (props)=>{
     )
 }
 
-export default ReportRequest;
+export default AccountRequest;

@@ -58,8 +58,11 @@ export const AddAdmin:React.FC = ()=>{
                     .send({ from: selectedWallet });
             console.log(transaction)
             const events = transaction.events
-            if(events&&Object.keys(events).includes('PatientCreated')){
+            if(events&&Object.keys(events).includes('AdminCreated')){
               updateNotification({type:'success',message:"User created successfully"})
+              navigate('/')
+            }else if (events&&Object.keys(events).includes('AdminFound')){
+              updateNotification({type:'success',message:"Admin Already exists"})
               navigate('/')
             }
           }

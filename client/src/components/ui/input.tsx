@@ -25,15 +25,16 @@ interface LabeledSelectProps extends LabeledInputProps{
     selectedStyle?:string,
     mutiple?:boolean,
     selectType?:"white",
+    notFit?:boolean,
     onChange?:(e)=>void
 }
 
 export const LabeledSelect:React.FC<LabeledSelectProps> =(props)=>{
     const color = props.selectType=="white"?"":`p-1 bg-white p-2 border-black focus:border-${props.outlineColor}-600 focus:outline-${props.outlineColor}-600 text-black`
     return(
-        <div className="flex flex-col items-center max-w-sm w-fit">
+        <div className={`flex flex-col items-center max-w-sm ${!props.notFit?'w-fit':''}`}>
             <label htmlFor={props.inputId} className={`pb-1 text-sm self-start ${props.textStyle}`}>{props.label}</label>
-            <select onChange={props.onChange} name={props.name} multiple={props?.mutiple} defaultValue={""} className={`${color} rounded-md text-md max-w-[275px] border-[1px]`}> 
+            <select onChange={props.onChange} name={props.name} multiple={props?.mutiple} className={`${color} rounded-md text-md max-w-[275px] border-[1px]`}> 
                 <option  value={""}>-</option>
                 {props?.options.map(ele=>{
                     return(
