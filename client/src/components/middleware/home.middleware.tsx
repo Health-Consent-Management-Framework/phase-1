@@ -35,12 +35,11 @@ const Hr = styled.hr`
 
 const HomeMiddleware = ()=>{
     const navigate = useNavigate()
-    const {updateUser,role,selectedWallet} = useCombinedContext()
+    const {updateUser,user,role,selectedWallet} = useCombinedContext()
     const patientContract = useContract(PatientAbi,PatientNetwork)
     const workerContract = useContract(WorkerAbi,WorkerNetwork)
     const adminContract = useContract(AdminAbi,AdminNetwork)
     const doctorContract = useContract(DoctorAbi,DoctorNetwork)
-    // const userContract = useContract(UserAbi,UserNetwork)
 
     function handleNavigate(data){
         if(data.walletAddress === '0x0000000000000000000000000000000000000000'){
@@ -78,20 +77,20 @@ const HomeMiddleware = ()=>{
 
 
 
-    function requestVerification(){
+    async function requestVerification(){
         const selectedWallet = localStorage.getItem('walletId')
         const role = localStorage.getItem('role')
         const createdAt = new Date().getTime()
         console.log(role)
         if(selectedWallet){
             if(role=='3'){
-                const doctorData = doctorContract?.methods.createVerificationRequest(createdAt).send({from:selectedWallet});
+                const doctorData = await doctorContract?.methods.createVerificationRequest(createdAt).send({from:selectedWallet});
                 console.log(doctorData)
             }else if(role=='2'){
-                const workerData = workerContract?.methods.createRequest(createdAt).send({from:selectedWallet})
+                const workerData = await workerContract?.methods.createRequest(user.email,'verify',createdAt).send({from:selectedWallet})
                 console.log(workerData)
             }else if(role=='1'){
-                const adminData = adminContract?.methods.createVerificationRequest(createdAt).send({from:selectedWallet})
+                const adminData = await adminContract?.methods.createVerificationRequest(createdAt).send({from:selectedWallet})
                 console.log(adminData)
             }
         }

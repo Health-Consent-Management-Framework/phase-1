@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT 
-import "./admin.sol";
+import "./user.sol";
+import "./requests.sol";
 
 
 pragma solidity ^0.8.21;
@@ -8,6 +9,11 @@ contract Worker{
 
     event WorkerFound(address);
     event WorkerCreated(address);
+
+    event NotAdmin(address);
+    event NotOwner(address);
+    event NotAdminOrOwner(address);
+
     event RequestCreated();
     event RequestAlreadyCreated();
     event RequestApproved();
@@ -50,39 +56,55 @@ contract Worker{
     mapping(address=>workerRequestType) workerRequests;
     address[] internal workerRequestKeys;
     address[] internal workersKeys;
-    uint totalWorkers =0;
-    Admin adminContract;
-
+    User userContract;
+    uint counter = 0;
+    Request requestContract;
+    uint totalWorkers = 0;
     enum verficationStatus{verified,notVerfied,rejected}
 
-    modifier isAdmin() {
-        require(adminContract.checkIfAdmin(msg.sender), "Only admin can access the feature");
-        _;
+    modifier OnlyAdmin(address adminAddress) {
+        if(userContract.getVerificationStatus(adminAddress, 1)) _;
+        else emit NotAdmin(adminAddress);
     }
 
-    modifier isOwner(){
-        require(msg.sender==workerRequests[msg.sender].walletAddress,"user doesn't own the resource to access.");
-        _;
-    }
-
-    modifier isAdminOrOwner(){
-        bool isSatisfied = false;
-        isSatisfied = adminContract.checkIfAdmin(msg.sender);
-        if(!isSatisfied) isSatisfied = checkIfWorker(msg.sender);
-        require(isSatisfied,"user doesn't own the resource to access.");
-        _;
+    modifier OnlyAdminOrOwner(address userAddress){
+        bool isWorker = false;
+        bool isAdmin = false;
+        isAdmin = userContract.getVerificationStatus(userAddress, 1);
+        isWorker = userContract.getVerificationStatus(userAddress, 1);
+        if(isAdmin || isWorker)_;
+        else emit NotAdminOrOwner(userAddress);
     }
 
     string workerSecret = 'worker_123';
 
-    constructor(address admin){
-        adminContract = Admin(admin);
+    constructor(address userAddress){
+        userContract = User(userAddress);
+        // requestContract = Request(requestAddress);
         totalWorkers = 0;
     }
 
     function checkIfWorker(address senderAddress) public view returns(bool){
         return workerData[senderAddress].walletAddress == senderAddress;
     }
+
+    function randomString(uint size) public  payable returns(string memory){
+        bytes memory randomWord=new bytes(size);
+        bytes memory chars = new bytes(26);
+        chars="abcdefghijklmnopqrstuvwxyz";
+        for (uint i=0;i<size;i++){
+            uint randomNumber=random(26);
+            randomWord[i]=chars[randomNumber];
+        }
+        return string(randomWord);
+    }
+
+    function random(uint number) public payable returns(uint){
+        counter++;
+        return uint(keccak256(abi.encodePacked(block.timestamp,block.difficulty,  
+        msg.sender,counter))) % number;
+    }
+    
 
     function createRequest(
         string memory email,
@@ -124,7 +146,7 @@ contract Worker{
         return true;
     }
 
-    function removeWorker(address senderAddress)  public returns (bool){
+    function removeWorker(address senderAddress) OnlyAdminOrOwner(msg.sender) public returns (bool){
         uint index = 0;
         bool exists = false;
         for(uint i=0;i<totalWorkers;i++){
@@ -141,7 +163,7 @@ contract Worker{
         return false;
     }
 
-    function approveWorkerRequest(address workerAddress) isAdmin public returns (bool){
+    function approveWorkerRequest(address workerAddress) OnlyAdmin(msg.sender) public returns (bool){
         bool exists = false;
         uint index;
         for(uint i=0;i<workerRequestKeys.length;i++){
@@ -160,7 +182,7 @@ contract Worker{
         }else return false;
     }
 
-    function rejectWorkerRequest(address workerRequestAddress) isAdmin public returns (bool) {
+    function rejectWorkerRequest(address workerRequestAddress) OnlyAdmin(msg.sender) public returns (bool) {
         bool exists = false;
         uint index;
         for(uint i=0;i<workerRequestKeys.length;i++){
@@ -178,7 +200,7 @@ contract Worker{
         return true;
     }
 
-    function deleteWorkerRequest() public isOwner returns (bool){
+    function deleteWorkerRequest() public returns (bool){
         bool exists = false;
         uint index;
         for(uint i=0;i<workerRequestKeys.length;i++){
@@ -204,5 +226,9 @@ contract Worker{
 
     function getWorker(address workerAddress) public view returns(workerType memory){
         return workerData[workerAddress];
+    }
+
+    function getWorkerRequest() public view returns(workerRequestType memory) {
+        return workerRequests[msg.sender];
     }
 }

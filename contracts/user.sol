@@ -84,6 +84,7 @@ contract User{
             userInfo.id = msg.sender;
             userInfo.roleInfo = ele;
             users.push(userInfo);
+            emit UserCreated();
             emit signupStatus(true,'user creation successful');
             return (true,'user creation successful');
         }

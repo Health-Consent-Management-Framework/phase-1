@@ -74,10 +74,10 @@ const ProfileDetails = () => {
   },[user])
 
   function calculateAge(year){
-    const givenYear = Date(year)
+    const givenYear = new Date(year)
     const curr_year = new Date()
     console.log(curr_year.getFullYear(),year)
-    return curr_year.getFullYear() - givenYear;
+    return curr_year.getFullYear() - givenYear.getFullYear();
   }
 
   function getDoB(dob){
@@ -109,11 +109,6 @@ const ProfileDetails = () => {
             <MailIcon />
             {user.email}
           </InternalData>
-          <InternalData>
-            <CalendarMonthIcon />
-            {user.DoB?`${getDoB(user.DoB)}`:'--/--/--'}
-            {/* {user.date}-{user.month}-{user.year} */}
-          </InternalData>
         </Data>
         <PatientDetails>
           <Text>
@@ -132,7 +127,14 @@ const ProfileDetails = () => {
             <span style={{ color: "#aaaaaa", fontWeight: "600" }}>WEIGHT </span>{" "}
             <span>{user.weight?Number(user.weight):'82kg'}</span>
           </Text>
-          {/* <button className="hover:border-blue-700 hover:text-blue-700" onClick={handleClick}>Delete</button> */}
+          <Text className="flex flex-col gap-2">
+            <span className="flex items-center gap-2" style={{ color: "#aaaaaa", fontWeight: "600" }}>
+              Date of Birth
+            </span>
+            <span>
+            {user.DoB?`${getDoB(user.DoB)}`:'--/--/--'}
+            </span>
+          </Text>
         </PatientDetails>
       </Details>
       {

@@ -2,16 +2,11 @@
 
 pragma solidity ^0.8.0;
 
-import "./patient.sol";
-import "./doctor.sol";
-import "./worker.sol";
 import "./user.sol";
 
 contract Report {
-    address patientContractAddress;
-    address doctorContractAddress;
-    address workerContractAddress;
-    address userContractAddress;
+
+    User userContract;
     
     uint totalReports;
     uint counter = 1;
@@ -71,53 +66,47 @@ contract Report {
 
     uint256 private nonce;
     mapping(address => DoctorType) public doctors;
-    mapping(address=>string[]) private patientToReportMapping;
+    mapping(address => string[]) private userToReportMapping;
     mapping(string => AccessRequest[]) public accessRequests;
     mapping(string => verficationRequestType[]) public verficationRequests;
 
-    string[] reportKeys;
+    string[] reportKeys; // fetch all reports
 
     mapping(string => ReportType) public reports;
 
-    modifier onlyOwner(string memory reportId) {
-        require(msg.sender == reports[reportId].patientAddress, "User doesn't own the report");
+    modifier onlyOwner(address userAddress,string memory reportId) {
+        if(userAddress == reports[reportId].patientAddress){
         _;
+        }else emit NotSelfResource(userAddress,reportId);
     }
 
-    modifier onlyDoctorWithAccess(string memory reportId) {
+    modifier onlyDoctorWithAccess(address doctorAddress,string memory reportId) {
         bool isdoctor = false;
         for(uint i=0;i<reports[reportId].doctorAddress.length;i++){
-            if(msg.sender==reports[reportId].doctorAddress[i]){
+            if(doctorAddress == reports[reportId].doctorAddress[i]){
                 isdoctor = true;
                 break;
             }
         }
-        require(isdoctor, "Only registered doctors can access this function");
-        _;
+        if(isdoctor) _;
+        else emit NoAccessToReport(doctorAddress,reportId);
     }
 
-    modifier onlyDoctor(){
-        (bool success,bytes memory data) = doctorContractAddress.delegatecall(abi.encodeWithSignature("checkIfDoctor(address)",msg.sender)); 
-        if(!success) revert("only worker delegate call failed");
-        bool isWorker = abi.decode(data, (bool));
-        require(bool(isWorker),"only worker has access to this request");
-        _;
-    }
-
-    modifier onlyWorkerOrAdmin(){
-        (bool adminSuccess,bytes memory adminData) = workerContractAddress.delegatecall(abi.encodeWithSignature("checkIfWorker(address)",msg.sender)); 
-        if(!adminSuccess) revert("only worker delegate call failer");
-        (bool workerSuccess,bytes memory workerData) = workerContractAddress.delegatecall(abi.encodeWithSignature("checkIfWorker(address)",msg.sender)); 
-        bool isAdmin = abi.decode(adminData, (bool));
-        bool isWorker = abi.decode(workerData,(bool));
-        require(bool(isWorker)||bool(isAdmin),"only worker has access to this request");
-        _;
+    modifier onlyWorkerOrAdmin(address userAddress){
+        bool isAdmin = userContract.getVerificationStatus(userAddress, 1);
+        bool isWorker = userContract.getVerificationStatus(userAddress, 2);
+        if(isAdmin||isWorker) _;
+        else emit NotWorkerOrAdmin(userAddress);
     }
 
     event reportCreated(string reportId);
     event reportUpdate(string reportId);
     event ReportVerified(string reportId);
     event NotSelfResource(address id,string reportId);
+    event NoAccessToReport(address id,string reportId);
+
+    event NotDoctor(address id);
+    event NotWorkerOrAdmin(address id);
 
     event DoctorAssignedToReport(address doctorAddress, string reportId);
     event DoctorAccessRevoked(address doctorAddress, string reportId);
@@ -132,10 +121,7 @@ contract Report {
 
 
     constructor(address _patientAddress,address _doctorAddress,address _workerAddress,address _userAddress) {
-        patientContractAddress = _patientAddress;
-        doctorContractAddress = _doctorAddress;
-        userContractAddress = _userAddress;
-        workerContractAddress = _workerAddress;
+        userContract = User(userContract); 
         totalReports = 0;
     }
 
@@ -171,7 +157,7 @@ contract Report {
         return hasAccess;
     }
 
-    function approveAccessRequest(uint256 requestId,string memory reportId) public onlyOwner(reportId) returns (bool){
+    function approveAccessRequest(uint256 requestId,string memory reportId) public onlyOwner(msg.sender,reportId) returns (bool){
         AccessRequest storage request = accessRequests[reportId][requestId];
         bool patientHasAccess = false;
         require(request.status != RequestStatus.pending, "Access request is not pending");
@@ -190,7 +176,7 @@ contract Report {
         return true;
     }
 
-    function rejectAccessRequest(uint256 requestId,string memory reportId) public onlyOwner(reportId) returns(bool) {
+    function rejectAccessRequest(uint256 requestId,string memory reportId) public onlyOwner(msg.sender,reportId) returns(bool) {
         AccessRequest storage request = accessRequests[reportId][requestId];
         require(request.status != RequestStatus.pending, "Access request is not pending");
         request.status = RequestStatus.rejected;
@@ -209,7 +195,7 @@ contract Report {
     }
 
     function createVerificationRequest(string memory reportId,uint timestamp) public returns(bool){
-        string[] memory patientReports = patientToReportMapping[msg.sender];
+        string[] memory patientReports = userToReportMapping[msg.sender];
         bool owns = false;
         for(uint i=0;i<patientReports.length;i++){
             if(keccak256(abi.encodePacked(patientReports[i])) == keccak256(abi.encodePacked(reportId))){
@@ -234,7 +220,7 @@ contract Report {
 
     function deleteReport(string memory reportId) public returns(bool){
         bool owns = false;
-        string[] memory patientReports = patientToReportMapping[msg.sender];
+        string[] memory patientReports = userToReportMapping[msg.sender];
         for(uint i=0;i<patientReports.length;i++){
             if(keccak256(abi.encodePacked(patientReports[i])) == keccak256(abi.encodePacked(reportId))){
                 owns = true;
@@ -265,7 +251,7 @@ contract Report {
     
     function getVerificationRequest(address userAddress) public view returns(verficationRequestType[][] memory){
         uint count = 0;
-        string[] memory reportId = patientToReportMapping[userAddress];
+        string[] memory reportId = userToReportMapping[userAddress];
 
         for(uint i=0;i<reportId.length;i++){
             count += verficationRequests[reportId[i]].length;
@@ -292,7 +278,7 @@ contract Report {
         string[] memory diagnosis;
         ReportType memory report = ReportType(reportId,msg.sender,accessedDoctors,attachement,diagnosis,tags,false,problem);
         reports[reportId] = report;
-        patientToReportMapping[msg.sender].push(reportId);
+        userToReportMapping[msg.sender].push(reportId);
         emit reportCreated(reportId);
         return true;
     }
@@ -308,12 +294,12 @@ contract Report {
         }
         ReportType memory report = ReportType(reportId,msg.sender,accessedDoctors,attachement,diagnosis,tags,isVerfied,problem);
         reports[reportId] = report;
-        patientToReportMapping[msg.sender].push(reportId);
+        userToReportMapping[msg.sender].push(reportId);
         emit reportCreated(reportId);
         return true;
     }
 
-    function updateReport(string memory reportId,string[] memory newDiagnosis) public onlyDoctorWithAccess(reportId) returns (bool) {
+    function updateReport(string memory reportId,string[] memory newDiagnosis) public onlyDoctorWithAccess(msg.sender,reportId) returns (bool s) {
         ReportType memory report = reports[reportId];
         report.diagnosis = newDiagnosis;
         // report.updatedAt = block.timestamp;
@@ -323,7 +309,7 @@ contract Report {
     }
 
     function getPatientReports(address patientAddress) public view returns (ReportType[] memory) {
-        ReportType[] memory foundReports = new ReportType[](patientToReportMapping[patientAddress].length);
+        ReportType[] memory foundReports = new ReportType[](userToReportMapping[patientAddress].length);
         for (uint i = 0; i < reportKeys.length; i++) {
             if (reports[reportKeys[i]].patientAddress == patientAddress) {
                 foundReports[i] = reports[reportKeys[i]];
@@ -332,7 +318,7 @@ contract Report {
         return foundReports;
     }
 
-    function updateTags(string memory reportId,string[] memory tags) public onlyOwner(reportId) returns(bool) {
+    function updateTags(string memory reportId,string[] memory tags) public onlyOwner(msg.sender,reportId) returns(bool) {
         ReportType memory report = reports[reportId];
         if(report.patientAddress != msg.sender) revert("user doesnot owne the resource to signin");
         report.tags = tags;

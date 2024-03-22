@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.21;
 
+import "./user.sol";
+
 contract Doctor{
 
     struct Date{
@@ -10,6 +12,7 @@ contract Doctor{
     }
 
     uint totalDoctors = 0;
+    User userContract;
     string doctorSecret = 'doctor123';
 
     struct DoctorType{
@@ -34,6 +37,9 @@ contract Doctor{
     }
 
     mapping(address => DoctorType) public doctors;
+    
+    mapping(address=>string[]) public accountRequests;
+
     address[] private doctorKeys;
     mapping(address => mapping(address => bool)) public patientRequests; // Mapping to track patient requests sent by doctors
 
