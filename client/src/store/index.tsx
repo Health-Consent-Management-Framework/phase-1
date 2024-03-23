@@ -70,18 +70,18 @@ export const CombinedContextProvider:React.FC<{children:React.ReactNode}> = ({ch
             }
             return value;
           })
-        localStorage.setItem('user',stringifiedUser)
-        setUser(e)
+          setUser(()=>e)
+          localStorage.setItem('user',stringifiedUser)
     }
 
     function updateRole(e:number){
-        setRole(role)
+        setRole(()=>role)
         console.log(e)
         localStorage.setItem("role",e)
     }
 
     function updateWallet(e){
-        setSelectedWallet(e)
+        setSelectedWallet(()=>e)
         localStorage.setItem('walletId',e)
     }
 

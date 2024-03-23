@@ -6,7 +6,6 @@ export const Home:React.FC = ()=>{
 
     // async function decodeSignature(data) {
     //     try {
-    //         const signature = localStorage.getItem('access_token') as string
     //         const dataString = '0x' + Buffer.from(JSON.stringify(data)).toString('hex');
     //         console.log(dataString)
     //         web3?.eth.personal.ecRecover(dataString, signature).then(()=>{

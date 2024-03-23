@@ -18,7 +18,7 @@ export const verificationEnum = {
 }
 
 export const requestTypeEnum = {
-    0:'',
-    1:'',
-    2:''
+    verification:0,
+    promotion:1,
+    deletion:2,
 }

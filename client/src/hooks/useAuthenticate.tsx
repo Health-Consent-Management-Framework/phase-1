@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import useContract from "./useContract"
 import {abi as UserAbi,networks as UserNetwork} from '../contracts/User.json'
-import { useCallback, useEffect } from "react"
+import { useCallback,useState } from "react"
 import { useCombinedContext } from "../store"
 import { routeConfig } from "../router"
 
@@ -16,12 +16,12 @@ export const useAuthenticate = ()=>{
         if(selectedWallet){
             if(userContract){
                 const data = await userContract.methods.checkUserRole(selectedWallet).call({from:selectedWallet})
+                console.log(data)
                 if(data[0]==true){
                     navigate('/home')
                 }else{
                     navigate(routeConfig.login)                    
                 }
-                console.log(data)
             }
         }else{
             navigate(routeConfig.login)

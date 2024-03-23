@@ -1,11 +1,7 @@
-import { Outlet,useNavigate } from "react-router-dom"
-import { useHandleLogin } from "../../hooks/useHandleLogin"
-import { useAuthenticate } from "../../hooks/useAuthenticats"
+import { Outlet } from "react-router-dom"
 
 const AuthMiddleware = ()=>{
     // const navigate = useNavigate()
-    
-    // const {authenticate} = useAuthenticate();
 
     return(
         <Outlet/>

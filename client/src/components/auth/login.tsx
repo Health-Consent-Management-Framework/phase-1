@@ -19,10 +19,8 @@ export const Login:React.FC = ()=>{
             setLoading(true);
             const {walletId} = e.target;
             const data = await contract?.methods.checkIfUserExists(walletId.value).call();
-            console.log(data)
             if(data[0]){
                 console.log("inside")
-                // data[3] gives role 
                 await handleLogin(Number(data[3]),walletId.value);
                 setLoading(false)
             }else{
