@@ -3,10 +3,17 @@
 pragma solidity ^0.8.21;
 
 import './user.sol';
+import './admin.sol';
+import './patient.sol';
+import './doctor.sol';
+import './worker.sol';
+
 
 contract Request{
 
-    enum RequestStatusEnumType {approved,rejected,pending}
+    uint counter = 0;
+
+    enum RequestStatusEnumType {pending,approved,rejected}
 
     enum AccountRequestEnumType {verfifcation,promotion,deletion}
     
@@ -15,6 +22,9 @@ contract Request{
     event accountCreated(string);
     event accountUpdated(string);
     event accountDeleted(string);
+    event accountActivated(address);
+
+    event userDoesNotExist(address);
 
     event RequestCreated(string);
     event RequestNotFound(string);
@@ -24,19 +34,53 @@ contract Request{
     event RequestDeleted(string);
 
     User userContract;
+    Admin adminContract;
+    Worker workerContract;
+    Doctor doctorContract;
+    Patient patientContract;
+
 
     struct AccountRequestType{
         string requestId;
+        address sentBy;
         address updatedBy;
-        uint created_at;
-        uint updated_at;
+        uint createdAt;
+        uint updatedAt;
         AccountRequestEnumType requestType;
         RequestStatusEnumType requestStatus; 
     }
 
-    constructor(address userContractAddress){
+    constructor(
+        address userContractAddress,
+        address adminContractAddress,
+        address workerContractAddress,
+        address doctorContractAddress,
+        address patientContractAddress
+    ){
         userContract = User(userContractAddress);
+        adminContract = Admin(adminContractAddress);
+        workerContract = Worker(workerContractAddress);
+        doctorContract = Doctor(doctorContractAddress);
+        patientContract = Patient(patientContractAddress);
     }
+
+    function randomString(uint size) public  payable returns(string memory){
+        bytes memory randomWord=new bytes(size);
+        // since we have 26 letters
+        bytes memory chars = new bytes(26);
+        chars="abcdefghijklmnopqrstuvwxyz";
+        for (uint i=0;i<size;i++){
+            uint randomNumber=random(26);
+            randomWord[i]=chars[randomNumber];
+        }
+        return string(randomWord);
+    }
+
+    function random(uint number) public payable returns(uint){
+        counter++;
+        return uint(keccak256(abi.encodePacked(block.timestamp,block.difficulty,  
+        msg.sender,counter))) % number;
+    } 
 
 
     mapping(address=>string[]) addressToRequests; 
@@ -44,12 +88,11 @@ contract Request{
     string[] accountRequestKeys; // admin can view all
 
     function createAccountRequest(
-        string memory requestId,
         address senderAddress,
-        uint created_at,
-        uint updated_at,
+        uint createdAt,
+        uint updatedAt,
         uint requestType
-    )public returns(bool) {
+    )public returns(bool,string memory) {
         AccountRequestEnumType rt;
         if(requestType==0){
             rt = AccountRequestEnumType.verfifcation;
@@ -58,41 +101,64 @@ contract Request{
         }else if(requestType==2){
             rt = AccountRequestEnumType.deletion;
         }
-        AccountRequestType memory r = AccountRequestType(requestId,senderAddress,created_at,updated_at,rt,RequestStatusEnumType.pending);
+        string memory requestId = randomString(10);
+        AccountRequestType memory r = AccountRequestType(requestId,senderAddress,address(0),createdAt,updatedAt,rt,RequestStatusEnumType.pending);
         accountRequests[requestId] = r;
         addressToRequests[senderAddress].push(requestId);
         accountRequestKeys.push(requestId);
-        return true;
+        return (true,requestId);
     }
 
-    function EditAccountStatus(string memory requestId,uint status) public returns(bool){
-        // string[] memory r = addressToRequests[accountAddress];
-        // uint index = r.length;
-        // for(uint i=0;i<r.length;i++){
-        //     if(keccak256(abi.encodePacked(r[i])) == keccak256(abi.encodePacked(requestId))){
-        //         index = i;
-        //         break;
-        //     }
-        // }
-        // if(index==r.length){
-        //     emit RequestNotFound(requestId);
-        //     return false;
-        // }
+    function EditAccountStatus(string memory requestId,uint status,uint updatedAt) public returns(bool){
         RequestStatusEnumType rs;
-
         if(status==0){
-            rs = RequestStatusEnumType.approved;
-        }else if(status==1){
             rs = RequestStatusEnumType.pending;
+        }else if(status==1){
+            rs = RequestStatusEnumType.approved;
         }else if(status==2){
             rs = RequestStatusEnumType.rejected;
         }
-        
+
         if(bytes(accountRequests[requestId].requestId).length>0){
             accountRequests[requestId].requestStatus = rs;
             return true;
         }else return false; 
-        // addressToRequests[accountAddress][index].requestStatus = status;
+    }
+
+    function ApproveAccountRequest(string memory requestId) public returns (bool){
+        address toBeVerifed = accountRequests[requestId].sentBy;
+        uint verifierRole = userContract.getUserRole(msg.sender);
+        uint toBeVerifedRole = userContract.getUserRole(toBeVerifed);
+        bool success;
+        bool vv = userContract.getVerificationStatus(msg.sender, verifierRole);
+        if(vv){
+            if(verifierRole==1){
+                userContract.changeVerificationStatus(toBeVerifed, 1);
+                if(toBeVerifedRole==4){
+                   success = patientContract.verifyUser(toBeVerifed,true);
+                }else if(toBeVerifedRole==3){
+                   success = doctorContract.verifyUser(toBeVerifed,true);
+                }else if(toBeVerifedRole==2){
+                   success = workerContract.verifyUser(toBeVerifed,true);
+                }else if(toBeVerifedRole==1){
+                   success = workerContract.verifyUser(toBeVerifed,true);
+                }
+            }else if(verifierRole==2){
+                if(toBeVerifedRole==3||toBeVerifedRole==3){
+                    userContract.changeVerificationStatus(toBeVerifed, 1);
+                    if(toBeVerifedRole==4){
+                        success = patientContract.verifyUser(toBeVerifed,true);
+                    }else if(toBeVerifedRole==3){
+                        success = doctorContract.verifyUser(toBeVerifed,true);
+                    }              
+                }
+            }
+        }
+        if(success){
+            accountRequests[requestId].requestStatus = requestStatusEnum.approved;
+            emit accountActivated(toBeVerifed);
+        }
+        return success;
     }
 
     function deleteAccountRequest(string memory requestId,address senderAddress) public returns (bool) {
@@ -117,7 +183,7 @@ contract Request{
         return true;
     }
 
-    function getMyAccountRequests(address senderAddress) public returns(AccountRequestType[] memory){
+    function getMyAccountRequests(address senderAddress) public view returns(AccountRequestType[] memory){
         string[] memory reportIds = addressToRequests[senderAddress];
         AccountRequestType[] memory requests =  new AccountRequestType[](reportIds.length);
         for(uint i=0;i<reportIds.length;i++){
@@ -135,6 +201,14 @@ contract Request{
 
     function getAccountRequest(string memory reportId) public view returns(AccountRequestType memory){
         return accountRequests[reportId];
+    }
+
+    function getOtherAccountRequests(address senderAddress) public view returns(AccountRequestType[] memory){
+        AccountRequestType[] memory requests = new AccountRequestType[](accountRequestKeys.length);
+        for(uint i=0;i<accountRequestKeys.length;i++){
+            requests[i] = accountRequests[accountRequestKeys[i]];
+        }
+        return requests;
     }
 }
 

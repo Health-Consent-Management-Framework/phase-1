@@ -55,7 +55,6 @@ contract Admin{
         uint DoB;
     }
 
-
     struct AdminRequest{
         address walletAddress;
         string email;
@@ -63,10 +62,10 @@ contract Admin{
         RequestStatusType requestStatus; 
     }
 
-    constructor(address userContractAddress,address requestContractAddress){
+    constructor(address userContractAddress){
         masterAdmin = msg.sender;
         userContract = User(userContractAddress);
-        requestContract = Request(requestContractAddress);
+        // requestContract = Request(requestContractAddress);
         totalAdminCount = 1;
     }
 
@@ -188,20 +187,9 @@ contract Admin{
         return true;
     }
 
-    function updateAccountRequest(string memory requestId,uint requestStatus) public returns(bool){
-        bool exists = requestContract.checkIfRequest(requestId);
-        if(!exists){
-            // emit requestContract.RequestNotFound(requestId);
-            return false;
-        }
-        bool updated = requestContract.EditAccountStatus(requestId, requestStatus);
-        if(updated){
-            // emit requestContract.RequestUpdated(requestId);
-        }else{
-            // emit requestContract.RequestNotUpdated(requestId);
-        }
-        return updated;
-
+    function verifyUser(address walletAddress,bool updatedStatus) public returns (bool){
+        if(updatedStatus) adminAddresses[walletAddress].isVerified = true;
+        return true;
     }
 
 }

@@ -4,11 +4,10 @@ export const roleEnum = {
     2:'worker',
     1:'admin'
 } 
-
 export const requestStatusEnum = {
-    0:'',
-    1:'',
-    2:''
+    pending:0,
+    approved:1,
+    rejected:2
 }
 
 export const verificationEnum = {

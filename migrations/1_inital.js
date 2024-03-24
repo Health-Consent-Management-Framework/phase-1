@@ -12,8 +12,7 @@ module.exports = async function(deployer,network,accounts) {
   const deployerAddress = accounts[0]; 
   await deployer.deploy(UtilsLibrary,{ from: deployerAddress });
   await deployer.deploy(User,{from:deployerAddress});
-  await deployer.deploy(Request,User.address,{from:deployerAddress});
-  await deployer.deploy(Admin,User.address,Request.address,{from:deployerAddress});
+  await deployer.deploy(Admin,User.address,{from:deployerAddress});
   await deployer.deploy(Doctor,{from:deployerAddress});
   await deployer.link(UtilsLibrary, Facility);
 
@@ -21,4 +20,6 @@ module.exports = async function(deployer,network,accounts) {
   await deployer.deploy(Facility,Admin.address,{from:deployerAddress});
   await deployer.deploy(Patient,User.address,{from:deployerAddress});
   await deployer.deploy(Report,Patient.address,Doctor.address,Worker.address,User.address,{from:deployerAddress})
+  await deployer.deploy(Request,User.address,Admin.address,Worker.address,Doctor.address,Patient.address,{from:deployerAddress});
+
 };

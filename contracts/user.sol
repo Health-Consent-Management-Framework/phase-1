@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: MIT 
 pragma solidity ^0.8.21;
-import "./admin.sol";
-import "./patient.sol";
-import "./doctor.sol";
-import "./worker.sol";
+
 
 contract User{
 
@@ -18,7 +15,9 @@ contract User{
     event isNotVerfied();
     event invalidRole();
     event UserCreated();
-    event userCreationFailed();
+    event UserRoleChanged(string);
+    event UserCreationFailed();
+    event UserNotFound(address);
 
     string [] superKeys = [
         'key1',
@@ -33,16 +32,8 @@ contract User{
         verificationStatus isVerified;
     }
 
-    struct userRoleInfo{
-        address id;
-        roleEle roleInfo;
-    }
-
     mapping(address=>roleEle) addressToRoles;
     mapping(string=>address) emailToAddress;
-
-    userRoleInfo[] users;
-
 
     modifier onlyAdmin(){
         require(addressToRoles[msg.sender].role==type_of_user.admin && addressToRoles[msg.sender].isVerified==verificationStatus.verfied);
@@ -54,12 +45,10 @@ contract User{
         _;
     }
 
-    event logBytes(bytes32);
-    event logAddress(address);
     uint totalUsers;
 
     constructor(){
-        totalUsers = 0;     
+        totalUsers = 0;   
     }
 
     function signup(
@@ -80,10 +69,10 @@ contract User{
                 ele = roleEle(role,true,verificationStatus.notVerfied);
                 addressToRoles[msg.sender] = ele;
             }
-            userRoleInfo memory userInfo;
-            userInfo.id = msg.sender;
-            userInfo.roleInfo = ele;
-            users.push(userInfo);
+            // userRoleInfo memory userInfo;
+            // userInfo.id = msg.sender;
+            // userInfo.roleInfo = ele;
+            // users.push(userInfo);
             emit UserCreated();
             emit signupStatus(true,'user creation successful');
             return (true,'user creation successful');
@@ -105,6 +94,7 @@ contract User{
     function checkIfUserExists(address userAddress) public view returns(bool,bool,string memory,type_of_user){
         if(addressToRoles[userAddress].exists){
             if(addressToRoles[userAddress].isVerified==verificationStatus.verfied){
+                // exists , verfied , message , role
                 return(true,true,'User login successful',addressToRoles[userAddress].role);
             }else{
                 return(true,false,'Please wait for verification',addressToRoles[userAddress].role);
@@ -126,7 +116,7 @@ contract User{
         
         if(!isKey){
             emit NotValidKey();
-            emit userCreationFailed();
+            emit UserCreationFailed();
             return(false,'not a valid key');
         }else{
             emit KeyFound();
@@ -138,7 +128,7 @@ contract User{
             addressToRoles[msg.sender].role==type_of_user.worker
         ){
             // emit signupStatus(false,'user signed for another role. request for promotion');
-            emit userCreationFailed();
+            emit UserCreationFailed();
             return (false,'user signed for another role. request for promotion');
         }else{
             addressToRoles[msg.sender] = roleEle(type_of_user.admin,true,verificationStatus.verfied);
@@ -162,4 +152,47 @@ contract User{
             }else return false;
         }else return false;
     }
+
+    function changeUserRole(uint role) public returns(bool,string memory){
+        bool exists = addressToRoles[msg.sender].exists;
+        if(!exists){
+            emit UserNotFound(msg.sender);
+            return (false,"user not found");
+        }
+        type_of_user newRole = type_of_user.dummy;
+        if(role == 1) newRole = type_of_user.admin;
+        else if(role == 2) newRole = type_of_user.worker;
+        else if(role == 3) newRole = type_of_user.doctor;
+        else if(role == 4) newRole = type_of_user.patient;
+        else{
+            emit invalidRole();
+            return (false,"Invalid role");
+        }
+        addressToRoles[msg.sender].role = newRole;
+        if(role!=4) addressToRoles[msg.sender].isVerified  = verificationStatus.verfied;
+        return (true,"user role changed");
+    }
+
+    function changeVerificationStatus(address userAddress,uint status) public returns(bool){
+        if(status==0){
+            addressToRoles[userAddress].isVerified = verificationStatus.notVerfied;
+        }else if(status==1){
+            addressToRoles[userAddress].isVerified = verificationStatus.verfied;
+        }else if(status==2){
+            addressToRoles[userAddress].isVerified = verificationStatus.rejected;
+        }
+        return true;
+    }
+
+    function getUserRole(address userAddress) public view returns(uint){
+        uint r = 0;
+        type_of_user role = addressToRoles[userAddress].role;
+        if(role==type_of_user.dummy) r = 0;
+        else if(role==type_of_user.admin) r = 1;
+        else if(role==type_of_user.worker) r = 2;
+        else if(role==type_of_user.doctor) r = 3;
+        else if(role==type_of_user.patient) r = 4;
+        return r;
+    }
+
 }

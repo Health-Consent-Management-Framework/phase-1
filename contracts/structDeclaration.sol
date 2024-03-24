@@ -14,6 +14,17 @@ struct Location{
     string state;
 }
 
+struct roleEle{
+    type_of_user role;
+    bool exists;
+    verificationStatus isVerified;
+}
+
+struct userRoleInfo{
+    address id;
+    roleEle roleInfo;
+}
+
 struct AdminType{
     string fname;
     string lname;
@@ -27,14 +38,8 @@ struct AdminType{
     uint DoB;
 }
 
-struct AdminRequest{
-    address walletAddress;
-    string email;
-    uint created_at;
-    RequestStatusType requestStatus; 
-}
 
-struct Doctor{
+struct DoctorType{
     string fname;
     string lname;
     string designation;
@@ -53,17 +58,6 @@ struct DoctorInfo{
     string designation;
     string[] degree;
     string email;
-}
-
-struct PatientType{
-    string fname;
-    string lname;
-}
-
-struct DoctorType{
-    string fname;
-    string lname;
-    string designation;
 }
 
 enum RequestStatus { pending, approved, rejected }
@@ -107,7 +101,7 @@ struct ReportType{
     string problem;
 }
 
-struct Patient {
+struct PatientType {
     string fname;
     string lname;
     string email;
@@ -129,17 +123,6 @@ struct PatientDeleteRequest{
     string reason;
 }
 
-struct roleEle{
-    type_of_user role;
-    bool exists;
-    verificationStatus isVerified;
-}
-
-struct userRoleInfo{
-    address id;
-    roleEle roleInfo;
-}
-
 struct workerType{
     string fname;
     string lname;
@@ -159,4 +142,11 @@ struct workerRequestType{
     verificationStatus isVerfied;
     string requestType;
     uint created_at;
+}
+
+struct AdminRequest{
+    address walletAddress;
+    string email;
+    uint created_at;
+    RequestStatusType requestStatus; 
 }

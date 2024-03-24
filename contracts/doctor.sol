@@ -22,7 +22,7 @@ contract Doctor{
         string[] degree;
         string email;
         string mobileNo;
-        bool doctorVerified;
+        bool isVerified;
         address walletAddress; 
         uint DoB;
         address[] patients; 
@@ -81,16 +81,15 @@ contract Doctor{
                             string memory mobileNo, 
                             string memory designation, 
                             string[] memory degree, 
-                            uint date,
-                            address walletAddress
+                            uint date
                         ) public returns(bool) {
-        if(doctors[walletAddress].walletAddress==address(0)){
-            emit DoctorNotFound(walletAddress);
+        if(doctors[msg.sender].walletAddress==address(0)){
+            emit DoctorNotFound(msg.sender);
         }
-        require(doctors[walletAddress].walletAddress == address(0), "Doctor with provided wallet address already exists");
+        require(doctors[msg.sender].walletAddress == address(0), "Doctor with provided wallet address already exists");
         address[] memory patientAddress = new address[](0);
-        doctors[walletAddress] = DoctorType(fname, lname, designation, degree, email, mobileNo, false, walletAddress,date,patientAddress);
-        emit DoctorCreated(walletAddress);
+        doctors[msg.sender] = DoctorType(fname, lname, designation, degree, email, mobileNo, false, walletAddress,date,patientAddress);
+        emit DoctorCreated(msg.sender);
         return true;
     }
 
@@ -169,4 +168,8 @@ contract Doctor{
         return keccak256(abi.encodePacked(str1)) == keccak256(abi.encodePacked(str2));
     }
 
+    function verifyUser(address walletAddress,bool updatedStatus) public returns (bool){
+        if(updatedStatus) doctors[walletAddress].isVerified = true;
+        return true;
+    }
 }

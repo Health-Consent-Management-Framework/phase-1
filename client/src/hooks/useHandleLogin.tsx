@@ -27,7 +27,7 @@ export const useHandleLogin = ()=>{
                 if (role == 4) {
                     const Patientdata = await patientContract.methods.getPatient(selectedWallet).call();
                     updateUser(Patientdata)
-                    if(Patientdata.walletAddress=="0x0000000000000000000000000000000000000000"){
+                    if(parseInt(Patientdata.walletAddress)==0){
                         navigate(`/addDetails/${selectedWallet}`)
                     }else{
                         navigate('/home')
@@ -35,27 +35,24 @@ export const useHandleLogin = ()=>{
                 } else if (role == 3) {
                     const doctorData = await doctorContract.methods.getDoctors(selectedWallet).call();
                     updateUser(doctorData); 
-                    if(doctorData.walletAddress=="0x0000000000000000000000000000000000000000"){
+                    if(parseInt(doctorData.walletAddress)==0){
                         navigate(`/addDetails/${selectedWallet}`)
                     }else{
                         navigate('/home')
                     }
                 } else if (role == 2) {
                    const workerData = await workerContract.methods.getWorker(selectedWallet).call();
-                   if(workerData.walletAddress=="0x0000000000000000000000000000000000000000"){
-                    navigate(`/addDetails/${selectedWallet}`)
-                }else{
-                    navigate('/home')
-                }
-                   updateUser(workerData); 
+                    if(parseInt(workerData.walletAddress,16)==0)
+                        navigate(`/addDetails/${selectedWallet}`)
+                    else navigate('/home')    
+                    updateUser(workerData); 
                 } else if (role == 1) {
                     const adminData = await adminContract.methods.getAdmin(selectedWallet).call();
-                    console.log(adminData)
-                    if(adminData.walletAddress=="0x0000000000000000000000000000000000000000"){
+                    if(parseInt(adminData.walletAddress,16)==0)
                         navigate(`/addDetails/${selectedWallet}`)
-                    }else{
+                    else
                         navigate('/home')
-                    }
+                    
                     updateUser(adminData); 
                 }
             }catch(err){
@@ -64,5 +61,4 @@ export const useHandleLogin = ()=>{
             }
         }
     }
-
 }

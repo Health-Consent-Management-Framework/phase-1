@@ -52,7 +52,10 @@ export const CombinedContextProvider:React.FC<{children:React.ReactNode}> = ({ch
         if(localStorage.getItem('user')) return JSON.parse(localStorage.getItem('user'))
         else return {}
     })
-    const [role,setRole] = useState(()=>localStorage.getItem("role")?JSON.parse(localStorage.getItem("role") as string):'')
+    const [role,setRole] = useState(()=>{
+        if(localStorage.getItem('role')) return JSON.parse(localStorage.getItem('role'))
+        else return {}
+    })
     const [hasProvider, setHasProvider] = useState<boolean>(false)
     const [wallet, setWallet] = useState<walletType>({accounts: []})
     const [web3,setWeb3] = useState<Web3 | undefined>()
@@ -75,9 +78,8 @@ export const CombinedContextProvider:React.FC<{children:React.ReactNode}> = ({ch
     }
 
     function updateRole(e:number){
-        setRole(()=>role)
-        console.log(e)
-        localStorage.setItem("role",e)
+        setRole(()=>e)
+        localStorage.setItem("role",JSON.stringify(e))
     }
 
     function updateWallet(e){

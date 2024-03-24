@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT 
-import "./user.sol";
 import "./requests.sol";
-import * as s from "./structDeclaration.sol";
+import './user.sol';
 
 pragma solidity ^0.8.21;
 
@@ -107,7 +106,6 @@ contract Worker{
     
 
     function createRequest(
-        string memory email,
         uint requestType,
         uint created_at
         ) public returns (bool){
@@ -117,8 +115,11 @@ contract Worker{
         //         return false;
         //     }
         // }
-        string memory requestId = randomString(10);
-        bool success = requestContract.createAccountRequest(requestId, msg.sender, created_at, 0, requestType);
+        // string memory requestId = randomString(10);
+        (bool success,string memory requestId) = requestContract.createAccountRequest(msg.sender, created_at, 0, requestType);
+        if(success){
+            emit RequestCreated();
+        }
         workerRequestKeys.push(requestId);
         workerRequests[msg.sender].push(requestId);
         return true;
@@ -255,4 +256,9 @@ contract Worker{
     //     }
     //     return requests;
     // }
+
+    function verifyUser(address walletAddress,bool updatedStatus) public returns (bool){
+        if(updatedStatus) workerData[walletAddress].isVerified = true;
+        return true;
+    }
 }

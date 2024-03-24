@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.21;
 
-import './worker.sol';
-import './admin.sol';
-
 contract Patient {
     uint totalPatients = 0;
     address userAddress;
@@ -127,6 +124,11 @@ contract Patient {
             allPatients[i] = patients[patientKeys[i]];
         }
         return allPatients;
+    }
+
+    function verifyUser(address walletAddress,bool updatedStatus) public returns (bool){
+        if(updatedStatus) patients[walletAddress].isVerified = true;
+        return true;
     }
 
 }
