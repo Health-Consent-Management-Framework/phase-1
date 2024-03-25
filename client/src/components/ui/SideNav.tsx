@@ -35,33 +35,33 @@ const SideNav:React.FC<propType> = (props) => {
     ],
     doctor:[
       {img:'/reportIcon.png',name:'My Reports',onClick:()=>navigate(routeConfig.reports)},
-      {icon:<NoteAddIcon/>,name:'Other Reports',onClick:()=>{navigate(routeConfig.reports);setQueryParams({type:'report',mode:'patient'})}},
+      {verfication:true,icon:<NoteAddIcon/>,name:'Other Reports',onClick:()=>{navigate(routeConfig.reports);setQueryParams({type:'report',mode:'patient'})}},
       {img:'/doctorIcon.png',name:'View Doctors',onClick:()=>navigate(routeConfig.doctors)},
       {img:'/facilityIcon.png',name:'View Facilites', onClick:()=>navigate(routeConfig.facility)},
       {img:'/viewRequests.png',name:'View Requests',onClick:()=>navigate(routeConfig.viewRequests)},
     ],
     worker:[
       {img:'/reportIcon.png',name:'My Reports',onClick:()=>navigate(routeConfig.reports)},
-      {icon:<NoteAddIcon/>,name:'Other Reports',onClick:()=>{navigate(routeConfig.reports);setQueryParams({type:'report',mode:'patient'})}},
+      {verfication:true,icon:<NoteAddIcon/>,name:'Other Reports',onClick:()=>{navigate(routeConfig.reports);setQueryParams({type:'report',mode:'patient'})}},
       {img:'/doctorIcon.png',name:'View Doctors',onClick:()=>navigate(routeConfig.doctors)},
       {img:'/facilityIcon.png',name:'View Facilites', onClick:()=>navigate(routeConfig.facility)},
       {img:'/me.png',
         name:'My Requests',
         onClick:()=>navigate(routeConfig.viewRequests),
       },
-      {img:'/viewRequests.png',name:'Others Requests',onClick:()=>{
+      {verfication:true,img:'/viewRequests.png',name:'Others Requests',onClick:()=>{
         navigate(routeConfig.viewRequests)
         setQueryParams({'user':'other'})
       }},
     ],
     admin:[
       {img:'/reportIcon.png',name:'Reports',onClick:()=>navigate(routeConfig.reports)},
-      {icon:<NoteAddIcon/>,name:'Upload Report',onClick:()=>{navigate(routeConfig.reports);setQueryParams({type:'report',mode:'patient'})}},
+      {verification:true,icon:<NoteAddIcon/>,name:'Upload Report',onClick:()=>{navigate(routeConfig.reports);setQueryParams({type:'report',mode:'patient'})}},
       {img:'/facilityIcon.png', name:'Facilites', onClick:()=>navigate(routeConfig.facility)},
-      {img:'/doctorIcon.png', name:'Doctors', onClick:()=>navigate(routeConfig.facility)},
+      {img:'/doctorIcon.png', name:'Doctors', onClick:()=>navigate(routeConfig.doctors)},
       {icon:<PersonAddAltIcon/>, name:'Add User',onClick:()=>navigate(routeConfig.addUser)},
       {img:"/me.png",name:'My Requests',onClick:()=>navigate(routeConfig.viewRequests)},
-      {icon:<InfoIcon/>,name:'Other Requests',onClick:()=>{
+      {verification:true,icon:<InfoIcon/>,name:'Other Requests',onClick:()=>{
         navigate(routeConfig.viewRequests)
         setQueryParams({'user':'other'})
       }},
@@ -101,7 +101,7 @@ const SideNav:React.FC<propType> = (props) => {
                   </article>
                 )
                 :(
-                  <button onClick={ele.onClick} className="flex gap-2 ps-2 text-[18px]">
+                  <button onClick={ele.onClick} className={`flex ${ele.verfication?user.isVerified?"":"hidden":""} gap-2 ps-2 text-[18px]`}>
                     {ele.icon&&ele.icon}
                     {ele.img&&<img className="w-6 h-6" src={ele.img}/>}
                     {ele.name}
