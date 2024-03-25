@@ -1,6 +1,5 @@
-// import { MdSpaceDashboard } from "react-icons/md";
-import React, { useEffect, useState } from "react";
-import roleEnum from "../utils/enums";
+import React, { useState } from "react";
+import {roleEnum} from "../utils/enums";
 import { routeConfig } from "../../router";
 import InfoIcon from '@mui/icons-material/Info';
 import { SlMenu } from "react-icons/sl";
@@ -18,16 +17,10 @@ interface propType{
 const SideNav:React.FC<propType> = (props) => {
   const [isOpen, setisOpen] = useState(false);
   const navigate = useNavigate();
-  const {user} = useCombinedContext();
-  const [role,setRole] = useState(()=>localStorage.getItem('role'))
+  const {user,role} = useCombinedContext();
   const [,setQueryParams] = useSearchParams()
   const [profileExpand,setProfileExpand] = useState(false)
   const [expand,setExpand] = useState(false)
-  interface menuElement{
-    name:string,
-    onClick:(props:any)=>void
-  }
-  
 
   const togglefunction = () => {
     setisOpen(!isOpen);
@@ -56,7 +49,10 @@ const SideNav:React.FC<propType> = (props) => {
         name:'My Requests',
         onClick:()=>navigate(routeConfig.viewRequests),
       },
-      {img:'/viewRequests.png',name:'Others Requests',onClick:()=>navigate(routeConfig.otherRequests)},
+      {img:'/viewRequests.png',name:'Others Requests',onClick:()=>{
+        navigate(routeConfig.viewRequests)
+        setQueryParams({'user':'other'})
+      }},
     ],
     admin:[
       {img:'/reportIcon.png',name:'Reports',onClick:()=>navigate(routeConfig.reports)},
@@ -64,7 +60,11 @@ const SideNav:React.FC<propType> = (props) => {
       {img:'/facilityIcon.png', name:'Facilites', onClick:()=>navigate(routeConfig.facility)},
       {img:'/doctorIcon.png', name:'Doctors', onClick:()=>navigate(routeConfig.facility)},
       {icon:<PersonAddAltIcon/>, name:'Add User',onClick:()=>navigate(routeConfig.addUser)},
-      {icon:<InfoIcon/>,name:'Requests',onClick:()=>navigate(routeConfig.viewRequests)},
+      {img:"/me.png",name:'My Requests',onClick:()=>navigate(routeConfig.viewRequests)},
+      {icon:<InfoIcon/>,name:'Other Requests',onClick:()=>{
+        navigate(routeConfig.viewRequests)
+        setQueryParams({'user':'other'})
+      }},
     ],
   } 
 

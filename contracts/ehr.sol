@@ -299,7 +299,7 @@ contract Report {
         return true;
     }
 
-    function updateReport(string memory reportId,string[] memory newDiagnosis) public onlyDoctorWithAccess(msg.sender,reportId) returns (bool s) {
+    function updateReport(string memory reportId,string[] memory newDiagnosis) public onlyDoctorWithAccess(msg.sender,reportId) returns (bool) {
         ReportType memory report = reports[reportId];
         report.diagnosis = newDiagnosis;
         // report.updatedAt = block.timestamp;

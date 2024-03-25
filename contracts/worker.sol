@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT 
-import "./user.sol";
 import "./requests.sol";
-
+import './user.sol';
 
 pragma solidity ^0.8.21;
 
@@ -53,8 +52,8 @@ contract Worker{
     }
 
     mapping(address=>workerType) workerData;
-    mapping(address=>workerRequestType) workerRequests;
-    address[] internal workerRequestKeys;
+    mapping(address=>string[]) workerRequests;
+    string[] internal workerRequestKeys;
     address[] internal workersKeys;
     User userContract;
     uint counter = 0;
@@ -78,9 +77,9 @@ contract Worker{
 
     string workerSecret = 'worker_123';
 
-    constructor(address userAddress){
+    constructor(address userAddress,address requestAddress){
         userContract = User(userAddress);
-        // requestContract = Request(requestAddress);
+        requestContract = Request(requestAddress);
         totalWorkers = 0;
     }
 
@@ -88,38 +87,41 @@ contract Worker{
         return workerData[senderAddress].walletAddress == senderAddress;
     }
 
-    function randomString(uint size) public  payable returns(string memory){
-        bytes memory randomWord=new bytes(size);
-        bytes memory chars = new bytes(26);
-        chars="abcdefghijklmnopqrstuvwxyz";
-        for (uint i=0;i<size;i++){
-            uint randomNumber=random(26);
-            randomWord[i]=chars[randomNumber];
-        }
-        return string(randomWord);
-    }
+    // function randomString(uint size) public  payable returns(string memory){
+    //     bytes memory randomWord=new bytes(size);
+    //     bytes memory chars = new bytes(26);
+    //     chars="abcdefghijklmnopqrstuvwxyz";
+    //     for (uint i=0;i<size;i++){
+    //         uint randomNumber=random(26);
+    //         randomWord[i]=chars[randomNumber];
+    //     }
+    //     return string(randomWord);
+    // }
 
-    function random(uint number) public payable returns(uint){
-        counter++;
-        return uint(keccak256(abi.encodePacked(block.timestamp,block.difficulty,  
-        msg.sender,counter))) % number;
-    }
+    // function random(uint number) public payable returns(uint){
+    //     counter++;
+    //     return uint(keccak256(abi.encodePacked(block.timestamp,block.difficulty,  
+    //     msg.sender,counter))) % number;
+    // }
     
 
     function createRequest(
-        string memory email,
-        string memory requestType,
-        uint date
+        uint requestType,
+        uint created_at
         ) public returns (bool){
-        for(uint i=0;i<workerRequestKeys.length;i++){
-            if(workerRequestKeys[i]==msg.sender){
-                emit RequestAlreadyCreated();
-                return false;
-            }
+        // for(uint i=0;i<workerRequestKeys.length;i++){
+        //     if(workerRequestKeys[i]==msg.sender){
+        //         emit RequestAlreadyCreated();
+        //         return false;
+        //     }
+        // }
+        // string memory requestId = randomString(10);
+        (bool success,string memory requestId) = requestContract.createAccountRequest(msg.sender, created_at, 0, requestType);
+        if(success){
+            emit RequestCreated();
         }
-        workerRequestType memory user = workerRequestType(msg.sender,email,verficationStatus.notVerfied,requestType,date); 
-        workerRequestKeys.push(msg.sender);
-        workerRequests[msg.sender] = user;
+        workerRequestKeys.push(requestId);
+        workerRequests[msg.sender].push(requestId);
         return true;
     }
 
@@ -163,61 +165,79 @@ contract Worker{
         return false;
     }
 
-    function approveWorkerRequest(address workerAddress) OnlyAdmin(msg.sender) public returns (bool){
-        bool exists = false;
-        uint index;
-        for(uint i=0;i<workerRequestKeys.length;i++){
-            if(workerRequestKeys[i]==workerAddress){
-                exists = true;
-                index = i;
-                break;
-            }
+    // function approveWorkerRequest(address workerAddress) OnlyAdmin(msg.sender) public returns (bool){
+    //     bool exists = false;
+    //     uint index;
+    //     for(uint i=0;i<workerRequestKeys.length;i++){
+    //         if(workerRequestKeys[i]==workerAddress){
+    //             exists = true;
+    //             index = i;
+    //             break;
+    //         }
+    //     }
+    //     if(exists){
+    //         workerData[workerAddress].isVerified = true;
+    //         workerRequests[workerAddress];
+    //         delete workerRequestKeys[index];
+    //         delete workerRequests[workerAddress];
+    //         return true;        
+    //     }else return false;
+    // }
+
+    // function rejectWorkerRequest(address workerRequestAddress) OnlyAdmin(msg.sender) public returns (bool) {
+    //     bool exists = false;
+    //     uint index;
+    //     for(uint i=0;i<workerRequestKeys.length;i++){
+    //         if(workerRequestKeys[i]==workerRequestAddress){
+    //             exists = true;
+    //             index = i;
+    //             break;
+    //         }
+    //     }
+    //     if(exists){
+    //         delete workerRequestKeys[index];
+    //         workerRequests[workerRequestAddress].isVerfied = verficationStatus.notVerfied;
+    //         return true;        
+    //     }
+    //     return true;
+    // }
+
+    // function deleteWorkerRequest() public returns (bool){
+    //     bool exists = false;
+    //     uint index;
+    //     for(uint i=0;i<workerRequestKeys.length;i++){
+    //         if(workerRequestKeys[i]==msg.sender){
+    //             exists = true;
+    //             index = i;
+    //             break;
+    //         }
+    //     }
+    //     if(exists){
+    //         delete workerRequestKeys[index];
+    //         delete workerRequests[msg.sender];
+    //         return true;        
+    //     }
+    //     return true;
+    // }
+
+    function randomString(uint size) public  payable returns(string memory){
+        bytes memory randomWord=new bytes(size);
+        // since we have 26 letters
+        bytes memory chars = new bytes(26);
+        chars="abcdefghijklmnopqrstuvwxyz";
+        for (uint i=0;i<size;i++){
+            uint randomNumber=random(26);
+            // Index access for string is not possible
+            randomWord[i]=chars[randomNumber];
         }
-        if(exists){
-            workerData[workerAddress].isVerified = true;
-            workerRequests[workerAddress];
-            delete workerRequestKeys[index];
-            delete workerRequests[workerAddress];
-            return true;        
-        }else return false;
+        return string(randomWord);
     }
 
-    function rejectWorkerRequest(address workerRequestAddress) OnlyAdmin(msg.sender) public returns (bool) {
-        bool exists = false;
-        uint index;
-        for(uint i=0;i<workerRequestKeys.length;i++){
-            if(workerRequestKeys[i]==workerRequestAddress){
-                exists = true;
-                index = i;
-                break;
-            }
-        }
-        if(exists){
-            delete workerRequestKeys[index];
-            workerRequests[workerRequestAddress].isVerfied = verficationStatus.notVerfied;
-            return true;        
-        }
-        return true;
-    }
-
-    function deleteWorkerRequest() public returns (bool){
-        bool exists = false;
-        uint index;
-        for(uint i=0;i<workerRequestKeys.length;i++){
-            if(workerRequestKeys[i]==msg.sender){
-                exists = true;
-                index = i;
-                break;
-            }
-        }
-        if(exists){
-            delete workerRequestKeys[index];
-            delete workerRequests[msg.sender];
-            return true;        
-        }
-        return true;
-    }
-
+    function random(uint number) public payable returns(uint){
+        counter++;
+        return uint(keccak256(abi.encodePacked(block.timestamp,block.difficulty,  
+        msg.sender,counter))) % number;
+    } 
 
     function compareString(string memory str1, string memory str2) public pure returns (bool) {
         return keccak256(abi.encodePacked(str1)) == keccak256(abi.encodePacked(str2));
@@ -228,7 +248,17 @@ contract Worker{
         return workerData[workerAddress];
     }
 
-    function getWorkerRequest() public view returns(workerRequestType memory) {
-        return workerRequests[msg.sender];
+    // function getMyAccountRequests(address senderAddress)public returns(s.AccountRequestType[] memory){
+    //     string[] memory requestIds = workerRequests[senderAddress];
+    //     s.AccountRequestType[] memory requests = new s.AccountRequestType[](requestIds.length);
+    //     for(uint i=0;i<size;i++){
+    //         requests.push(s.getAccountRequest(requestIds[i]));
+    //     }
+    //     return requests;
+    // }
+
+    function verifyUser(address walletAddress,bool updatedStatus) public returns (bool){
+        if(updatedStatus) workerData[walletAddress].isVerified = true;
+        return true;
     }
 }

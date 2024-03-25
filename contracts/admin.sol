@@ -7,6 +7,7 @@
 pragma solidity ^0.8.21;
 
 import './user.sol';
+import './requests.sol';
 
 contract Admin{
 
@@ -16,7 +17,7 @@ contract Admin{
     }
 
     User userContract;
-
+    Request requestContract;
     address[] public adminKeys;
     mapping(address => AdminType) public adminAddresses;
     address[] public adminRequestkeys;
@@ -64,6 +65,7 @@ contract Admin{
     constructor(address userContractAddress){
         masterAdmin = msg.sender;
         userContract = User(userContractAddress);
+        // requestContract = Request(requestContractAddress);
         totalAdminCount = 1;
     }
 
@@ -182,6 +184,11 @@ contract Admin{
         AdminType memory admin = AdminType(fname,lname,email,mobileNo,gender,isVerified,height,weight,walletAddress,dob);
         adminAddresses[walletAddress] = admin;
         emit AdminCreated(walletAddress);
+        return true;
+    }
+
+    function verifyUser(address walletAddress,bool updatedStatus) public returns (bool){
+        if(updatedStatus) adminAddresses[walletAddress].isVerified = true;
         return true;
     }
 

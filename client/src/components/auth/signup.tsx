@@ -4,8 +4,9 @@ import { useNavigate } from "react-router-dom"
 import {abi as UserAbi,networks as UserNetwork} from '../../contracts/User.json'
 import useContract from "../../hooks/useContract"
 import { routeConfig } from "../../router"
-import roleEnum from "../utils/enums"
+import {roleEnum} from "../utils/enums"
 import { useCombinedContext } from "../../store"
+import { BeatLoader } from "react-spinners"
 
 
 export const Signup:React.FC = ()=>{
@@ -17,6 +18,7 @@ export const Signup:React.FC = ()=>{
 
     const handleSubmit = async(e)=>{
         try{
+            console.log("submitting")
             e.preventDefault();
             setLoading(true);
             const {walletId,type,AdminKey} = e.target
@@ -57,6 +59,9 @@ export const Signup:React.FC = ()=>{
     
     return(
         <section className="w-screen min-h-screen h-dvh flex items-center justify-center">
+            <div className="absolute top-4 left-1/2 -translate-x-1/2">
+                <BeatLoader loading={loading} color="red" size={5}/>
+            </div>
             <div className="left-side hidden sm:flex sm:w-1/2 bg-red-300 items-center justify-center h-full">
                 <img src="/login.png" className="max-w-sm object-contain"/>
             </div>

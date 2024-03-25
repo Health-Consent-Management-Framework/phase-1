@@ -52,7 +52,10 @@ export const CombinedContextProvider:React.FC<{children:React.ReactNode}> = ({ch
         if(localStorage.getItem('user')) return JSON.parse(localStorage.getItem('user'))
         else return {}
     })
-    const [role,setRole] = useState(()=>localStorage.getItem("role")?JSON.parse(localStorage.getItem("role") as string):'')
+    const [role,setRole] = useState(()=>{
+        if(localStorage.getItem('role')) return JSON.parse(localStorage.getItem('role'))
+        else return {}
+    })
     const [hasProvider, setHasProvider] = useState<boolean>(false)
     const [wallet, setWallet] = useState<walletType>({accounts: []})
     const [web3,setWeb3] = useState<Web3 | undefined>()
@@ -70,18 +73,17 @@ export const CombinedContextProvider:React.FC<{children:React.ReactNode}> = ({ch
             }
             return value;
           })
-        localStorage.setItem('user',stringifiedUser)
-        setUser(e)
+          setUser(()=>e)
+          localStorage.setItem('user',stringifiedUser)
     }
 
     function updateRole(e:number){
-        setRole(role)
-        console.log(e)
-        localStorage.setItem("role",e)
+        setRole(()=>e)
+        localStorage.setItem("role",JSON.stringify(e))
     }
 
     function updateWallet(e){
-        setSelectedWallet(e)
+        setSelectedWallet(()=>e)
         localStorage.setItem('walletId',e)
     }
 
@@ -143,7 +145,7 @@ export const CombinedContextProvider:React.FC<{children:React.ReactNode}> = ({ch
             notification,updateNotification,selectedWallet,updateWallet,
             updateRole,updateUser,role,wallet,networkId,user,hasProvider,web3
             }}>
-            <div className={`inline-block duration-300 p-2 absolute ${shownNotification?`translate-y-[100px]`:`translate-y-[0px]`} -top-[100px] -translate-x-1/2 left-1/2`}>
+            <div className={`inline-block duration-300 p-2 z-10 absolute ${shownNotification?`translate-y-[100px]`:`translate-y-[0px]`} -top-[100px] -translate-x-1/2 left-1/2`}>
                 <article className="border-[1px] relative rounded-lg font-regular px-2 py-1 pr-6 w-[300px] text-center bg-white shadow-lg">
                     <p>{notification?.message}</p>
                     <button onClick={()=>{closeInvitation()}} className="absolute border-[1px] h-fit duration-300 rounded-2xl px-1 inline-block right-0 hover:border-red-500 top-1/2 -translate-y-1/2">

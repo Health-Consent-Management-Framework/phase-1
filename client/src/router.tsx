@@ -10,7 +10,7 @@ import AddDetails from "./components/forms/addDetails";
 import AddUser from './components/forms/addUser'
 import RequestSection from "./components/requests/reportRequests";
 import ReportRequest from "./components/requests/reportRequests";
-import RequestsMiddleware from "./components/requests/RquestsPage";
+import RequestsMiddleware from "./components/requests/RequestsPage";
 
 const router = createBrowserRouter([
  {
@@ -126,7 +126,7 @@ export const routeConfig = {
     login:'/auth',
     signup:'/auth/signup',
     changeRole:'/auth/changeRole',
-    dashboard:'/home',
+    home:'/home',
     reports:'/home/reports',
     facility:'/home/facilites',
     doctors:'/home/doctors',
@@ -134,7 +134,6 @@ export const routeConfig = {
     addWorker:'/admin/worker',
     addUser:'/home/addUser',
     viewRequests:'/home/requests',
-    otherRequests:'/home/requests/other',
     report:(id:string|number)=>`/home/report/${id}`,
     editFacility:(id:string|number)=>`home/facilites/${id}`,
     editReport:(id:string|number)=>`/reports/edit/${id}`,

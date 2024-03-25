@@ -1,5 +1,6 @@
 import { useEffect } from "react"
-import { Outlet, useNavigate } from "react-router-dom"
+import { Outlet, Navigate,useNavigate } from "react-router-dom"
+import { requestTypeEnum } from "../utils/enums";
 
 import styled from "styled-components";
 import ProfileDetails from "../ProfileDetails"
@@ -9,6 +10,7 @@ import {abi as PatientAbi,networks as PatientNetwork} from '../../contracts/Pati
 import {abi as DoctorAbi,networks as DoctorNetwork} from '../../contracts/Doctor.json'
 import {abi as WorkerAbi,networks as WorkerNetwork} from '../../contracts/Worker.json'
 import {abi as AdminAbi,networks as AdminNetwork} from '../../contracts/Admin.json'
+import {abi as RequestAbi,networks as RequestNetwork} from '../../contracts/Request.json'
 // import {abi as UserAbi,networks as UserNetwork} from '../../contracts/User.json'
 
 import useContract from "../../hooks/useContract";
@@ -35,11 +37,16 @@ const Hr = styled.hr`
 
 const HomeMiddleware = ()=>{
     const navigate = useNavigate()
-    const {updateUser,user,role,selectedWallet} = useCombinedContext()
+    const {updateUser,user,role,selectedWallet,updateNotification} = useCombinedContext()
     const patientContract = useContract(PatientAbi,PatientNetwork)
     const workerContract = useContract(WorkerAbi,WorkerNetwork)
     const adminContract = useContract(AdminAbi,AdminNetwork)
     const doctorContract = useContract(DoctorAbi,DoctorNetwork)
+    const requestContract = useContract(RequestAbi,RequestNetwork)
+
+    useEffect(()=>{
+      // triggering rerender on role or select wallet change
+    },[role,selectedWallet])
 
     function handleNavigate(data){
         if(data.walletAddress === '0x0000000000000000000000000000000000000000'){
@@ -71,36 +78,24 @@ const HomeMiddleware = ()=>{
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[patientContract,doctorContract,adminContract,workerContract,selectedWallet])
     
-    useEffect(()=>{
-        if (!localStorage.getItem('role') || !localStorage.getItem('walletId')) navigate('/auth');
-    },[])
-
-
-
     async function requestVerification(){
-        const selectedWallet = localStorage.getItem('walletId')
-        const role = localStorage.getItem('role')
+      try{
         const createdAt = new Date().getTime()
-        console.log(role)
+        console.log(role,selectedWallet)
         if(selectedWallet){
-            if(role=='3'){
-                const doctorData = await doctorContract?.methods.createVerificationRequest(createdAt).send({from:selectedWallet});
-                console.log(doctorData)
-            }else if(role=='2'){
-                const workerData = await workerContract?.methods.createRequest(user.email,'verify',createdAt).send({from:selectedWallet})
-                console.log(workerData)
-            }else if(role=='1'){
-                const adminData = await adminContract?.methods.createVerificationRequest(createdAt).send({from:selectedWallet})
-                console.log(adminData)
-            }
+            const data = await requestContract?.methods.createAccountRequest(selectedWallet,createdAt,0,requestTypeEnum.verification).send({from:selectedWallet})
+            console.log(data)
         }
+      }catch(err){
+        updateNotification({type:"error",message:"Somenthing went wrong"})
+      }
     }
 
     function deleteAccount(){
 
     }
 
-    return(
+    return role&&selectedWallet?(
         <section className="h-screen flex">
             <SideNav requestVerification={requestVerification} deleteAccount={deleteAccount}/>
             <Container>
@@ -111,7 +106,7 @@ const HomeMiddleware = ()=>{
                 </Wrapper>
             </Container>
         </section>
-    )
+    ):<Navigate to={'/auth'}/>
 }
 
 export default HomeMiddleware

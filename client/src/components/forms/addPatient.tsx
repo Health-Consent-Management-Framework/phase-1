@@ -1,7 +1,7 @@
 import {abi,networks} from '../../contracts/Patient.json';
 import { LabeledInput, Button, LabeledSelect } from '../ui';
 import useContract from '../../hooks/useContract';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BeatLoader } from 'react-spinners';
 import { useCombinedContext } from '../../store';
@@ -12,18 +12,6 @@ export const AddPatient:React.FC = () => {
   const params = useParams()
   const navigate = useNavigate()
   const [loading,setLoading] = useState(false);
-
-  useEffect(()=>{
-    async function fetchPatient() {
-      const data = await contract?.methods.getPatient(params.id).call()
-      console.log(data)
-      if(data&&data.walletAddress!='0x0000000000000000000000000000000000000000'){
-        navigate('/home')
-      }
-    }
-    if(contract) fetchPatient()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[contract,params])
 
   const handleSubmit = async (e) => {
     try {

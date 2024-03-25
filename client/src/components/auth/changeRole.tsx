@@ -6,20 +6,15 @@ import useContract from "../../hooks/useContract"
 
 const ChangeRole:React.FC = ()=>{
     const navigate = useNavigate()
-    
-    const {updateNotification,selectedWallet,web3} = useCombinedContext()
+    const {updateNotification,selectedWallet} = useCombinedContext()
 
     const contract = useContract(abi,networks)
-
-    // async function generateSignature(data){  
-    //     return await web3?.eth.personal.sign(JSON.stringify(data),selectedWallet,'')
-    //  }
 
     const handleSubmit = async(e)=>{
         console.log(e)
         e.preventDefault();
-        const {walletId,role} = e.target;
-        const transaction = await contract?.methods.changeRole().send({from:walletId.value}) 
+        const {role} = e.target;
+        const transaction = await contract?.methods.changeUserRole(role.value).send({from:selectedWallet}) 
         console.log(transaction)
         if(transaction?.status){
             updateNotification({type:"success",message:"user logged in successfully"})

@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 import MoreVertIcon from '@mui/icons-material/MoreVert'; 
 import { useEffect, useRef } from 'react';
+import { useCombinedContext } from '../../store';
 
 const Container=styled.div`
     height:215px;
@@ -27,7 +28,7 @@ const Details=styled.div`
 
 const ReportCard = ({disease,reportId,verified,date,viewRequests,expand, updateExpand, link, index,tags,requestVerification,deleteReport,viewReport}) => {
     const popUpRef = useRef<HTMLDivElement>(null)
-
+    const {role} = useCombinedContext()
     return (
     <Container>
             <div className='flex items-center justify-between'>
@@ -55,7 +56,7 @@ const ReportCard = ({disease,reportId,verified,date,viewRequests,expand, updateE
                         <button onClick={()=>viewRequests(reportId)} className='text-sm duration-300 hover:bg-blue-600 w-full rounded-md p-1 text-white'>
                             View Requests
                         </button>
-                        {localStorage.getItem('role')=='2'&&<button className='text-sm duration-300 hover:bg-blue-600 rounded-md p-1 text-white'>Edit Report</button>}
+                        {role==2&&<button className='text-sm duration-300 hover:bg-blue-600 rounded-md p-1 text-white'>Edit Report</button>}
                         <button className='text-sm duration-300 hover:bg-blue-600 rounded-md p-1 text-white'>Delete Report</button>
                     </article>
                 </div>

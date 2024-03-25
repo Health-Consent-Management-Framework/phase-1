@@ -13,17 +13,17 @@ export const AddAdmin:React.FC = ()=>{
     const [loading,setLoading] = useState(false)
     const params = useParams();
 
-    useEffect(()=>{
-      async function fetchPatient() {
-        const data = await contract?.methods.getAdmin(params.id).call()
-        console.log(data)
-        if(data&&data.walletAddress!='0x0000000000000000000000000000000000000000'){
-          navigate('/home')
-        }
-      }
-      if(contract) fetchPatient()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[contract,params])
+    // useEffect(()=>{
+    //   async function fetchPatient() {
+    //     const data = await contract?.methods.getAdmin(params.id).call()
+    //     console.log(data)
+    //     if(data&&data.walletAddress!='0x0000000000000000000000000000000000000000'){
+    //       navigate('/home')
+    //     }
+    //   }
+    //   if(contract) fetchPatient()
+    // // eslint-disable-next-line react-hooks/exhaustive-deps
+    // },[contract,params])
 
 
     const handleSubmit = async (e) => {

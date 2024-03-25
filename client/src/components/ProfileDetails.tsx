@@ -2,10 +2,9 @@
 import styled from "styled-components";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import MailIcon from "@mui/icons-material/Mail";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import { useEffect } from "react";
+import { useCallback } from "react";
 import { useCombinedContext } from "../store";
-import { Button } from "./ui";
+import { roleEnum } from "./utils/enums";
 
 const Container = styled.div`
   display: flex;
@@ -69,21 +68,17 @@ const DoctorDetails = styled.div`
 const ProfileDetails = () => {
   const {role,user} = useCombinedContext();
 
-  useEffect(()=>{
-    console.log(user)
-  },[user])
-
-  function calculateAge(year){
+  const calculateAge = useCallback((year)=>{
     const givenYear = new Date(year)
     const curr_year = new Date()
-    console.log(curr_year.getFullYear(),year)
     return curr_year.getFullYear() - givenYear.getFullYear();
-  }
+  },[])
 
-  function getDoB(dob){
+  const getDoB = useCallback((dob)=>{
     const date = new Date(Number(dob));
-    return `${date.getDate()}-${date.getMonth()}-${date.getFullYear()}`
-  }
+    return `${date.getDate()}-${date.getMonth()}-${date.getFullYear()}`    
+  },[])
+
 
   function getRole(){
     if(role==1) return 'Admin'
@@ -98,7 +93,7 @@ const ProfileDetails = () => {
       <Details>
         <Name>{user.fname} {user.lname}</Name>
         <article>
-          <span>{getRole()}</span>
+          <span className="capitalize">{roleEnum[role]}</span>
           <span className={`w-3 h-3 mx-2 inline-block rounded-md ${user.isVerified?"bg-green-500":"bg-red-500"}`}></span>
         </article>
         <Data>

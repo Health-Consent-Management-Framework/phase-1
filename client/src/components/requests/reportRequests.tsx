@@ -1,19 +1,16 @@
 import { useSearchParams } from "react-router-dom";
 import useContract from "../../hooks/useContract";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useCombinedContext } from "../../store";
 import {abi as ReportAbi,networks as ReportNetwork} from '../../contracts/Report.json'
 import { BeatLoader } from "react-spinners";
 
-interface propType{
-    requests:any,
-    loading:boolean
-}
 
-const ReportRequest:React.FC<propType> = (props)=>{
-    const {selectedWallet} = useCombinedContext()
+const ReportRequest:React.FC<propType> = ()=>{
+    const {selectedWallet,role} = useCombinedContext()
     const reportContract = useContract(ReportAbi,ReportNetwork)
-    const [verficationRequests,setVerificationRequests] = useState([])
+    const [requests,setRequests] = useState([])
+    const [loading,setLoading] = useState(false)
     const [searchParams] = useSearchParams()
     
     function getDate(number){
@@ -49,8 +46,8 @@ const ReportRequest:React.FC<propType> = (props)=>{
                     </tr>
                 </thead>
                 <tbody>
-                    {props.loading&&<BeatLoader size={10} color="blue" loading={props.loading}></BeatLoader>}
-                    {/* {props.requests.length&&props.requests?.map((ele,index)=>(
+                    {loading&&<BeatLoader size={10} color="blue" loading={loading}></BeatLoader>}
+                    {/* {requests.length&&requests?.map((ele,index)=>(
                         <tr>
                             <td className="px-4 py-2 bg-gray-200 text-center">{index}</td>
                             <td className="px-4 py-2 bg-gray-200 text-center">
