@@ -67,6 +67,7 @@ contract Report {
     uint256 private nonce;
     mapping(address => DoctorType) public doctors;
     mapping(address => string[]) private userToReportMapping;
+    
     mapping(string => AccessRequest[]) public accessRequests;
     mapping(string => verficationRequestType[]) public verficationRequests;
 
@@ -249,27 +250,6 @@ contract Report {
         msg.sender,counter))) % number;
     }
     
-    function getVerificationRequest(address userAddress) public view returns(verficationRequestType[][] memory){
-        uint count = 0;
-        string[] memory reportId = userToReportMapping[userAddress];
-
-        for(uint i=0;i<reportId.length;i++){
-            count += verficationRequests[reportId[i]].length;
-        }
-
-        verficationRequestType[][] memory vr = new verficationRequestType[][](count);
-        for(uint i=0;i<reportId.length;i++){
-            for(uint j=0;j<verficationRequests[reportId[i]].length;j++){
-                verficationRequestType[] memory vri = verficationRequests[reportId[i]];
-                vr[i][j] = vri[j]; 
-            }
-        }
-        return vr;
-    }
-
-    function getVerificationRequestForReport(string memory reportId) public view returns(verficationRequestType[] memory){
-        return verficationRequests[reportId];
-    }
 
     function createTempReport(string memory problem,string[] memory attachement,string[] memory tags) public returns(bool){
         string memory reportId = randomString(15);

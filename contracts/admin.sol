@@ -65,7 +65,6 @@ contract Admin{
     constructor(address userContractAddress){
         masterAdmin = msg.sender;
         userContract = User(userContractAddress);
-        // requestContract = Request(requestContractAddress);
         totalAdminCount = 1;
     }
 

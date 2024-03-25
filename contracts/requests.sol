@@ -109,8 +109,9 @@ contract Request{
         return (true,requestId);
     }
 
-    function EditAccountStatus(string memory requestId,uint status,uint updatedAt) public returns(bool){
+    function EditAccountRequestStatus(string memory requestId,uint status,uint updatedAt) public returns(bool){
         RequestStatusEnumType rs;
+        // normal request rejection
         if(status==0){
             rs = RequestStatusEnumType.pending;
         }else if(status==1){
@@ -121,6 +122,8 @@ contract Request{
 
         if(bytes(accountRequests[requestId].requestId).length>0){
             accountRequests[requestId].requestStatus = rs;
+            accountRequests[requestId].updatedAt = updatedAt;
+            accountRequests[requestId].updatedBy = msg.sender;
             return true;
         }else return false; 
     }
@@ -141,7 +144,7 @@ contract Request{
                 }else if(toBeVerifedRole==2){
                    success = workerContract.verifyUser(toBeVerifed,true);
                 }else if(toBeVerifedRole==1){
-                   success = workerContract.verifyUser(toBeVerifed,true);
+                   success = adminContract.verifyUser(toBeVerifed,true);
                 }
             }else if(verifierRole==2){
                 if(toBeVerifedRole==3||toBeVerifedRole==3){
@@ -155,11 +158,12 @@ contract Request{
             }
         }
         if(success){
-            accountRequests[requestId].requestStatus = requestStatusEnum.approved;
+            accountRequests[requestId].requestStatus = RequestStatusEnumType.approved;
             emit accountActivated(toBeVerifed);
         }
         return success;
     }
+
 
     function deleteAccountRequest(string memory requestId,address senderAddress) public returns (bool) {
         string[] memory r = addressToRequests[senderAddress];

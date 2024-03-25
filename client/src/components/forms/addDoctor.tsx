@@ -90,7 +90,7 @@ export const AddDoctor:React.FC = () => {
                         }}
                         renderInput={(params) => 
                         <div className="px-1">
-                            <label className="pb-1 text-sm self-start">Tags</label>
+                            <label className="pb-1 text-sm self-start">Degrees</label>
                             <TextField  sx={{
                                 '& .MuiOutlinedInput-root': {
                                     padding:0,

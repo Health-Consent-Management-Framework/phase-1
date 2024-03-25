@@ -23,7 +23,7 @@ const RequestsMiddleware = ()=>{
         <section className="w-full">
         <div className="w-full flex items-center justify-between">
             <article className="flex flex-col p-2 border-black">
-                <span className="font-medium text-lg">My Requests</span>
+                <span className="font-medium text-lg">{searchParams.get('user')=='other'?"Other":"My"} Requests</span>
             </article>
 
             <div className="flex gap-4">

@@ -135,12 +135,9 @@ const ProfileDetails = () => {
       {
         role==3&&(
           <Doctor>
-          <Avatar
-            style={{ height: "50px", width: "50px" }}
-            src="https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png"
-          />
+
           <DoctorDetails>
-            {user.length&&(
+            
               <>
               
               <span
@@ -154,7 +151,7 @@ const ProfileDetails = () => {
                 ))}
               </article>
               </>
-            )}
+            
           </DoctorDetails>
           </Doctor>
         )

@@ -69,7 +69,7 @@ const AccountRequest:React.FC = ()=>{
 
     async function rejectAccountRequest(requestId){
         const time = new Date().getTime()
-        const transaction = await requestContract?.methods.RejectAccountRequest(requestId,requestStatusEnum.rejected,time).send({from:selectedWallet});
+        const transaction = await requestContract?.methods.EditAccountStatus(requestId,requestStatusEnum.rejected,time).send({from:selectedWallet});
         console.log(transaction)
     }
 
@@ -125,10 +125,10 @@ const AccountRequest:React.FC = ()=>{
                             {searchParams.get('user')=='other'&&(
                                 <td>
                                     <article className="flex justify-center items-center">
-                                        <IconButton onClick={()=>approveAccountRequest(ele.requestId)}>
+                                        <IconButton disabled={ele.requestStatus==requestStatusEnum.approved} onClick={()=>approveAccountRequest(ele.requestId)}>
                                             <ThumbUp color="success"/>
                                         </IconButton>
-                                        <IconButton onClick={()=>rejectAccountRequest(ele.requestId)}>
+                                        <IconButton disabled={ele.requestStatus==requestStatusEnum.rejected} onClick={()=>rejectAccountRequest(ele.requestId)}>
                                             <ThumbDown color="error"/>
                                         </IconButton>
                                     </article>

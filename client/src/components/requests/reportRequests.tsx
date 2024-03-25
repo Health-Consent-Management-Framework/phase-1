@@ -1,13 +1,13 @@
 import { useSearchParams } from "react-router-dom";
 import useContract from "../../hooks/useContract";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useCombinedContext } from "../../store";
 import {abi as ReportAbi,networks as ReportNetwork} from '../../contracts/Report.json'
 import { BeatLoader } from "react-spinners";
 
 
 const ReportRequest:React.FC<propType> = ()=>{
-    const {selectedWallet,role} = useCombinedContext()
+    const {selectedWallet} = useCombinedContext()
     const reportContract = useContract(ReportAbi,ReportNetwork)
     const [requests,setRequests] = useState([])
     const [loading,setLoading] = useState(false)
@@ -15,6 +15,7 @@ const ReportRequest:React.FC<propType> = ()=>{
     
     function getDate(number){
         console.log(number)
+        number = Number(number)
         if(number==0) return '-'
         const date = new Date(number);
         return `${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}`
@@ -24,10 +25,34 @@ const ReportRequest:React.FC<propType> = ()=>{
         if(status==0){
             return `pending`
         }else if(status==1){
-            
+            return "approved"
         }else if(status==2){
             return "rejected"
         }
+    }
+
+    useEffect(()=>{
+        if(reportContract){ 
+            if(searchParams.get('user')=='other'){
+                getAllRequests();
+            }else getMyRequests();
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[reportContract])
+
+    async function getMyRequests(){
+        console.log("called")
+        if(reportContract){
+            console.log("inside")
+            const data = await reportContract.methods.getPatientReports(selectedWallet).call({from:selectedWallet})
+            if(data) setRequests(data)
+        }
+    }
+
+    async function getAllRequests(){
+        const data = await reportContract?.methods.getOtherAccountRequests(selectedWallet).call({from:selectedWallet});
+        console.log(data)
+        if(data) setRequests(data)
     }
 
 
@@ -47,7 +72,7 @@ const ReportRequest:React.FC<propType> = ()=>{
                 </thead>
                 <tbody>
                     {loading&&<BeatLoader size={10} color="blue" loading={loading}></BeatLoader>}
-                    {/* {requests.length&&requests?.map((ele,index)=>(
+                    {requests?.map((ele,index)=>(
                         <tr>
                             <td className="px-4 py-2 bg-gray-200 text-center">{index}</td>
                             <td className="px-4 py-2 bg-gray-200 text-center">
@@ -60,13 +85,13 @@ const ReportRequest:React.FC<propType> = ()=>{
                                 {getStatus(Number(ele.status))}
                             </td>
                             <td className="px-4 py-2 bg-gray-200 text-center">
-                                {getWorker(Number(ele.status))}
+                                {ele.updatedBy}
                             </td>
                             <td className="px-4 py-2 bg-gray-200 text-center">
                                 {getDate(Number(ele.updatedAt))}
                             </td>
                         </tr>
-                    ))} */}
+                    ))}
                 </tbody>
                 </table>
             </div>
