@@ -1,13 +1,17 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
-import {CombinedContextProvider} from './store'
+import { CombinedContextProvider } from './store'
+// import { ThemeProvider } from '@mui/material/styles'
+// import theme from './lib/materal.lib.ts'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <CombinedContextProvider>
-      <App />
-    </CombinedContextProvider>
+    {/* <ThemeProvider theme={theme}> */}
+      <CombinedContextProvider>
+        <App />
+      </CombinedContextProvider>
+    {/* </ThemeProvider> */}
   </React.StrictMode>,
 )

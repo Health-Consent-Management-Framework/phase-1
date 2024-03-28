@@ -8,11 +8,12 @@ import { AddReport } from "./forms/addReport";
 import { BeatLoader } from 'react-spinners'
 import { useCombinedContext } from "../store";
 import { Button } from "./ui";
+import { roleEnum } from "./utils/enums";
 
 const PatientReports:React.FC = ()=>{
   const reportContract = useContract(ReportAbi,ReportNetwork);
   const [reports,setReports] = useState([])
-  const {selectedWallet,role,updateNotification} = useCombinedContext()
+  const {selectedWallet,role,updateNotification,user} = useCombinedContext()
   const [searchParams,setSearchPrams] = useSearchParams()
   const [loading,setLoading] = useState(false)
   const [reportPopUp,setReportPopUp] = useState(false)
@@ -25,23 +26,23 @@ const PatientReports:React.FC = ()=>{
     else setReportExpand(index)
   }
 
-
   function handleReportPopUpClose(){
     setReportPopUp(false)
   }
+
+  async function fetchReports(){
+    setLoading(true)
+    const data = await reportContract?.methods.getPatientReports(selectedWallet).call({from:selectedWallet})
+    console.log(data)
+    if(data){
+      setReports(data)
+    }else {
+      updateNotification({type:"success",message:"Failed to fetch reports"})
+    }
+    setLoading(false)
+  }
   
   useEffect(()=>{
-    async function fetchReports(){
-      setLoading(true)
-      const data = await reportContract?.methods.getPatientReports(selectedWallet).call({from:selectedWallet})
-      console.log(data)
-      if(data){
-        setReports(data)
-      }else {
-        updateNotification({type:"success",message:"Failed to fetch reports"})
-      }
-      setLoading(false)
-    }
     if(reportContract&&selectedWallet) {
       fetchReports()
     }
@@ -50,8 +51,15 @@ const PatientReports:React.FC = ()=>{
   async function requestVerification(reportId){
     const date = new Date();
     const seconds = date.getTime();
+    console.log(seconds)
     const data = await reportContract?.methods.createVerificationRequest(reportId,seconds).send({from:selectedWallet});
     console.log(data)
+  }
+
+  async function DeleteReport(reportId){
+    const data = await reportContract?.methods.deleteReport(reportId).send({from:selectedWallet});
+    console.log(data)
+    fetchReports();
   }
 
   async function viewReportRequests(reportId){
@@ -60,17 +68,22 @@ const PatientReports:React.FC = ()=>{
 
   return(
     <div className="w-full relative flex-col gap-4">
-        <div className="w-full flex items-center px-10 py-1 rounded-md justify-between">
+        <div className="w-full flex items-center px-10 py-1 mb-2 rounded-md justify-between">
           <h1 className="text-xl font-medium p-0">Reports</h1>
-          <Button onClick={()=>{setReportPopUp(true)}} className={`p-0 ${role==1||role==2?"":"bg-blue-400"}`} buttonType="primary">Add Report</Button>
+          <div className="flex gap-2">
+            <Button onClick={()=>{setReportPopUp(true)}} className={`p-0 ${role==1||role==2?"":"bg-blue-400"}`} buttonType="primary">Add Report</Button>
+            {(roleEnum[role]=='admin'||roleEnum[role]=='worker')&&user.isVerified&&<Button onClick={()=>{setReportPopUp(true)}} className={`p-0 ${role==1||role==2?"":"bg-blue-400"}`} >Add Other Report</Button>}
+          </div>
         </div>
         {!reports.length&&<p className="text-center w-full">These are your Reports</p>}
         <div className="w-full flex absolute top-2 left-1/2 -translate-x-1/2 items-center justify-center">
           <BeatLoader loading={loading} size={10} color="blue"/>
         </div>
-        {reports.map((ele,index)=>(
-            <ReportElement viewRequests={viewReportRequests} reportId={ele.reportId} requestVerification={requestVerification} verified={ele.isVerified} link={ele.attachements[0]} tags={ele.tags} key={index} index={index} updateExpand={updateReportOpen} expand={reportExpand==index} disease={ele.problem} date={ele.date} />
+        <div className="flex items-center flex-wrap gap-5">
+          {reports.map((ele,index)=>(
+            <ReportElement viewRequests={viewReportRequests} reportId={ele.reportId} deleteReport={DeleteReport} requestVerification={requestVerification} verified={ele.isVerified} link={ele.attachements[0]} tags={ele.tags} key={index} index={index} updateExpand={updateReportOpen} expand={reportExpand==index} disease={ele.problem} date={ele.date} />
           ))}
+        </div>
         <Dialog
             PaperProps={{
               style: {

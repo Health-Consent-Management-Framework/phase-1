@@ -4,7 +4,6 @@ import { routeConfig } from "../../router";
 import InfoIcon from '@mui/icons-material/Info';
 import { SlMenu } from "react-icons/sl";
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
-import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {useCombinedContext} from "../../store"
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -17,10 +16,9 @@ interface propType{
 const SideNav:React.FC<propType> = (props) => {
   const [isOpen, setisOpen] = useState(false);
   const navigate = useNavigate();
-  const {user,role} = useCombinedContext();
+  const {user,role,updateUser,updateRole} = useCombinedContext();
   const [,setQueryParams] = useSearchParams()
   const [profileExpand,setProfileExpand] = useState(false)
-  const [expand,setExpand] = useState(false)
 
   const togglefunction = () => {
     setisOpen(!isOpen);
@@ -35,31 +33,30 @@ const SideNav:React.FC<propType> = (props) => {
     ],
     doctor:[
       {img:'/reportIcon.png',name:'My Reports',onClick:()=>navigate(routeConfig.reports)},
-      {verfication:true,icon:<NoteAddIcon/>,name:'Other Reports',onClick:()=>{navigate(routeConfig.reports);setQueryParams({type:'report',mode:'patient'})}},
+      {verification:true,icon:<NoteAddIcon/>,name:'Other Reports',onClick:()=>{navigate(routeConfig.reports);setQueryParams({type:'report',mode:'patient'})}},
       {img:'/doctorIcon.png',name:'View Doctors',onClick:()=>navigate(routeConfig.doctors)},
       {img:'/facilityIcon.png',name:'View Facilites', onClick:()=>navigate(routeConfig.facility)},
       {img:'/viewRequests.png',name:'View Requests',onClick:()=>navigate(routeConfig.viewRequests)},
     ],
     worker:[
       {img:'/reportIcon.png',name:'My Reports',onClick:()=>navigate(routeConfig.reports)},
-      {verfication:true,icon:<NoteAddIcon/>,name:'Other Reports',onClick:()=>{navigate(routeConfig.reports);setQueryParams({type:'report',mode:'patient'})}},
+      {verification:true,icon:<NoteAddIcon/>,name:'Other Reports',onClick:()=>{navigate(routeConfig.reports);setQueryParams({type:'report',mode:'patient'})}},
       {img:'/doctorIcon.png',name:'View Doctors',onClick:()=>navigate(routeConfig.doctors)},
       {img:'/facilityIcon.png',name:'View Facilites', onClick:()=>navigate(routeConfig.facility)},
       {img:'/me.png',
         name:'My Requests',
         onClick:()=>navigate(routeConfig.viewRequests),
       },
-      {verfication:true,img:'/viewRequests.png',name:'Others Requests',onClick:()=>{
+      {verification:true,img:'/viewRequests.png',name:'Others Requests',onClick:()=>{
         navigate(routeConfig.viewRequests)
         setQueryParams({'user':'other'})
       }},
     ],
     admin:[
       {img:'/reportIcon.png',name:'Reports',onClick:()=>navigate(routeConfig.reports)},
-      {verification:true,icon:<NoteAddIcon/>,name:'Upload Report',onClick:()=>{navigate(routeConfig.reports);setQueryParams({type:'report',mode:'patient'})}},
       {img:'/facilityIcon.png', name:'Facilites', onClick:()=>navigate(routeConfig.facility)},
       {img:'/doctorIcon.png', name:'Doctors', onClick:()=>navigate(routeConfig.doctors)},
-      {icon:<PersonAddAltIcon/>, name:'Add User',onClick:()=>navigate(routeConfig.addUser)},
+      // {icon:<PersonAddAltIcon/>, name:'Add User',onClick:()=>navigate(routeConfig.addUser)},
       {img:"/me.png",name:'My Requests',onClick:()=>navigate(routeConfig.viewRequests)},
       {verification:true,icon:<InfoIcon/>,name:'Other Requests',onClick:()=>{
         navigate(routeConfig.viewRequests)
@@ -71,12 +68,14 @@ const SideNav:React.FC<propType> = (props) => {
   const handleLogout = ()=>{
     localStorage.clear()
     navigate(routeConfig.login)
+    updateUser({})
+    updateRole('')
   }
 
 
   return (
     <>
-      <div className="bg-slate-50 border-2 h-screen border-slate-400 pt-10 w-[300px] px-8 text-left  flex flex-col min-h-screen">
+      <div className="bg-slate-50 border-2 h-screen border-slate-400 pt-10 min-w-[280px] px-8 text-left  flex flex-col min-h-screen">
         <span className="font-medium text-2xl text-[#4864d6]">
             Report Dash
         </span>
@@ -101,7 +100,7 @@ const SideNav:React.FC<propType> = (props) => {
                   </article>
                 )
                 :(
-                  <button onClick={ele.onClick} className={`flex ${ele.verfication?user.isVerified?"":"hidden":""} gap-2 ps-2 text-[18px]`}>
+                  <button onClick={ele.onClick} className={`flex ${ele.verification?user.isVerified?"":"hidden":""} gap-2 ps-2 text-[18px]`}>
                     {ele.icon&&ele.icon}
                     {ele.img&&<img className="w-6 h-6" src={ele.img}/>}
                     {ele.name}
@@ -126,7 +125,7 @@ const SideNav:React.FC<propType> = (props) => {
               {!user.isVerified&&(
                 <button onClick={props.requestVerification} className="py-3 w-full duration-300 hover:text-white font-medium rounded-md mt-1 text-black text-center hover:bg-[#4864d697]">Request Verification</button>
               )}
-              <button onClick={props.deleteAccount} className="py-3 w-full duration-300 hover:text-white font-medium rounded-md mt-1 text-black text-center hover:bg-[#4864d697]">Delete Account</button>
+              {/* <button onClick={props.deleteAccount} className="py-3 w-full duration-300 hover:text-white font-medium rounded-md mt-1 text-black text-center hover:bg-[#4864d697]">Delete Account</button> */}
               <button className="py-3 w-full duration-300 hover:text-white font-medium rounded-md mt-1 text-black text-center hover:bg-[#4864d697]" onClick={handleLogout}>Log Out</button>
             </article>
         </div>

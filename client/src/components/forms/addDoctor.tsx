@@ -21,7 +21,8 @@ export const AddDoctor:React.FC = () => {
       e.preventDefault();
       if(contract) {
         const {fname,lname,DoB,email,phoneno,designation} = e.target
-        const [year,month,day] = DoB.value.split('-').map(ele=>Number(ele))
+        const date = new Date(DoB.value).getTime()
+        console.log(phoneno)
         console.log(
           fname.value,
           lname.value,
@@ -29,7 +30,7 @@ export const AddDoctor:React.FC = () => {
           phoneno.value,
           designation.value,
           degrees,
-          day,month,year,
+          date,
           params.id          
         )
         const transaction = await contract?.methods.createDoctor(
@@ -39,8 +40,7 @@ export const AddDoctor:React.FC = () => {
                                                     phoneno.value,
                                                     designation.value,
                                                     degrees,
-                                                    day,month,year,
-                                                    params.id
+                                                    date
                                                     )
                                                   .send({ from: params.id,gas:"1000000" });
         // navigate('/patient', { state: { patientAddress: patientAddress.value } });
@@ -74,7 +74,6 @@ export const AddDoctor:React.FC = () => {
               <LabeledInput textStyle="text-blue-700 capitalize" type="text" name="phoneno" label="phone number"/>
               <LabeledInput textStyle="text-blue-700 capitalize" type="date" name="DoB" label="date of birth"/>
             </div>
-              <LabeledInput textStyle="text-blue-700 capitalize" type="text" name="phoneno" label="phone number"/>
               <div className="flex justify-evenly">
                     <Autocomplete
                         clearIcon={false}

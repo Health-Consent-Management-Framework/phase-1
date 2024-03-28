@@ -1,13 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useSearchParams } from "react-router-dom";
 import useContract from "../../hooks/useContract";
 import React, { useEffect, useState } from "react";
 import { useCombinedContext } from "../../store";
 import {abi as ReportAbi,networks as ReportNetwork} from '../../contracts/Report.json'
 import { BeatLoader } from "react-spinners";
+import { IconButton } from "@mui/material";
+import { ThumbDown,ThumbUp } from "@mui/icons-material";
+import { reportRequestTypeEnum, roleEnum } from "../utils/enums";
 
 
-const ReportRequest:React.FC<propType> = ()=>{
-    const {selectedWallet} = useCombinedContext()
+const ReportRequest:React.FC = ()=>{
+    const {selectedWallet,role} = useCombinedContext()
     const reportContract = useContract(ReportAbi,ReportNetwork)
     const [requests,setRequests] = useState([])
     const [loading,setLoading] = useState(false)
@@ -44,13 +48,36 @@ const ReportRequest:React.FC<propType> = ()=>{
         console.log("called")
         if(reportContract){
             console.log("inside")
-            const data = await reportContract.methods.getPatientReports(selectedWallet).call({from:selectedWallet})
+            const data = await reportContract.methods.getMyRequests(selectedWallet).call({from:selectedWallet})
             if(data) setRequests(data)
+            console.log(data)
         }
     }
 
+
+    async function approveVerfifcationRequest(requestId,reportId){
+        const updatedAt = new Date().getTime()
+        const data = await reportContract?.methods.approveVerfifcationRequest(requestId,reportId,updatedAt).send({from:selectedWallet})
+        console.log(data)
+    }
+
+    async function rejectVerificationRequest(){
+        const data = await reportContract?.methods.rejectVerfifcationRequest(requestId,reportId,updatedAt).send({from:selectedWallet})
+        console.log(data)
+    }
+
+    async function approveAccessRequest(){
+        const data = await reportContract?.methods.approveAccessRequest(requestId,reportId,updatedAt).send({from:selectedWallet})
+        console.log(data)
+    }
+
+    async function rejectAccessRequest() {
+        const data = await reportContract?.methods.rejectAccessRequest(requestId,reportId,updatedAt).send({from:selectedWallet})
+        console.log(data)
+    }
+
     async function getAllRequests(){
-        const data = await reportContract?.methods.getOtherAccountRequests(selectedWallet).call({from:selectedWallet});
+        const data = await reportContract?.methods.getAllRequests(selectedWallet).call({from:selectedWallet});
         console.log(data)
         if(data) setRequests(data)
     }
@@ -61,34 +88,59 @@ const ReportRequest:React.FC<propType> = ()=>{
             <div className="p-5 w-full">
                 <table className="w-full rounded-lg shadow mx-auto">
                 <thead>
-                    <tr>
+                    <tr className="border-2 border-black">
                         <th className="px-4 py-2 bg-gray-200 text-center"></th>
                         <th className="px-4 py-2 bg-gray-200 text-center">Report ID</th>
+                        <th className="px-4 py-2 bg-gray-200 text-center">SentBy</th>
                         <th className="px-4 py-2 bg-gray-200 text-center">Created At</th>
+                        <th className="px-4 py-2 bg-gray-200 text-center">RequestType</th>
                         <th className="px-4 py-2 bg-gray-200 text-center">Status</th>
-                        <th className="px-4 py-2 bg-gray-200 text-center">UpdatedBy</th>
+                        <th className="px-4 py-2 bg-gray-200 text-center">UpdatedBy/RecievedBy</th>
                         <th className="px-4 py-2 bg-gray-200 text-center">UpdatedAt</th>
+                        <th className="px-4 py-2 bg-gray-200 text-center">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody className="bg-blue-300 border-2 border-blue-500">
                     {loading&&<BeatLoader size={10} color="blue" loading={loading}></BeatLoader>}
                     {requests?.map((ele,index)=>(
-                        <tr>
-                            <td className="px-4 py-2 bg-gray-200 text-center">{index}</td>
-                            <td className="px-4 py-2 bg-gray-200 text-center">
+                        <tr key={index}>
+                            <td className="px-4 py-2 text-center">{ele.requestId}</td>
+                            <td className="px-4 py-2 text-center">
                                 {ele.reportId}
                             </td>
-                            <td className="px-4 py-2 bg-gray-200 text-center">
+                            <td  className="px-4 py-2 text-center">
+                                <p className="inline-block w-20 text-ellipsis overflow-hidden">
+                                {ele.sentBy}
+                                </p>
+                            </td>
+                            <td className="px-4 py-2 text-center">
                                 {getDate(Number(ele.createdAt))}
                             </td>
-                            <td className="px-4 py-2 bg-gray-200 text-center">
+                            <td className="px-4 py-2 text-center">
                                 {getStatus(Number(ele.status))}
                             </td>
-                            <td className="px-4 py-2 bg-gray-200 text-center">
+                            <td className="px-4 py-2 text-center">
+                                {getDate(Number(ele.createdAt))}
+                            </td>
+                            <td className="px-4 py-2 text-center">
                                 {ele.updatedBy}
                             </td>
-                            <td className="px-4 py-2 bg-gray-200 text-center">
+                            <td className="px-4 py-2 text-center">
                                 {getDate(Number(ele.updatedAt))}
+                            </td>
+                            <td>
+                            {(reportRequestTypeEnum[Number(ele.requestType)]=="verification"&&roleEnum[Number(role)]=="admin"||roleEnum[Number(role)]=='worker')||reportRequestTypeEnum[Number(ele.requestType)]!="verification"&&(
+                                <td>
+                                    <article className="flex justify-center items-center">
+                                        <IconButton onClick={()=>approveReportRequest(ele.requestId,ele.reportId)}>
+                                            <ThumbUp color="success"/>
+                                        </IconButton>
+                                        <IconButton  onClick={()=>rejectReportRequest(ele.requestId,ele.reportId)}>
+                                            <ThumbDown color="error"/>
+                                        </IconButton>
+                                    </article>
+                                </td>
+                            )}
                             </td>
                         </tr>
                     ))}
