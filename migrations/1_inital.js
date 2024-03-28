@@ -19,7 +19,7 @@ module.exports = async function(deployer,network,accounts) {
   await deployer.deploy(Worker,Admin.address,Request.address,{from:deployerAddress});
   await deployer.deploy(Facility,Admin.address,{from:deployerAddress});
   await deployer.deploy(Patient,User.address,{from:deployerAddress});
-  await deployer.deploy(Report,Patient.address,Doctor.address,Worker.address,User.address,{from:deployerAddress})
+  await deployer.deploy(Report,User.address,{from:deployerAddress})
   await deployer.deploy(Request,User.address,Admin.address,Worker.address,Doctor.address,Patient.address,{from:deployerAddress});
 
 };
