@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {roleEnum} from "../utils/enums";
 import { routeConfig } from "../../router";
 import InfoIcon from '@mui/icons-material/Info';
+import {Dashboard} from '@mui/icons-material';
 import { SlMenu } from "react-icons/sl";
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -26,6 +27,7 @@ const SideNav:React.FC<propType> = (props) => {
 
   const menuConfig = {
     patient:[
+      {icon:<Dashboard/>,name:"Home",onClick:()=>navigate(routeConfig.home)},
       {img:'/reportIcon.png',name:'Reports',onClick:()=>navigate(routeConfig.reports)},
       {img:'/doctorIcon.png',name:'View Doctors',onClick:()=>navigate(routeConfig.doctors)},
       {img:'/facilityIcon.png',name:'View Facilites', onClick:()=>navigate(routeConfig.facility)},

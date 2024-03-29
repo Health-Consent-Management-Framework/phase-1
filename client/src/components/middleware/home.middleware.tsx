@@ -3,7 +3,6 @@ import { Outlet, Navigate,useNavigate } from "react-router-dom"
 import { requestTypeEnum } from "../utils/enums";
 
 import styled from "styled-components";
-import ProfileDetails from "../ProfileDetails"
 import SideNav from "../ui/SideNav"
 
 import {abi as PatientAbi,networks as PatientNetwork} from '../../contracts/Patient.json'
@@ -15,25 +14,6 @@ import {abi as RequestAbi,networks as RequestNetwork} from '../../contracts/Requ
 
 import useContract from "../../hooks/useContract";
 import { useCombinedContext } from "../../store";
-
-const Container = styled.div`
-  background-color: #faf7f5;
-  height: 100%;
-  overflow-y:auto;
-  flex-grow:1;
-  padding: 10px 30px;
-`;
-
-const Wrapper = styled.div`
-  display: flex;
-  align-items: center;
-  gap:30px;
-  flex-wrap:wrap;
-`;
-const Hr = styled.hr`
-  margin: 12px 0px;
-  border: 0.5px solid #aaaaaa;
-`;
 
 
 const HomeMiddleware = ()=>{
@@ -97,13 +77,7 @@ const HomeMiddleware = ()=>{
     return role&&selectedWallet?(
         <section className="h-screen flex">
             <SideNav requestVerification={requestVerification} deleteAccount={deleteAccount}/>
-            <Container>
-                <ProfileDetails />
-                <Hr />
-                <Wrapper>
-                    <Outlet/>
-                </Wrapper>
-            </Container>
+            <Outlet/>
         </section>
     ):<Navigate to={'/auth'}/>
 }

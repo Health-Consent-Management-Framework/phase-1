@@ -4,11 +4,13 @@ import ReportElement from "./ui/ReportCardElement";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Dialog, DialogContent } from "@mui/material";
+import {AddCircleRounded} from '@mui/icons-material'
 import { AddReport } from "./forms/addReport";
 import { BeatLoader } from 'react-spinners'
 import { useCombinedContext } from "../store";
 import { Button } from "./ui";
 import { roleEnum } from "./utils/enums";
+import { routeConfig } from "../router";
 
 const PatientReports:React.FC = ()=>{
   const reportContract = useContract(ReportAbi,ReportNetwork);
@@ -24,6 +26,10 @@ const PatientReports:React.FC = ()=>{
   function updateReportOpen(index:number){
     if(index==reportExpand) setReportExpand(-1)
     else setReportExpand(index)
+  }
+
+  function viewReport(id){
+    navigate(routeConfig.viewReport(id));
   }
 
   function handleReportPopUpClose(){
@@ -68,10 +74,12 @@ const PatientReports:React.FC = ()=>{
 
   return(
     <div className="w-full relative flex-col gap-4">
-        <div className="w-full flex items-center px-10 py-1 mb-2 rounded-md justify-between">
+        <div className="w-full flex items-center px-10 py-3 border-b-2  mb-2 justify-between">
           <h1 className="text-xl font-medium p-0">Reports</h1>
           <div className="flex gap-2">
-            <Button onClick={()=>{setReportPopUp(true)}} className={`p-0 ${role==1||role==2?"":"bg-blue-400"}`} buttonType="primary">Add Report</Button>
+            <Button onClick={()=>{setReportPopUp(true)}} className={`p-0 border-white shadow-sm ${role==1||role==2?"":"bg-blue-400"}`} buttonType="primary">
+              <AddCircleRounded sx={{color:"white"}}/>
+            </Button>
             {(roleEnum[role]=='admin'||roleEnum[role]=='worker')&&user.isVerified&&<Button onClick={()=>{setReportPopUp(true)}} className={`p-0 ${role==1||role==2?"":"bg-blue-400"}`} >Add Other Report</Button>}
           </div>
         </div>
@@ -79,9 +87,9 @@ const PatientReports:React.FC = ()=>{
         <div className="w-full flex absolute top-2 left-1/2 -translate-x-1/2 items-center justify-center">
           <BeatLoader loading={loading} size={10} color="blue"/>
         </div>
-        <div className="flex items-center flex-wrap gap-5">
+        <div className="flex items-center p-4 flex-wrap gap-5">
           {reports.map((ele,index)=>(
-            <ReportElement viewRequests={viewReportRequests} reportId={ele.reportId} deleteReport={DeleteReport} requestVerification={requestVerification} verified={ele.isVerified} link={ele.attachements[0]} tags={ele.tags} key={index} index={index} updateExpand={updateReportOpen} expand={reportExpand==index} disease={ele.problem} date={ele.date} />
+            <ReportElement viewRequests={viewReportRequests} viewReport={viewReport} reportId={ele.reportId} deleteReport={DeleteReport} requestVerification={requestVerification} verified={ele.isVerified} link={ele.attachements[0]} tags={ele.tags} key={index} index={index} updateExpand={updateReportOpen} expand={reportExpand==index} disease={ele.problem} date={ele.date} />
           ))}
         </div>
         <Dialog
