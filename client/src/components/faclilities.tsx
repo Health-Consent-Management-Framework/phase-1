@@ -3,19 +3,24 @@ import {abi ,networks} from '../contracts/Facility.json'
 import useContract from "../hooks/useContract";
 import { useCombinedContext } from "../store";
 import { Button } from "./ui";
+import { MoreVert } from '@mui/icons-material'
 import { AddFacility } from "./forms/addFacility";
-import { Dialog, DialogContent } from "@mui/material";
+import { Dialog, DialogContent, IconButton } from "@mui/material";
+import { roleEnum } from "./utils/enums";
 
 interface facility{
     facilityName:string,
     facilityType:string,
+    facilityId:string,
+    intro:string,
     location:{street:string,state:string,country:string},
 }
 
 export const Facilities:React.FC = ()=>{
 
     const [facilties,setFacilites] = useState<facility[]>([])
-    const {wallet,updateNotification,role} = useCombinedContext();
+    const [menuExpand,setMenuExpand] = useState<number>()
+    const {selectedWallet,updateNotification,role} = useCombinedContext();
     const contract = useContract(abi,networks)
     const [openPopup,setOpenPopUp] = useState(false)
 
@@ -25,7 +30,7 @@ export const Facilities:React.FC = ()=>{
             try{
                 if(contract){
                     console.log("inside")
-                    const data = await contract.methods.getFacilities().call({from:wallet.accounts[0]}) 
+                    const data = await contract.methods.getFacilities().call({from:selectedWallet}) 
                     setFacilites(data as facility[])
                     console.log(data)
                 }    
@@ -51,6 +56,16 @@ export const Facilities:React.FC = ()=>{
         setOpenPopUp(false);
     }
 
+    function updateMenuOpen(index:number){
+        if(index==menuExpand) setMenuExpand(-1)
+        else setMenuExpand(index)
+    }
+
+    async function deleteFacility(id:string){
+        const data = await contract?.methods.removeFacility(id).send({from:selectedWallet});
+        console.log(data)
+    }
+
     return(
         <section className="w-full">
             {role==1&&(<div className="w-full flex justify-end px-10 py-2">
@@ -58,9 +73,24 @@ export const Facilities:React.FC = ()=>{
             </div>)}
             <div className="p-3" id="facilities-wrapper">
                 <p className="text-center pb-4">These are facilities</p>
-                <div className="flex justify-evenly">
+                <div className="flex gap-5 flex-wrap">
                 {facilties.map((ele,index)=>(                    
-                    <article key={index} className="border-[1px] cursor-pointer border-black p-2 hover:border-red-200  duration-300 rounded-lg w-[200px] shadow-lg flex flex-col">
+                    <div key={index} className="relative border-[1px] cursor-pointer border-black p-2 hover:border-red-200  duration-300 rounded-lg w-[200px] shadow-lg flex flex-col">
+                        {roleEnum[role]==='admin'&&(
+                            <div className="absolute top-2 right-2">
+                                <div className="relative">
+                                    <IconButton onClick={()=>updateMenuOpen(index)}>
+                                        <MoreVert/>
+                                    </IconButton>
+                                    {menuExpand==index&&(
+                                        <article className="bg-blue-500 rounded-md z-10 absolute top-[100%] -right-[100%]">
+                                            {/* <button className="bg-blue-500 my-[2px] hover:bg-sky-500 hover:text-white w-full duration-300 text-center whitespace-nowrap px-3 py-2">Edit Facility</button> */}
+                                            <button onClick={()=>{deleteFacility(ele.facilityId)}} className="bg-blue-500 my-[2px] hover:bg-sky-500 hover:text-white w-full duration-300 text-center whitespace-nowrap px-3 py-2">Delete Facility</button>
+                                        </article>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                         <img className="bg-red-200 h-24 rounded-lg w-full mb-2" />
                         <div className="flex flex-col">
                             <span className="uppercase font-bold text-sm">{ele.facilityName}</span>
@@ -68,9 +98,9 @@ export const Facilities:React.FC = ()=>{
                             <span className="text-sm ">{getAccessType(ele.facilityType.toString())}</span>
                             <span className="text-xs font-bold inline-block ms-auto bg-red-200 rounded-md px-1 pt-[2px] uppercase">{`${ele.location.state}-${ele.location.district}`}</span>
                             </span>
-                            <span className="text-xs text-justify px-2">this is some information about the facility on how it is to be made in the canopy and all</span>
+                            <span className="text-xs text-justify px-2">{ele.intro}</span>
                         </div>
-                    </article>
+                    </div>
                 ))}
                 </div>
                 <></>

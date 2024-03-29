@@ -23,7 +23,7 @@ const router = createBrowserRouter([
     element:<HomeMiddleware/>,
     children:[
         {
-            path:'info',
+            path:'',
             element:<Home/>
         },
         {

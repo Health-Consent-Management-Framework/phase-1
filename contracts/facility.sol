@@ -30,6 +30,8 @@ contract Facility {
         string facilityId;
         Location location;
         accessType facilityType;
+        string intro;
+        string image;
         // Worker[] facilityWorkers;
         // string[] services;
     }
@@ -41,7 +43,7 @@ contract Facility {
     }
 
 
-    function createFacility(string memory facilityName,string memory state,string memory district,string memory street,string memory pincode,accessType facilityType) public returns(bool){
+    function createFacility(string memory facilityName,string memory state,string memory district,string memory street,string memory pincode,accessType facilityType,string memory facilityInfo,string memory image) public returns(bool){
         require(bytes(facilityName).length > 0, "name cannot be empty");
         require(bytes(state).length > 0, "state cannot be empty");
         require(bytes(district).length > 0, "state cannot be empty");
@@ -50,7 +52,7 @@ contract Facility {
         string memory randomIdentifer = generateRandomString(4);
         Location memory facilityLocation = Location(state, district, street);
         string memory facilityId = string(abi.encodePacked(facilityName,state,substring(street,0,4),'-',randomIdentifer));
-        FacilityType memory newFacility = FacilityType(facilityName,facilityId,facilityLocation,facilityType);
+        FacilityType memory newFacility = FacilityType(facilityName,facilityId,facilityLocation,facilityType,facilityInfo,image);
         facilityRegister[facilityId] = newFacility;
         facilityIds.push(facilityId);
         return true;
@@ -60,9 +62,6 @@ contract Facility {
         return facilityRegister[facilityId].location;
     }
 
-    // function getWorkers(string calldata facilityId) public view returns(Worker[] memory){
-    //     return facilityRegister[facilityId].facilityWorkers;
-    // }
 
     function getFacilty(string memory facilityId) internal view returns(FacilityType memory){
         return facilityRegister[facilityId];
@@ -75,25 +74,32 @@ contract Facility {
     }
 
     function removeFacility(string memory facilityId) public returns(bool){
-        require(bytes(facilityRegister[facilityId].facilityId).length!=0, "Facility not found");
-        facilityRegister[facilityId].facilityName = "";
-        facilityRegister[facilityId].facilityId = "";
-        facilityRegister[facilityId].location = Location("", "", "");
-        facilityRegister[facilityId].facilityType = accessType.local;
-        // facilityRegister[facilityId].facilityWorkers = new Worker[](0);
+        require(bytes(facilityId).length != 0, "Facility ID cannot be empty");
+        uint256 indexToRemove;
+        bool found = false;
+        for (uint256 i = 0; i < facilityIds.length; i++) {
+            if (keccak256(bytes(facilityIds[i])) == keccak256(bytes(facilityId))) {
+                indexToRemove = i;
+                found = true;
+                break;
+            }
+        }
+        require(found, "Facility ID not found");
+        delete facilityRegister[facilityId];
+        for (uint256 i = indexToRemove; i < facilityIds.length - 1; i++) {
+            facilityIds[i] = facilityIds[i + 1];
+        }
+        facilityIds.pop(); 
         return true;
     }
 
-        function getFacilities() public view returns (FacilityType[] memory) {
-            uint256 length = facilityIds.length;
-
-            FacilityType[] memory facilites = new FacilityType[](length);
-
-            for (uint256 i = 0; i < length; i++) {
-                facilites[i] = facilityRegister[facilityIds[i]];
-            }
-
-            return facilites;
+    function getFacilities() public view returns (FacilityType[] memory) {
+        uint256 length = facilityIds.length ;
+        FacilityType[] memory facilites = new FacilityType[](length);    
+        for (uint256 i = 0; i < length; i++) {
+            facilites[i] = facilityRegister[facilityIds[i]];
+        }
+        return facilites;
     }
 
     // function updateWorkers(string calldata facilityId,Worker[] memory workers) public returns(Worker[] memory){
@@ -101,7 +107,7 @@ contract Facility {
     //     return facilityRegister[facilityId].facilityWorkers;
     // }
 
-        function generateRandomString(uint256 length) public view returns (string memory) {
+    function generateRandomString(uint256 length) public view returns (string memory) {
         bytes memory characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         bytes memory randomString = new bytes(length);
 

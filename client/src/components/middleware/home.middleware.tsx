@@ -18,7 +18,8 @@ import { useCombinedContext } from "../../store";
 
 const Container = styled.div`
   background-color: #faf7f5;
-  height: 100vh;
+  height: 100%;
+  overflow-y:auto;
   flex-grow:1;
   padding: 10px 30px;
 `;
@@ -37,7 +38,7 @@ const Hr = styled.hr`
 
 const HomeMiddleware = ()=>{
     const navigate = useNavigate()
-    const {updateUser,user,role,selectedWallet,updateNotification} = useCombinedContext()
+    const {updateUser,role,selectedWallet,updateNotification} = useCombinedContext()
     const patientContract = useContract(PatientAbi,PatientNetwork)
     const workerContract = useContract(WorkerAbi,WorkerNetwork)
     const adminContract = useContract(AdminAbi,AdminNetwork)
@@ -91,9 +92,7 @@ const HomeMiddleware = ()=>{
       }
     }
 
-    function deleteAccount(){
-
-    }
+    function deleteAccount(){}
 
     return role&&selectedWallet?(
         <section className="h-screen flex">

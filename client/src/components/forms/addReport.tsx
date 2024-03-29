@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LabeledInput, Button } from "../ui"
 import {storage} from '../../firebaseconfig'
 import { useCombinedContext } from "../../store";
@@ -7,6 +7,7 @@ import { abi as reportAbi, networks as reportNetworks} from '../../contracts/Rep
 import { Autocomplete, Chip, TextField } from "@mui/material";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { BeatLoader } from "react-spinners";
+import { useSearchParams } from "react-router-dom";
 
 // interface Report{
 //     diagnoisedDoctor?:string,
@@ -20,8 +21,9 @@ import { BeatLoader } from "react-spinners";
 
 
 export const AddReport:React.FC = ()=>{
-    const {updateNotification,selectedWallet} = useCombinedContext()
+    const {updateNotification,selectedWallet,web3} = useCombinedContext()
     const reportContract = useContract(reportAbi,reportNetworks)
+    const [searchParams] = useSearchParams()
     const [loading,setLoading] = useState(false)
     const [tags,setTags] = useState<string[]>([])
 
@@ -45,10 +47,11 @@ export const AddReport:React.FC = ()=>{
             console.log(attachements.files[0])
             const downloadUrl = [await handleFileUpload(attachements.files[0])]
             console.log(downloadUrl)
-            const data = await reportContract?.methods.createTempReport(
+            const data = await reportContract?.methods.createReport(
                 problem.value,
                 downloadUrl,
-                tags
+                tags,
+                selectedWallet
             ).send({from:selectedWallet})
             if(Number(data?.status)){
                 updateNotification({type:'success',message:"Created report successfully"})
@@ -59,7 +62,7 @@ export const AddReport:React.FC = ()=>{
         }
         setLoading(false)
     }
-    
+
 
     return(
             <form onSubmit={handleSubmit} 
@@ -74,6 +77,9 @@ export const AddReport:React.FC = ()=>{
                     <div className="flex items-center justify-center duration-500 flex-wrap md:flex-nowrap">
                         <LabeledInput label="attachements" type="file" name="attachements"></LabeledInput>
                     </div>
+                    {/* <div className="flex items-center justify-center duration-500 flex-wrap md:flex-nowrap">
+                        <LabeledInput label="Address" outlineColor="blue" textStyle="text-blue-700 capitalize" name="owner"></LabeledInput>
+                    </div> */}
                     <div className="flex justify-evenly">
                     <Autocomplete
                         clearIcon={false}

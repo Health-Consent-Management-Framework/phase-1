@@ -50,6 +50,17 @@ contract Request{
         RequestStatusEnumType requestStatus; 
     }
 
+    struct ReportRequestType {
+        uint id;
+        string reportId;
+        address sentBy;
+        address receivedBy;
+        uint createdAt;
+        uint updatedAt;
+        RequestStatusEnumType status;
+        ReportRequestEnumType requestType;
+    }
+
     constructor(
         address userContractAddress,
         address adminContractAddress,
@@ -207,12 +218,13 @@ contract Request{
         return accountRequests[reportId];
     }
 
-    function getOtherAccountRequests(address senderAddress) public view returns(AccountRequestType[] memory){
+    function getOtherAccountRequests() public view returns(AccountRequestType[] memory){
         AccountRequestType[] memory requests = new AccountRequestType[](accountRequestKeys.length);
         for(uint i=0;i<accountRequestKeys.length;i++){
             requests[i] = accountRequests[accountRequestKeys[i]];
         }
         return requests;
     }
+
 }
 

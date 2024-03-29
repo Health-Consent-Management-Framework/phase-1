@@ -16,6 +16,11 @@ export const verificationEnum = {
     2:''
 }
 
+export const reportRequestTypeEnum = {
+    0:"verification",
+    1:"access"
+}
+
 export const requestTypeEnum = {
     verification:0,
     promotion:1,

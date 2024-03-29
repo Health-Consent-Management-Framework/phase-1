@@ -6,13 +6,23 @@ import { useSearchParams } from "react-router-dom";
 import { requestStatusEnum, requestTypeEnum } from "../utils/enums";
 import { ThumbDown, ThumbUp} from '@mui/icons-material';
 import { IconButton } from "@mui/material";
+// import { makeStyles } from '@mui/styles'
+
+// const useStyles = makeStyles(() => ({
+//     disabledButton: {
+//       backgroundColor: 'red', // Example styling for disabled state
+//       color: 'black', // Example text color for disabled state
+//       opacity: 0.5, // Example opacity for disabled state
+//       pointerEvents: 'none', // Prevent click events on disabled button
+//     },
+//   }));
+
 
 const AccountRequest:React.FC = ()=>{
     const {selectedWallet} = useCombinedContext()
     const requestContract = useContract(RequestAbi,RequestNetwork)
     const [requests,setRequests] = useState([])
     const [searchParams] = useSearchParams()
-    const [loading,setLoading] = useState([])
 
     function getDate(number){
         typeof number == 'bigint'?number = Number(number):''
@@ -125,10 +135,10 @@ const AccountRequest:React.FC = ()=>{
                             {searchParams.get('user')=='other'&&(
                                 <td>
                                     <article className="flex justify-center items-center">
-                                        <IconButton disabled={ele.requestStatus==requestStatusEnum.approved} onClick={()=>approveAccountRequest(ele.requestId)}>
+                                        <IconButton disabled={ele.requestStatus!=requestStatusEnum.pending} onClick={()=>approveAccountRequest(ele.requestId)}>
                                             <ThumbUp color="success"/>
                                         </IconButton>
-                                        <IconButton disabled={ele.requestStatus==requestStatusEnum.rejected} onClick={()=>rejectAccountRequest(ele.requestId)}>
+                                        <IconButton  disabled={ele.requestStatus!=requestStatusEnum.pending}  onClick={()=>rejectAccountRequest(ele.requestId)}>
                                             <ThumbDown color="error"/>
                                         </IconButton>
                                     </article>

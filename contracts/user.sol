@@ -195,4 +195,15 @@ contract User{
         return r;
     }
 
+    function deleteAccount(address userAddress) public returns(bool){
+        if(addressToRoles[userAddress].exists){
+            delete addressToRoles[userAddress];
+            return true;
+        }
+        else{
+            emit UserNotFound(userAddress);
+            return false;
+        }
+    }
+
 }

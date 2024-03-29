@@ -37,7 +37,7 @@ contract Doctor{
     }
 
     mapping(address => DoctorType) public doctors;
-    
+    DoctorType[] test;
     mapping(address=>string[]) public accountRequests;
 
     address[] private doctorKeys;
@@ -93,6 +93,24 @@ contract Doctor{
         return true;
     }
 
+    function createDoctorDummy(
+        string memory fname, 
+        string memory lname, 
+        string memory email,
+        string memory mobileNo, 
+        string memory designation, 
+        string[] memory degree, 
+        uint date,
+        address walletAddress
+    )public returns(bool){
+        address[] memory patientAddress = new address[](0);
+        DoctorType memory d= DoctorType(fname, lname, designation, degree, email, mobileNo, true, walletAddress,date,patientAddress);
+        doctors[walletAddress] = d;  
+        doctorKeys.push(walletAddress);
+        test.push(d);
+        emit DoctorCreated(walletAddress);
+        return true;
+    }
 
     function addPatientToDoctor(address doctorAddress, address patientAddress) public onlyDoctor returns(bool) {
         require(doctors[doctorAddress].walletAddress != address(0), "Invalid doctor address");
@@ -170,6 +188,23 @@ contract Doctor{
 
     function verifyUser(address walletAddress,bool updatedStatus) public returns (bool){
         if(updatedStatus) doctors[walletAddress].isVerified = true;
+        test.push(doctors[walletAddress]);
         return true;
+    }
+
+    function getVerifiedDoctors() public view returns(DoctorType[] memory){
+        uint count = 0;
+        for(uint i=0;i<doctorKeys.length;i++){
+            if(doctors[doctorKeys[i]].isVerified) count++;
+        }
+        DoctorType[] memory verifiedDoctors = new DoctorType[](count);
+        uint index = 0;
+        for(uint i=0;i<doctorKeys.length;i++){
+            if(doctors[doctorKeys[i]].isVerified){
+                verifiedDoctors[index] = doctors[doctorKeys[i]];
+                index++;
+            }
+        }
+        return verifiedDoctors;
     }
 }
