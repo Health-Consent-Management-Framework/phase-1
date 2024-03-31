@@ -135,6 +135,7 @@ export const routeConfig = {
     addWorker:'/admin/worker',
     addUser:'/home/addUser',
     viewRequests:'/home/requests',
+    viewConnections:'/home/connections',
     viewReport:(id:string|number)=>`/home/report/${id}`,
     editFacility:(id:string|number)=>`home/facilites/${id}`,
     editReport:(id:string|number)=>`/reports/edit/${id}`,

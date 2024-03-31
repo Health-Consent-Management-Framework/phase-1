@@ -89,6 +89,7 @@ contract Doctor{
         require(doctors[msg.sender].walletAddress == address(0), "Doctor with provided wallet address already exists");
         address[] memory patientAddress = new address[](0);
         doctors[msg.sender] = DoctorType(fname, lname, designation, degree, email, mobileNo, false, msg.sender,date,patientAddress);
+        doctorKeys.push(msg.sender);
         emit DoctorCreated(msg.sender);
         return true;
     }

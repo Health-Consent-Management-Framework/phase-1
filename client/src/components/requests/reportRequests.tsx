@@ -6,7 +6,7 @@ import { useCombinedContext } from "../../store";
 import {abi as ReportAbi,networks as ReportNetwork} from '../../contracts/Report.json'
 import { BeatLoader } from "react-spinners";
 import { IconButton } from "@mui/material";
-import { ThumbDown,ThumbUp } from "@mui/icons-material";
+import { ThumbDownOffAlt,ThumbUpOffAlt,AddTask } from "@mui/icons-material";
 import { reportRequestTypeEnum, roleEnum } from "../utils/enums";
 
 
@@ -57,12 +57,13 @@ const ReportRequest:React.FC = ()=>{
 
     async function approveVerfifcationRequest(requestId,reportId){
         const updatedAt = new Date().getTime()
-        const data = await reportContract?.methods.approveVerfifcationRequest(requestId,reportId,updatedAt).send({from:selectedWallet})
+        const data = await reportContract?.methods.approveVerificationRequest(reportId,requestId,updatedAt).send({from:selectedWallet})
         console.log(data)
     }
 
-    async function rejectVerificationRequest(){
-        const data = await reportContract?.methods.rejectVerfifcationRequest(requestId,reportId,updatedAt).send({from:selectedWallet})
+    async function rejectVerificationRequest(requestId,reportId){
+        const updatedAt = new Date().getTime()
+        const data = await reportContract?.methods.rejectVerificationRequest(requestId,reportId,updatedAt).send({from:selectedWallet})
         console.log(data)
     }
 
@@ -82,6 +83,9 @@ const ReportRequest:React.FC = ()=>{
         if(data) setRequests(data)
     }
 
+    async function approveAccess(){}
+
+    async function rejectAccess(){}
 
     return(
         <section className="w-full">
@@ -93,8 +97,8 @@ const ReportRequest:React.FC = ()=>{
                         <th className="px-4 py-2 bg-gray-200 text-center">Report ID</th>
                         <th className="px-4 py-2 bg-gray-200 text-center">SentBy</th>
                         <th className="px-4 py-2 bg-gray-200 text-center">Created At</th>
-                        <th className="px-4 py-2 bg-gray-200 text-center">RequestType</th>
                         <th className="px-4 py-2 bg-gray-200 text-center">Status</th>
+                        <th className="px-4 py-2 bg-gray-200 text-center">RequestType</th>
                         <th className="px-4 py-2 bg-gray-200 text-center">UpdatedBy/RecievedBy</th>
                         <th className="px-4 py-2 bg-gray-200 text-center">UpdatedAt</th>
                         <th className="px-4 py-2 bg-gray-200 text-center">Actions</th>
@@ -120,26 +124,38 @@ const ReportRequest:React.FC = ()=>{
                                 {getStatus(Number(ele.status))}
                             </td>
                             <td className="px-4 py-2 text-center">
-                                {getDate(Number(ele.createdAt))}
+                                {reportRequestTypeEnum[Number(ele.requestType)]}
                             </td>
                             <td className="px-4 py-2 text-center">
-                                {ele.updatedBy}
+                                {ele.updatedBy||'-'}
                             </td>
                             <td className="px-4 py-2 text-center">
                                 {getDate(Number(ele.updatedAt))}
                             </td>
                             <td>
-                            {(reportRequestTypeEnum[Number(ele.requestType)]=="verification"&&roleEnum[Number(role)]=="admin"||roleEnum[Number(role)]=='worker')||reportRequestTypeEnum[Number(ele.requestType)]!="verification"&&(
+                            {(reportRequestTypeEnum[Number(ele.requestType)]=="verification"&&(roleEnum[Number(role)]=="admin"||roleEnum[Number(role)]=='worker'))&&(
                                 <td>
                                     <article className="flex justify-center items-center">
-                                        <IconButton onClick={()=>approveReportRequest(ele.requestId,ele.reportId)}>
-                                            <ThumbUp color="success"/>
+                                        <IconButton onClick={()=>approveVerfifcationRequest(ele.id,ele.reportId)}>
+                                            <ThumbUpOffAlt color="success"/>
                                         </IconButton>
-                                        <IconButton  onClick={()=>rejectReportRequest(ele.requestId,ele.reportId)}>
-                                            <ThumbDown color="error"/>
+                                        <IconButton  onClick={()=>rejectVerificationRequest(ele.requestId,ele.reportId)}>
+                                            <ThumbDownOffAlt color="error"/>
                                         </IconButton>
                                     </article>
                                 </td>
+                            )}
+                            {reportRequestTypeEnum[Number(ele.requestType)]=='access'&&(
+                                <td>
+                                <article className="flex justify-center items-center">
+                                    <IconButton onClick={()=>approveAccess(ele.requestId,ele.reportId)}>
+                                        <ThumbUpOffAlt color="success"/>
+                                    </IconButton>
+                                    <IconButton  onClick={()=>rejectAccess(ele.requestId)}>
+                                        <ThumbDownOffAlt color="error"/>
+                                    </IconButton>
+                                </article>
+                            </td>
                             )}
                             </td>
                         </tr>

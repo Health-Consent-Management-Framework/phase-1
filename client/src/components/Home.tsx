@@ -60,17 +60,22 @@ export const Home:React.FC = ()=>{
             <div className="w-full flex items-center px-10 py-3 border-b-2  mb-2 justify-between">
                 <h1 className="text-xl font-medium p-0">Home</h1>
             </div>
-            <div className='p-5'>
-                <div className='card border-2 flex flex-col grow rounded-md py-8 px-10 shadow-sm w-full'>
+            <div className='p-1'>
+                <div className='card bg-wheat-100 border-2 flex flex-col grow rounded-md py-8 px-10 shadow-sm w-full'>
                     <ProfileDetails />
                 </div>
             </div>
-            <div className='flex my-2 justify-around m-auto rounded-lg shadow-lg p-5 max-w-[800px]'>
+            <div className='flex my-2 relative justify-around border-2 mx-2 pt-12 m-auto rounded-lg p-5'>
+                <h1 className='absolute top-4 left-10 font-medium'>Status</h1>
                 <IllustrationIcon icon={<DocumentScanner/>} name='No of Reports' count={33}/>
                 <IllustrationIcon icon={<DocumentScanner/>} name='No of Connections' count={33}/>
+                <IllustrationIcon icon={<DocumentScanner/>} name='New Notifications' count={33}/>
                 <IllustrationIcon icon={<DocumentScanner/>} name='No of Reports' count={33}/>
             </div>
-            {walletInfo}
+            <div className='border-2 mx-2 rounded-md p-2'>
+                <h1 className='pt-2 ps-10 font-medium'>Network Info</h1>
+                {walletInfo}
+            </div>
         </section>
 
     )

@@ -43,6 +43,7 @@ export const AddReport:React.FC = ()=>{
             setLoading(true)
             e.preventDefault();
             const {problem,attachements} = e.target
+            const date = new Date().getTime();
             console.log(problem.value,attachements.value,tags)
             console.log(attachements.files[0])
             const downloadUrl = [await handleFileUpload(attachements.files[0])]
@@ -51,7 +52,8 @@ export const AddReport:React.FC = ()=>{
                 problem.value,
                 downloadUrl,
                 tags,
-                selectedWallet
+                selectedWallet,
+                date
             ).send({from:selectedWallet})
             if(Number(data?.status)){
                 updateNotification({type:'success',message:"Created report successfully"})

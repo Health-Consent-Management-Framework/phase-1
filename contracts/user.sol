@@ -35,6 +35,10 @@ contract User{
     mapping(address=>roleEle) addressToRoles;
     mapping(string=>address) emailToAddress;
 
+    mapping(string=>address) usernameToAddress;
+    mapping(address=>string) addressToUsername;
+ 
+
     modifier onlyAdmin(){
         require(addressToRoles[msg.sender].role==type_of_user.admin && addressToRoles[msg.sender].isVerified==verificationStatus.verfied);
         _;
@@ -44,6 +48,8 @@ contract User{
         require(addressToRoles[msg.sender].role==type_of_user.worker && addressToRoles[msg.sender].isVerified==verificationStatus.verfied);
         _;
     }
+
+    // modifier onlyOwner(){}
 
     uint totalUsers;
 

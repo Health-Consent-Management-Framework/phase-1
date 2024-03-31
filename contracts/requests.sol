@@ -15,7 +15,7 @@ contract Request{
 
     enum RequestStatusEnumType {pending,approved,rejected}
 
-    enum AccountRequestEnumType {verfifcation,promotion,deletion}
+    enum AccountRequestEnumType {verfifcation,promotion,deletion,connect}
     
     enum ReportRequestEnumType {verification,access,deleteion}
 
@@ -44,6 +44,7 @@ contract Request{
         string requestId;
         address sentBy;
         address updatedBy;
+        string message;
         uint createdAt;
         uint updatedAt;
         AccountRequestEnumType requestType;
@@ -51,7 +52,7 @@ contract Request{
     }
 
     struct ReportRequestType {
-        uint id;
+        string id;
         string reportId;
         address sentBy;
         address receivedBy;
@@ -93,13 +94,17 @@ contract Request{
         msg.sender,counter))) % number;
     } 
 
-
     mapping(address=>string[]) addressToRequests; 
     mapping(string=>AccountRequestType) accountRequests;
+
     string[] accountRequestKeys; // admin can view all
+
+    // ---------------------------   Account Request ---------------------------------------- //
 
     function createAccountRequest(
         address senderAddress,
+        string memory message,
+        address recieverAddress,
         uint createdAt,
         uint updatedAt,
         uint requestType
@@ -111,12 +116,20 @@ contract Request{
             rt = AccountRequestEnumType.promotion;
         }else if(requestType==2){
             rt = AccountRequestEnumType.deletion;
+        }else if(requestType==3){
+            rt = AccountRequestEnumType.connect;
         }
         string memory requestId = randomString(10);
-        AccountRequestType memory r = AccountRequestType(requestId,senderAddress,address(0),createdAt,updatedAt,rt,RequestStatusEnumType.pending);
+        AccountRequestType memory r = AccountRequestType(requestId,senderAddress,recieverAddress,message,createdAt,updatedAt,rt,RequestStatusEnumType.pending);
         accountRequests[requestId] = r;
         addressToRequests[senderAddress].push(requestId);
-        accountRequestKeys.push(requestId);
+        if(requestType!=3){
+            // prevents adming from getting the connection requests;
+            accountRequestKeys.push(requestId);
+        }else{
+            //updating it in the reciever side so as to see request on his screen
+            addressToRequests[recieverAddress].push(requestId);
+        }
         return (true,requestId);
     }
 
@@ -146,25 +159,32 @@ contract Request{
         bool success;
         bool vv = userContract.getVerificationStatus(msg.sender, verifierRole);
         if(vv){
-            if(verifierRole==1){
-                userContract.changeVerificationStatus(toBeVerifed, 1);
-                if(toBeVerifedRole==4){
-                   success = patientContract.verifyUser(toBeVerifed,true);
-                }else if(toBeVerifedRole==3){
-                   success = doctorContract.verifyUser(toBeVerifed,true);
-                }else if(toBeVerifedRole==2){
-                   success = workerContract.verifyUser(toBeVerifed,true);
-                }else if(toBeVerifedRole==1){
-                   success = adminContract.verifyUser(toBeVerifed,true);
-                }
-            }else if(verifierRole==2){
-                if(toBeVerifedRole==3||toBeVerifedRole==3){
+            if(accountRequests[requestId].requestType == AccountRequestEnumType.verfifcation){
+                if(verifierRole==1){
                     userContract.changeVerificationStatus(toBeVerifed, 1);
                     if(toBeVerifedRole==4){
-                        success = patientContract.verifyUser(toBeVerifed,true);
+                    success = patientContract.verifyUser(toBeVerifed,true);
                     }else if(toBeVerifedRole==3){
-                        success = doctorContract.verifyUser(toBeVerifed,true);
-                    }              
+                    success = doctorContract.verifyUser(toBeVerifed,true);
+                    }else if(toBeVerifedRole==2){
+                    success = workerContract.verifyUser(toBeVerifed,true);
+                    }else if(toBeVerifedRole==1){
+                    success = adminContract.verifyUser(toBeVerifed,true);
+                    }
+                }else if(verifierRole==2){
+                    if(toBeVerifedRole==3||toBeVerifedRole==3){
+                        userContract.changeVerificationStatus(toBeVerifed, 1);
+                        if(toBeVerifedRole==4){
+                            success = patientContract.verifyUser(toBeVerifed,true);
+                        }else if(toBeVerifedRole==3){
+                            success = doctorContract.verifyUser(toBeVerifed,true);
+                        }              
+                    }
+                }
+            }else{
+                // for connection request
+                if(accountRequests[requestId].updatedBy == msg.sender){
+                    accountRequests[requestId].requestStatus = RequestStatusEnumType.approved;
                 }
             }
         }
@@ -174,7 +194,6 @@ contract Request{
         }
         return success;
     }
-
 
     function deleteAccountRequest(string memory requestId,address senderAddress) public returns (bool) {
         string[] memory r = addressToRequests[senderAddress];
@@ -207,23 +226,19 @@ contract Request{
         return requests;
     }
 
-    function checkIfRequest(string memory requestId) public view returns(bool){
-        if(bytes(accountRequests[requestId].requestId).length>0){
-            return true;
-        }
-        return false;
-    }
-
-    function getAccountRequest(string memory reportId) public view returns(AccountRequestType memory){
-        return accountRequests[reportId];
-    }
-
     function getOtherAccountRequests() public view returns(AccountRequestType[] memory){
         AccountRequestType[] memory requests = new AccountRequestType[](accountRequestKeys.length);
         for(uint i=0;i<accountRequestKeys.length;i++){
             requests[i] = accountRequests[accountRequestKeys[i]];
         }
         return requests;
+    }
+
+    function checkIfRequest(string memory requestId) public view returns(bool){
+        if(bytes(accountRequests[requestId].requestId).length>0){
+            return true;
+        }
+        return false;
     }
 
 }

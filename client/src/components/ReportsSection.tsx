@@ -4,7 +4,7 @@ import ReportElement from "./ui/ReportCardElement";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Dialog, DialogContent } from "@mui/material";
-import {AddCircleRounded} from '@mui/icons-material'
+import {Add, AddCircleRounded} from '@mui/icons-material'
 import { AddReport } from "./forms/addReport";
 import { BeatLoader } from 'react-spinners'
 import { useCombinedContext } from "../store";
@@ -77,8 +77,9 @@ const PatientReports:React.FC = ()=>{
         <div className="w-full flex items-center px-10 py-3 border-b-2  mb-2 justify-between">
           <h1 className="text-xl font-medium p-0">Reports</h1>
           <div className="flex gap-2">
-            <Button onClick={()=>{setReportPopUp(true)}} className={`p-0 border-white shadow-sm ${role==1||role==2?"":"bg-blue-400"}`} buttonType="primary">
-              <AddCircleRounded sx={{color:"white"}}/>
+            <Button onClick={()=>{setReportPopUp(true)}} buttonType="dark" className={`p-0 flex gap-2 items-center shadow-sm ${role==1||role==2?"":""}`} >
+              <Add/>
+              <span>Add Report</span>
             </Button>
             {(roleEnum[role]=='admin'||roleEnum[role]=='worker')&&user.isVerified&&<Button onClick={()=>{setReportPopUp(true)}} className={`p-0 ${role==1||role==2?"":"bg-blue-400"}`} >Add Other Report</Button>}
           </div>

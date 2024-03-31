@@ -3,7 +3,7 @@ import {abi ,networks} from '../contracts/Facility.json'
 import useContract from "../hooks/useContract";
 import { useCombinedContext } from "../store";
 import { Button } from "./ui";
-import { MoreVert } from '@mui/icons-material'
+import { Add, MoreVert } from '@mui/icons-material'
 import { AddFacility } from "./forms/addFacility";
 import { Dialog, DialogContent, IconButton } from "@mui/material";
 import { roleEnum } from "./utils/enums";
@@ -68,9 +68,15 @@ export const Facilities:React.FC = ()=>{
 
     return(
         <section className="w-full">
-            {role==1&&(<div className="w-full flex justify-end px-10 py-2">
-                <Button onClick={()=>{setOpenPopUp(true)}} buttonType="dark" type="button">Add Facility</Button>
-            </div>)}
+            <div className="w-full flex items-center px-10 py-3 border-b-2  mb-2 justify-between">
+                <h1 className="text-xl font-medium p-0">Facilities</h1>
+                {role&&(
+                <Button onClick={()=>{setOpenPopUp(true)}} className="flex gap-2 items-center"  buttonType="dark" type="button">
+                    <Add/>
+                    Add Facility
+                </Button>
+            )}
+            </div>
             <div className="p-3" id="facilities-wrapper">
                 <p className="text-center pb-4">These are facilities</p>
                 <div className="flex gap-5 flex-wrap">

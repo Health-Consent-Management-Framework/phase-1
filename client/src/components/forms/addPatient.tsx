@@ -5,12 +5,16 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BeatLoader } from 'react-spinners';
 import { useCombinedContext } from '../../store';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
+
 
 export const AddPatient:React.FC = () => {
   const {selectedWallet,updateNotification} = useCombinedContext();
   const contract = useContract(abi,networks)
   const params = useParams()
   const navigate = useNavigate()
+  const [date,setDate] = useState()
   const [loading,setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -18,10 +22,10 @@ export const AddPatient:React.FC = () => {
       e.preventDefault();
       setLoading(true)
       if(contract) {
-        const {fname,lname,DoB,phoneno,address,email,gender,height,weight} = e.target
-        const date = new Date(DoB.value).getTime()
-        console.log(fname.value,lname.value,email.value,phoneno.value,date,address.value,params.id)
-        const transaction = await contract?.methods.createPatient(fname.value,lname.value,email.value,phoneno.value,gender.value,height.value,weight.value,date,selectedWallet,params.id).send({ from: selectedWallet,gas:"1000000" });
+        const {fname,lname,phoneno,address,email,gender,height,weight} = e.target
+        const dateValue = new Date(date).getTime()
+        console.log(fname.value,lname.value,email.value,phoneno.value,dateValue,address.value,params.id)
+        const transaction = await contract?.methods.createPatient(fname.value,lname.value,email.value,phoneno.value,gender.value,height.value,weight.value,dateValue,selectedWallet,params.id).send({ from: selectedWallet,gas:"1000000" });
         console.log(transaction)
         const events = transaction.events
         if(Object.keys(events).includes('PatientCreated')){
@@ -57,9 +61,32 @@ export const AddPatient:React.FC = () => {
               <LabeledInput textStyle='text-blue-700 capitalize' label='Height' name='height'/>
               <LabeledInput textStyle='text-blue-700 capitalize' label='Weight' name='weight'/>
             </div>
-            <div className='flex gap-5'>
+            <div className='flex items-center gap-5'>
               <LabeledInput textStyle="text-blue-700 capitalize" type="text" name="phoneno" label="phone number"/>
-              <LabeledInput textStyle="text-blue-700 capitalize" type="date" name="DoB" label="date of birth"/>
+              <div>
+                <label>Date of Birth</label>
+                <DatePicker
+                sx={{padding:0,border:'2px solid black'}}
+                value={date}
+                onChange={(value)=>setDate(dayjs(value))}
+                slotProps={{
+                  textField:{
+                    inputProps:{
+                      style:{
+                        padding:'7.5px 10px',
+                        // border:'2px solid black'
+                      }
+                    },
+                    sx:{
+                      backgroundColor:"white",
+                      borderRadius:2,
+                      border:'2px solid black'
+                    }
+                  }
+                }}
+                name='DoB' format='DD-MM-YYYY'/>
+              </div>
+              {/* <LabeledInput textStyle="text-blue-700 capitalize" type="date" name="DoB" label="date of birth"/> */}
               {/* <LabeledInput textStyle='text-blue-700 capitalize' label='pincode' name='pincode'/> */}
             </div>
             <div className="flex items-center justify-center duration-500 flex-wrap md:flex-nowrap">

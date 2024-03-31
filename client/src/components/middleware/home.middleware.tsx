@@ -18,7 +18,7 @@ import { useCombinedContext } from "../../store";
 
 const HomeMiddleware = ()=>{
     const navigate = useNavigate()
-    const {updateUser,role,selectedWallet,updateNotification} = useCombinedContext()
+    const {updateUser,role,selectedWallet,web3,updateNotification} = useCombinedContext()
     const patientContract = useContract(PatientAbi,PatientNetwork)
     const workerContract = useContract(WorkerAbi,WorkerNetwork)
     const adminContract = useContract(AdminAbi,AdminNetwork)
@@ -64,10 +64,11 @@ const HomeMiddleware = ()=>{
         const createdAt = new Date().getTime()
         console.log(role,selectedWallet)
         if(selectedWallet){
-            const data = await requestContract?.methods.createAccountRequest(selectedWallet,createdAt,0,requestTypeEnum.verification).send({from:selectedWallet})
+            const data = await requestContract?.methods.createAccountRequest(selectedWallet,`${selectedWallet} request for its account to be verified`,web3.utils.padLeft('0x', 40),createdAt,0,requestTypeEnum.verification).send({from:selectedWallet})
             console.log(data)
         }
       }catch(err){
+        console.log(err)
         updateNotification({type:"error",message:"Somenthing went wrong"})
       }
     }
@@ -76,8 +77,12 @@ const HomeMiddleware = ()=>{
 
     return role&&selectedWallet?(
         <section className="h-screen flex">
-            <SideNav requestVerification={requestVerification} deleteAccount={deleteAccount}/>
-            <Outlet/>
+            <div className="w-[120px] md:w-fit h-full">
+                <SideNav requestVerification={requestVerification} deleteAccount={deleteAccount}/>
+            </div>
+            <div className="h-screen grow overflow-y-auto">
+                <Outlet/>
+            </div>
         </section>
     ):<Navigate to={'/auth'}/>
 }

@@ -105,26 +105,6 @@ contract Worker{
     // }
     
 
-    function createRequest(
-        uint requestType,
-        uint created_at
-        ) public returns (bool){
-        // for(uint i=0;i<workerRequestKeys.length;i++){
-        //     if(workerRequestKeys[i]==msg.sender){
-        //         emit RequestAlreadyCreated();
-        //         return false;
-        //     }
-        // }
-        // string memory requestId = randomString(10);
-        (bool success,string memory requestId) = requestContract.createAccountRequest(msg.sender, created_at, 0, requestType);
-        if(success){
-            emit RequestCreated();
-        }
-        workerRequestKeys.push(requestId);
-        workerRequests[msg.sender].push(requestId);
-        return true;
-    }
-
     function createWorker(
         string memory fname,
         string memory lname,
