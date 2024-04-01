@@ -57,7 +57,7 @@ contract Worker{
     address[] internal workersKeys;
     User userContract;
     uint counter = 0;
-    Request requestContract;
+    // Request requestContract;
     uint totalWorkers = 0;
     enum verficationStatus{verified,notVerfied,rejected}
 
@@ -77,9 +77,9 @@ contract Worker{
 
     string workerSecret = 'worker_123';
 
-    constructor(address userAddress,address requestAddress){
+    constructor(address userAddress){
         userContract = User(userAddress);
-        requestContract = Request(requestAddress);
+        // requestContract = Request(requestAddress);
         totalWorkers = 0;
     }
 
