@@ -12,6 +12,7 @@ import RequestSection from "./components/requests/reportRequests";
 import ReportRequest from "./components/requests/reportRequests";
 import RequestsMiddleware from "./components/requests/RequestsPage";
 import ViewReport from "./components/viewReport";
+import ViewConnections from "./components/viewConnections";
 
 const router = createBrowserRouter([
  {
@@ -101,6 +102,10 @@ const router = createBrowserRouter([
         {
             path:'changeRole',
             element:<ChangeRole/>
+        },
+        {
+            path:'connections',
+            element:<ViewConnections/>
         }
     ],
  },

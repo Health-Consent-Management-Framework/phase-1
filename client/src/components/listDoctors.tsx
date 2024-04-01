@@ -3,13 +3,12 @@ import {abi as DoctorAbi, networks as DoctorNetworks} from '../contracts/Doctor.
 import React, { useEffect, useState } from "react"
 import { BeatLoader } from "react-spinners"
 import DoctorCard from "./ui/DoctorCardElement"
-import { Menu, MenuItem } from "@mui/material"
+import { Dialog, Menu,DialogContent, MenuItem } from "@mui/material"
 import {abi as RequestAbi,networks as RequestNetworks} from '../contracts/Request.json'
 import { useCombinedContext } from "../store"
 import { requestTypeEnum } from "./utils/enums"
-interface Doctor{
+import ViewAccessReports from "./accessListReport"
 
-}
 
 const ListDoctors:React.FC = ()=>{
     const doctorContract = useContract(DoctorAbi,DoctorNetworks)
@@ -17,6 +16,7 @@ const ListDoctors:React.FC = ()=>{
     const {selectedWallet} = useCombinedContext()
     const [loading,setLoading] = useState(false)    
     const [doctors,setDoctors] = useState([])
+    const [accessPopup,setAccessPopup] = useState(false)
     const [anchorEl,setAnchorEl] = useState<HTMLElement | null>(null)
     const [doctorId,setDoctorId] = useState('');
     
@@ -70,13 +70,24 @@ const ListDoctors:React.FC = ()=>{
                     transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                     anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                 >
-                    <MenuItem >Give Access</MenuItem>
+                    <MenuItem onClick={()=>{setAccessPopup(true)}}>Give Access</MenuItem>
                     <MenuItem onClick={()=>{createConnectionRequest()}}>Connect</MenuItem>
                     {/* <MenuItem></MenuItem> */}
                 </Menu>
-                {/* <DoctorCard></DoctorCard> */}
-                {/* {JSON.stringify(doctors)} */}
             </div>
+            <Dialog
+            PaperProps={{
+                style: {
+                  backgroundColor: 'transparent',
+                  boxShadow: 'none',
+                },
+              }}  
+              maxWidth="lg"
+            open={accessPopup} onClose={()=>setAccessPopup(false)}>
+                <DialogContent>
+                    <ViewAccessReports doctorAddress={doctorId}/>
+                </DialogContent>
+            </Dialog>
         </section>
     )
 }

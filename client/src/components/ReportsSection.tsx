@@ -3,8 +3,8 @@ import {abi as ReportAbi,networks as ReportNetwork} from '../contracts/Report.js
 import ReportElement from "./ui/ReportCardElement";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Dialog, DialogContent } from "@mui/material";
-import {Add, AddCircleRounded} from '@mui/icons-material'
+import { Dialog, DialogContent, Menu, MenuItem } from "@mui/material";
+import {Add} from '@mui/icons-material'
 import { AddReport } from "./forms/addReport";
 import { BeatLoader } from 'react-spinners'
 import { useCombinedContext } from "../store";
@@ -19,13 +19,14 @@ const PatientReports:React.FC = ()=>{
   const [searchParams,setSearchPrams] = useSearchParams()
   const [loading,setLoading] = useState(false)
   const [reportPopUp,setReportPopUp] = useState(false)
-  const [reportExpand,setReportExpand] = useState(-1); 
+  const [anchorEl,setAnchorEl] = useState<HTMLElement|null>(null); 
+  const [id,setId] = useState('')
 
   const navigate = useNavigate();
   
-  function updateReportOpen(index:number){
-    if(index==reportExpand) setReportExpand(-1)
-    else setReportExpand(index)
+  function updateMenuOpen(ele:HTMLElement,id:string){
+    setAnchorEl(ele)
+    setId(id)
   }
 
   function viewReport(id){
@@ -72,6 +73,11 @@ const PatientReports:React.FC = ()=>{
     navigate(`/home/requests/report?&id=${reportId}`)
   }
 
+  async function handleMenuClose() {
+    setAnchorEl(null)
+    setId('')
+  }
+
   return(
     <div className="w-full relative flex-col gap-4">
         <div className="w-full flex items-center px-10 py-3 border-b-2  mb-2 justify-between">
@@ -89,8 +95,24 @@ const PatientReports:React.FC = ()=>{
           <BeatLoader loading={loading} size={10} color="blue"/>
         </div>
         <div className="flex items-center p-4 flex-wrap gap-5">
+
+        <Menu
+            anchorEl={anchorEl}
+            id="Doctor Menu"
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+            // onClick={}
+            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          >
+          <MenuItem >Give Access</MenuItem>
+          <MenuItem onClick={()=>{navigate(routeConfig.viewReport(id))}}>View Report</MenuItem>
+          <MenuItem onClick={()=>{requestVerification(id)}}>Request Verification</MenuItem>
+          <MenuItem>Delete Report</MenuItem>
+      </Menu>
+
           {reports.map((ele,index)=>(
-            <ReportElement viewRequests={viewReportRequests} viewReport={viewReport} reportId={ele.reportId} deleteReport={DeleteReport} requestVerification={requestVerification} verified={ele.isVerified} link={ele.attachements[0]} tags={ele.tags} key={index} index={index} updateExpand={updateReportOpen} expand={reportExpand==index} disease={ele.problem} date={ele.date} />
+            <ReportElement viewRequests={viewReportRequests} viewReport={viewReport} reportId={ele.reportId} deleteReport={DeleteReport} requestVerification={requestVerification} verified={ele.isVerified} link={ele.attachements[0]} tags={ele.tags} key={index} index={index} updateMenuOpen={updateMenuOpen} disease={ele.problem} date={ele.date} />
           ))}
         </div>
         <Dialog

@@ -68,9 +68,9 @@ export const Home:React.FC = ()=>{
             <div className='flex my-2 relative justify-around border-2 mx-2 pt-12 m-auto rounded-lg p-5'>
                 <h1 className='absolute top-4 left-10 font-medium'>Status</h1>
                 <IllustrationIcon icon={<DocumentScanner/>} name='No of Reports' count={33}/>
-                <IllustrationIcon icon={<DocumentScanner/>} name='No of Connections' count={33}/>
-                <IllustrationIcon icon={<DocumentScanner/>} name='New Notifications' count={33}/>
-                <IllustrationIcon icon={<DocumentScanner/>} name='No of Reports' count={33}/>
+                <IllustrationIcon icon={<DocumentScanner/>} name='No of Connections Requests' count={33}/>
+                <IllustrationIcon icon={<DocumentScanner/>} name='No of Access Requests' count={33}/>
+                <IllustrationIcon icon={<DocumentScanner/>} name='No of Verification Requests' count={33}/>
             </div>
             <div className='border-2 mx-2 rounded-md p-2'>
                 <h1 className='pt-2 ps-10 font-medium'>Network Info</h1>

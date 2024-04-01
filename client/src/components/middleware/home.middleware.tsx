@@ -15,7 +15,6 @@ import {abi as RequestAbi,networks as RequestNetwork} from '../../contracts/Requ
 import useContract from "../../hooks/useContract";
 import { useCombinedContext } from "../../store";
 
-
 const HomeMiddleware = ()=>{
     const navigate = useNavigate()
     const {updateUser,role,selectedWallet,web3,updateNotification} = useCombinedContext()

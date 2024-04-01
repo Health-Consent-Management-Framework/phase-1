@@ -105,7 +105,7 @@ const ViewReport = ()=>{
                                         <h1 className="font-medium ps-5 pb-2 pt-4 text-xl">Doctors with access</h1>
                                         <Divider></Divider>
                                         {report?.doctorAddress.map(ele=>(
-                                            <DoctorCard fname={ele.fname} designation={ele.designation} degree={ele.degree} lname={ele.lname} />
+                                            <p>{ele}</p>
                                         ))}
                                         <p className="ps-5">No thing to worry</p>
                                     </article>
