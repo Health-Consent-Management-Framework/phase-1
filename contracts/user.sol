@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT 
 pragma solidity ^0.8.21;
-
+import * as types from "./structDeclaration.sol";
 
 contract User{
 
@@ -18,6 +18,7 @@ contract User{
     event UserRoleChanged(string);
     event UserCreationFailed();
     event UserNotFound(address);
+    event UserAlreadyExists(address);
 
     string [] superKeys = [
         'key1',
@@ -34,6 +35,15 @@ contract User{
 
     mapping(address=>roleEle) addressToRoles;
     mapping(string=>address) emailToAddress;
+
+    mapping(string=>address) usernameToAddress;
+    mapping(address=>address[]) connections;
+
+    mapping(address=>types.UserType) admins;
+    mapping(address=>types.UserType) workers;
+    mapping(address=>types.DoctorType) doctors;
+    mapping(address=>types.UserType) patients;
+
 
     modifier onlyAdmin(){
         require(addressToRoles[msg.sender].role==type_of_user.admin && addressToRoles[msg.sender].isVerified==verificationStatus.verfied);
@@ -205,5 +215,33 @@ contract User{
             return false;
         }
     }
-
+    
+    function AddDetails(
+        string memory fname,
+        string memory lname,
+        string memory email,
+        string memory mobileNo,
+        string memory gender,
+        uint height,
+        uint weight,
+        uint dob,
+        address walletAddress,
+        string memory location,
+        uint role
+    ) public returns (bool){
+        if(addressToRoles[walletAddress].exists){
+            emit UserAlreadyExists(walletAddress);
+            return false;
+        }
+        bool isVerified = role==4?true:false;
+        if(role!=3){
+            types.UserType memory user = types.UserType(fname,lname,email,location,gender,isVerified,height,weight,dob,mobileNo,walletAddress);
+            if(role==1) admins[walletAddress] = user;
+            else if(role==2) workers[walletAddress] = user;
+            else if(role==4) patients[walletAddress] = user; 
+            }
+        emit UserCreated();
+        return true;
+    }
 }
+

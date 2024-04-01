@@ -57,7 +57,7 @@ contract Worker{
     address[] internal workersKeys;
     User userContract;
     uint counter = 0;
-    Request requestContract;
+    // Request requestContract;
     uint totalWorkers = 0;
     enum verficationStatus{verified,notVerfied,rejected}
 
@@ -77,9 +77,9 @@ contract Worker{
 
     string workerSecret = 'worker_123';
 
-    constructor(address userAddress,address requestAddress){
+    constructor(address userAddress){
         userContract = User(userAddress);
-        requestContract = Request(requestAddress);
+        // requestContract = Request(requestAddress);
         totalWorkers = 0;
     }
 
@@ -104,26 +104,6 @@ contract Worker{
     //     msg.sender,counter))) % number;
     // }
     
-
-    function createRequest(
-        uint requestType,
-        uint created_at
-        ) public returns (bool){
-        // for(uint i=0;i<workerRequestKeys.length;i++){
-        //     if(workerRequestKeys[i]==msg.sender){
-        //         emit RequestAlreadyCreated();
-        //         return false;
-        //     }
-        // }
-        // string memory requestId = randomString(10);
-        (bool success,string memory requestId) = requestContract.createAccountRequest(msg.sender, created_at, 0, requestType);
-        if(success){
-            emit RequestCreated();
-        }
-        workerRequestKeys.push(requestId);
-        workerRequests[msg.sender].push(requestId);
-        return true;
-    }
 
     function createWorker(
         string memory fname,

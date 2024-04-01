@@ -37,6 +37,8 @@ contract Report {
         string[] tags;
         bool isVerified;
         string problem;
+        uint createdAt;
+        uint updatedAt;
     }
 
     uint256 private nonce;
@@ -113,6 +115,15 @@ contract Report {
         if(success) emit DoctorAccessRevoked(doctorAddress, reportId);
         else revert("given doctor doesn't have access to the file");
         return success;
+    }
+
+    function grantDoctorAccess(string memory reportId,address doctorAddress) public returns (bool){
+        uint size = reports[reportId].doctorAddress.length;
+        for(uint i=0;i<size;i++){
+            if(reports[reportId].doctorAddress[i]==doctorAddress) return false;
+        }
+        reports[reportId].doctorAddress.push(doctorAddress);
+        return true;
     }
 
     function sendAccessRequest(string memory reportId,address reciever,uint createdAt) public returns(bool) {
@@ -222,7 +233,7 @@ contract Report {
             emit NotSelfResource(msg.sender,reportId);
             return false;
         }
-        for(uint i=index;i<userReports.length;i++){
+        for(uint i=index+1;i<userReports.length;i++){
             userToReportMapping[msg.sender][i] = userToReportMapping[msg.sender][i-1];
         }
         userToReportMapping[msg.sender].pop();
@@ -248,15 +259,13 @@ contract Report {
         msg.sender,counter))) % number;
     }
     
-    function createReport(string memory problem,string[] memory attachement,string[] memory tags,address owner) public returns(bool){
+    function createReport(string memory problem,string[] memory attachement,string[] memory tags,address owner,uint createdAt) public returns(bool){
         string memory reportId = randomString(15);
-        address[] memory accessedDoctors;
-        string[] memory diagnosis;
         bool verified = false;
         if(userContract.getVerificationStatus(msg.sender, 1)||userContract.getVerificationStatus(msg.sender, 2)){
             verified = true;
         }
-        ReportType memory report = ReportType(reportId,owner,accessedDoctors,attachement,diagnosis,tags,verified,problem);
+        ReportType memory report = ReportType(reportId,owner,new address[](0),attachement,new string[](0),tags,verified,problem,createdAt,0);
         reports[reportId] = report;
         reportKeys.push(reportId);
         userToReportMapping[owner].push(reportId);
@@ -329,5 +338,8 @@ contract Report {
         return reportKeys;
     }
 
+    function getCompleteReport(string memory id) public view returns(ReportType memory){
+        return reports[id];
+    }
 }
 

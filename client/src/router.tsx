@@ -11,6 +11,8 @@ import AddUser from './components/forms/addUser'
 import RequestSection from "./components/requests/reportRequests";
 import ReportRequest from "./components/requests/reportRequests";
 import RequestsMiddleware from "./components/requests/RequestsPage";
+import ViewReport from "./components/viewReport";
+import ViewConnections from "./components/viewConnections";
 
 const router = createBrowserRouter([
  {
@@ -59,7 +61,7 @@ const router = createBrowserRouter([
         },
         {
             path:'report/:id',
-            element:<h1>Complete report info here</h1>
+            element:<ViewReport/>
         },
         {
             path:'profile',
@@ -100,6 +102,10 @@ const router = createBrowserRouter([
         {
             path:'changeRole',
             element:<ChangeRole/>
+        },
+        {
+            path:'connections',
+            element:<ViewConnections/>
         }
     ],
  },
@@ -134,7 +140,8 @@ export const routeConfig = {
     addWorker:'/admin/worker',
     addUser:'/home/addUser',
     viewRequests:'/home/requests',
-    report:(id:string|number)=>`/home/report/${id}`,
+    viewConnections:'/home/connections',
+    viewReport:(id:string|number)=>`/home/report/${id}`,
     editFacility:(id:string|number)=>`home/facilites/${id}`,
     editReport:(id:string|number)=>`/reports/edit/${id}`,
     deleteReport:(id:string|number)=>`/reports/delete/${id}`,

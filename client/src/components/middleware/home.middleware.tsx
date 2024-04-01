@@ -3,7 +3,6 @@ import { Outlet, Navigate,useNavigate } from "react-router-dom"
 import { requestTypeEnum } from "../utils/enums";
 
 import styled from "styled-components";
-import ProfileDetails from "../ProfileDetails"
 import SideNav from "../ui/SideNav"
 
 import {abi as PatientAbi,networks as PatientNetwork} from '../../contracts/Patient.json'
@@ -16,29 +15,9 @@ import {abi as RequestAbi,networks as RequestNetwork} from '../../contracts/Requ
 import useContract from "../../hooks/useContract";
 import { useCombinedContext } from "../../store";
 
-const Container = styled.div`
-  background-color: #faf7f5;
-  height: 100%;
-  overflow-y:auto;
-  flex-grow:1;
-  padding: 10px 30px;
-`;
-
-const Wrapper = styled.div`
-  display: flex;
-  align-items: center;
-  gap:30px;
-  flex-wrap:wrap;
-`;
-const Hr = styled.hr`
-  margin: 12px 0px;
-  border: 0.5px solid #aaaaaa;
-`;
-
-
 const HomeMiddleware = ()=>{
     const navigate = useNavigate()
-    const {updateUser,role,selectedWallet,updateNotification} = useCombinedContext()
+    const {updateUser,role,selectedWallet,web3,updateNotification} = useCombinedContext()
     const patientContract = useContract(PatientAbi,PatientNetwork)
     const workerContract = useContract(WorkerAbi,WorkerNetwork)
     const adminContract = useContract(AdminAbi,AdminNetwork)
@@ -84,10 +63,11 @@ const HomeMiddleware = ()=>{
         const createdAt = new Date().getTime()
         console.log(role,selectedWallet)
         if(selectedWallet){
-            const data = await requestContract?.methods.createAccountRequest(selectedWallet,createdAt,0,requestTypeEnum.verification).send({from:selectedWallet})
+            const data = await requestContract?.methods.createAccountRequest(selectedWallet,`${selectedWallet} request for its account to be verified`,web3.utils.padLeft('0x', 40),createdAt,0,requestTypeEnum.verification).send({from:selectedWallet})
             console.log(data)
         }
       }catch(err){
+        console.log(err)
         updateNotification({type:"error",message:"Somenthing went wrong"})
       }
     }
@@ -96,14 +76,12 @@ const HomeMiddleware = ()=>{
 
     return role&&selectedWallet?(
         <section className="h-screen flex">
-            <SideNav requestVerification={requestVerification} deleteAccount={deleteAccount}/>
-            <Container>
-                <ProfileDetails />
-                <Hr />
-                <Wrapper>
-                    <Outlet/>
-                </Wrapper>
-            </Container>
+            <div className="w-[120px] md:w-fit h-full">
+                <SideNav requestVerification={requestVerification} deleteAccount={deleteAccount}/>
+            </div>
+            <div className="h-screen grow overflow-y-auto">
+                <Outlet/>
+            </div>
         </section>
     ):<Navigate to={'/auth'}/>
 }

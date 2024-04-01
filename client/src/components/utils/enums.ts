@@ -25,4 +25,5 @@ export const requestTypeEnum = {
     verification:0,
     promotion:1,
     deletion:2,
+    connection:3
 }

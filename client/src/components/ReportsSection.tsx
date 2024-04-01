@@ -3,12 +3,14 @@ import {abi as ReportAbi,networks as ReportNetwork} from '../contracts/Report.js
 import ReportElement from "./ui/ReportCardElement";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Dialog, DialogContent } from "@mui/material";
+import { Dialog, DialogContent, Menu, MenuItem } from "@mui/material";
+import {Add} from '@mui/icons-material'
 import { AddReport } from "./forms/addReport";
 import { BeatLoader } from 'react-spinners'
 import { useCombinedContext } from "../store";
 import { Button } from "./ui";
 import { roleEnum } from "./utils/enums";
+import { routeConfig } from "../router";
 
 const PatientReports:React.FC = ()=>{
   const reportContract = useContract(ReportAbi,ReportNetwork);
@@ -17,13 +19,18 @@ const PatientReports:React.FC = ()=>{
   const [searchParams,setSearchPrams] = useSearchParams()
   const [loading,setLoading] = useState(false)
   const [reportPopUp,setReportPopUp] = useState(false)
-  const [reportExpand,setReportExpand] = useState(-1); 
+  const [anchorEl,setAnchorEl] = useState<HTMLElement|null>(null); 
+  const [id,setId] = useState('')
 
   const navigate = useNavigate();
   
-  function updateReportOpen(index:number){
-    if(index==reportExpand) setReportExpand(-1)
-    else setReportExpand(index)
+  function updateMenuOpen(ele:HTMLElement,id:string){
+    setAnchorEl(ele)
+    setId(id)
+  }
+
+  function viewReport(id){
+    navigate(routeConfig.viewReport(id));
   }
 
   function handleReportPopUpClose(){
@@ -66,12 +73,20 @@ const PatientReports:React.FC = ()=>{
     navigate(`/home/requests/report?&id=${reportId}`)
   }
 
+  async function handleMenuClose() {
+    setAnchorEl(null)
+    setId('')
+  }
+
   return(
     <div className="w-full relative flex-col gap-4">
-        <div className="w-full flex items-center px-10 py-1 mb-2 rounded-md justify-between">
+        <div className="w-full flex items-center px-10 py-3 border-b-2  mb-2 justify-between">
           <h1 className="text-xl font-medium p-0">Reports</h1>
           <div className="flex gap-2">
-            <Button onClick={()=>{setReportPopUp(true)}} className={`p-0 ${role==1||role==2?"":"bg-blue-400"}`} buttonType="primary">Add Report</Button>
+            <Button onClick={()=>{setReportPopUp(true)}} buttonType="dark" className={`p-0 flex gap-2 items-center shadow-sm ${role==1||role==2?"":""}`} >
+              <Add/>
+              <span>Add Report</span>
+            </Button>
             {(roleEnum[role]=='admin'||roleEnum[role]=='worker')&&user.isVerified&&<Button onClick={()=>{setReportPopUp(true)}} className={`p-0 ${role==1||role==2?"":"bg-blue-400"}`} >Add Other Report</Button>}
           </div>
         </div>
@@ -79,9 +94,25 @@ const PatientReports:React.FC = ()=>{
         <div className="w-full flex absolute top-2 left-1/2 -translate-x-1/2 items-center justify-center">
           <BeatLoader loading={loading} size={10} color="blue"/>
         </div>
-        <div className="flex items-center flex-wrap gap-5">
+        <div className="flex items-center p-4 flex-wrap gap-5">
+
+        <Menu
+            anchorEl={anchorEl}
+            id="Doctor Menu"
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+            // onClick={}
+            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          >
+          <MenuItem >Give Access</MenuItem>
+          <MenuItem onClick={()=>{navigate(routeConfig.viewReport(id))}}>View Report</MenuItem>
+          <MenuItem onClick={()=>{requestVerification(id)}}>Request Verification</MenuItem>
+          <MenuItem>Delete Report</MenuItem>
+      </Menu>
+
           {reports.map((ele,index)=>(
-            <ReportElement viewRequests={viewReportRequests} reportId={ele.reportId} deleteReport={DeleteReport} requestVerification={requestVerification} verified={ele.isVerified} link={ele.attachements[0]} tags={ele.tags} key={index} index={index} updateExpand={updateReportOpen} expand={reportExpand==index} disease={ele.problem} date={ele.date} />
+            <ReportElement viewRequests={viewReportRequests} viewReport={viewReport} reportId={ele.reportId} deleteReport={DeleteReport} requestVerification={requestVerification} verified={ele.isVerified} link={ele.attachements[0]} tags={ele.tags} key={index} index={index} updateMenuOpen={updateMenuOpen} disease={ele.problem} date={ele.date} />
           ))}
         </div>
         <Dialog

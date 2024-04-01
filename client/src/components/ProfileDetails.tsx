@@ -9,8 +9,8 @@ import { roleEnum } from "./utils/enums";
 const Container = styled.div`
   display: flex;
   gap: 25px;
+  align-items:center;
   justify-content:space-evenly;
-  margin: 30px 0px;
 `;
 const Avatar = styled.img`
   height: 100px;
@@ -38,17 +38,19 @@ const Text = styled.span`
 const InternalData = styled.div`
   font-size: 18px;
   display: flex;
+  margin:0 10px;
   align-items: center;
   gap: 5px;
 `;
 const Data = styled.div`
   display: flex;
-  gap: 50px;
+  flex-wrap:wrap;
   color: ${({ theme }) => theme.textSoft};
 `;
 const PatientDetails = styled.div`
   display: flex;
   font-size: 14px;
+  flex-wrap:wrap;
   justify-content: space-between;
   margin-top: 13px;
 `;

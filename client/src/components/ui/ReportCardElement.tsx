@@ -1,12 +1,13 @@
 import MoreVertIcon from '@mui/icons-material/MoreVert'; 
 import { useRef } from 'react';
 import { useCombinedContext } from '../../store';
+import { IconButton } from '@mui/material';
 
 
 
 
 
-const ReportCard = ({disease,reportId,verified,viewRequests,expand, updateExpand, link, index,tags,requestVerification,deleteReport,viewReport}) => {
+const ReportCard = ({disease,reportId,verified,viewRequests,expand, updateMenuOpen, link,tags,requestVerification,deleteReport,viewReport}) => {
     const popUpRef = useRef<HTMLDivElement>(null)
     const {role} = useCombinedContext()
     return (
@@ -19,15 +20,15 @@ const ReportCard = ({disease,reportId,verified,viewRequests,expand, updateExpand
             )}
             </article>
             <div className='relative px-2'>
-                <button className='' onClick={()=>{updateExpand(index)}}>
+                <IconButton className='' onClick={(e)=>{updateMenuOpen(e.currentTarget,reportId)}}>
                     <MoreVertIcon/>
-                </button>
+                </IconButton>
                 <article ref={popUpRef} className={`absolute flex gap-1 z-10 w-32 ${expand?"h-fit":"h-0"} overflow-hidden flex-col bg-blue-300 rounded-md shadow-sm`}>
-                    <a href={link} target='_blank' className='w-full inline-block'>
-                        <button className='text-sm duration-300 hover:bg-blue-600 w-full rounded-md p-1 text-white'>
+                    {/* <a href={link} target='_blank' className='w-full inline-block'> */}
+                        <button onClick={()=>{viewReport(reportId)}} className='text-sm duration-300 hover:bg-blue-600 w-full rounded-md p-1 text-white'>
                             View Report
                         </button>
-                    </a>
+                    {/* </a> */}
                     {!verified&&<button 
                                     onClick={()=>requestVerification(reportId)}
                                     className='text-sm duration-300 hover:bg-blue-600 rounded-md p-1 text-white'>
