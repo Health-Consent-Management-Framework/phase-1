@@ -68,22 +68,55 @@ contract Admin{
         totalAdminCount = 1;
     }
 
-    function createAdminRequest(
-        string memory email,
-        address fromAddress,
-        uint date
-    ) public returns (bool) {
-        if(adminAddresses[fromAddress].walletAddress==address(0)){
-            adminRequestkeys.push(fromAddress);
-        }else{
-            emit AdminFound(fromAddress);
-            return false;
-        }
+    // function createAdminRequest(
+    //     string memory email,
+    //     address fromAddress,
+    //     uint date
+    // ) public returns (bool) {
+    //     if(adminAddresses[fromAddress].walletAddress==address(0)){
+    //         adminRequestkeys.push(fromAddress);
+    //     }else{
+    //         emit AdminFound(fromAddress);
+    //         return false;
+    //     }
 
-        AdminRequest memory newRequest = AdminRequest(fromAddress,email,date,RequestStatusType.pending);
-        adminRequests[fromAddress] = newRequest;
-        return true;
-    }
+    //     AdminRequest memory newRequest = AdminRequest(fromAddress,email,date,RequestStatusType.pending);
+    //     adminRequests[fromAddress] = newRequest;
+    //     return true;
+    // }
+
+    // function acceptAdminRequest(address newAdmin) public returns (address newAdminAddress){
+    //     require(msg.sender==masterAdmin || bytes(adminAddresses[msg.sender].email).length>0,"only master admin can add the user");
+    //     if(bytes(adminAddresses[msg.sender].email).length==0){
+    //         revert("user doesn't exist");
+    //     }
+    //     adminAddresses[newAdmin].isVerified = true;
+    //     adminRequests[newAdmin].requestStatus = RequestStatusType.approved;
+    //     adminKeys.push(newAdmin);
+    //     totalAdminCount+=1;
+    //     return newAdmin;
+    // }
+
+    // function declineAdminRequest(address newAdmin) public returns (address rejectedAddress){
+    //     require(msg.sender==masterAdmin || bytes(adminAddresses[msg.sender].email).length>0,"only master admin can add the user");
+    //     if(bytes(adminAddresses[msg.sender].email).length==0){
+    //         revert("user doesn't exist");
+    //     }
+    //     adminRequests[newAdmin].requestStatus = RequestStatusType.rejected;
+    //     return newAdmin;
+    // }
+
+    // function getAdminRequests()public view returns (AdminRequest[] memory){
+    //     AdminRequest[] memory requests = new AdminRequest[](adminRequestkeys.length);
+    //     for(uint i=0;i<adminRequestkeys.length;i++){
+    //         requests[i] = adminRequests[adminRequestkeys[i]];
+    //     }
+    //     return requests;
+    // }
+
+    // function getMasterAdmin() public view returns (address){
+    //     return  masterAdmin;
+    // }
 
 
     function getTotalAdminCount() public view returns (uint256){
@@ -105,39 +138,6 @@ contract Admin{
         return false;
     }
 
-
-    function acceptAdminRequest(address newAdmin) public returns (address newAdminAddress){
-        require(msg.sender==masterAdmin || bytes(adminAddresses[msg.sender].email).length>0,"only master admin can add the user");
-        if(bytes(adminAddresses[msg.sender].email).length==0){
-            revert("user doesn't exist");
-        }
-        adminAddresses[newAdmin].isVerified = true;
-        adminRequests[newAdmin].requestStatus = RequestStatusType.approved;
-        adminKeys.push(newAdmin);
-        totalAdminCount+=1;
-        return newAdmin;
-    }
-
-    function declineAdminRequest(address newAdmin) public returns (address rejectedAddress){
-        require(msg.sender==masterAdmin || bytes(adminAddresses[msg.sender].email).length>0,"only master admin can add the user");
-        if(bytes(adminAddresses[msg.sender].email).length==0){
-            revert("user doesn't exist");
-        }
-        adminRequests[newAdmin].requestStatus = RequestStatusType.rejected;
-        return newAdmin;
-    }
-
-    function getAdminRequests()public view returns (AdminRequest[] memory){
-        AdminRequest[] memory requests = new AdminRequest[](adminRequestkeys.length);
-        for(uint i=0;i<adminRequestkeys.length;i++){
-            requests[i] = adminRequests[adminRequestkeys[i]];
-        }
-        return requests;
-    }
-
-    function getMasterAdmin() public view returns (address){
-        return  masterAdmin;
-    }
 
     function toAsciiString(address x) internal pure returns (string memory) {
         bytes memory s = new bytes(40);

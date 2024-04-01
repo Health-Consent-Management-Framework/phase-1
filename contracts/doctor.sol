@@ -189,7 +189,7 @@ contract Doctor{
 
     function verifyUser(address walletAddress,bool updatedStatus) public returns (bool){
         if(updatedStatus) doctors[walletAddress].isVerified = true;
-        test.push(doctors[walletAddress]);
+        // test.push(doctors[walletAddress]);
         return true;
     }
 

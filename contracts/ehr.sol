@@ -117,6 +117,15 @@ contract Report {
         return success;
     }
 
+    function grantDoctorAccess(string memory reportId,address doctorAddress) public returns (bool){
+        uint size = reports[reportId].doctorAddress.length;
+        for(uint i=0;i<size;i++){
+            if(reports[reportId].doctorAddress[i]==doctorAddress) return false;
+        }
+        reports[reportId].doctorAddress.push(doctorAddress);
+        return true;
+    }
+
     function sendAccessRequest(string memory reportId,address reciever,uint createdAt) public returns(bool) {
         bool hasAccess = false;
         for(uint i=0;i<reports[reportId].doctorAddress.length;i++){

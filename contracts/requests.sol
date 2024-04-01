@@ -7,6 +7,7 @@ import './admin.sol';
 import './patient.sol';
 import './doctor.sol';
 import './worker.sol';
+import './connection.sol';
 
 
 contract Request{
@@ -38,6 +39,7 @@ contract Request{
     Worker workerContract;
     Doctor doctorContract;
     Patient patientContract;
+    Connection connectionContract;
 
 
     struct AccountRequestType{
@@ -67,13 +69,15 @@ contract Request{
         address adminContractAddress,
         address workerContractAddress,
         address doctorContractAddress,
-        address patientContractAddress
+        address patientContractAddress,
+        address connectionContractAddress
     ){
         userContract = User(userContractAddress);
         adminContract = Admin(adminContractAddress);
         workerContract = Worker(workerContractAddress);
         doctorContract = Doctor(doctorContractAddress);
         patientContract = Patient(patientContractAddress);
+        connectionContract = Connection(connectionContractAddress);
     }
 
     function randomString(uint size) public  payable returns(string memory){
@@ -152,7 +156,7 @@ contract Request{
         }else return false; 
     }
 
-    function ApproveAccountRequest(string memory requestId) public returns (bool){
+    function ApproveAccountRequest(string memory requestId,uint updatedAt) public returns (bool){
         address toBeVerifed = accountRequests[requestId].sentBy;
         uint verifierRole = userContract.getUserRole(msg.sender);
         uint toBeVerifedRole = userContract.getUserRole(toBeVerifed);
@@ -185,11 +189,16 @@ contract Request{
                 // for connection request
                 if(accountRequests[requestId].updatedBy == msg.sender){
                     accountRequests[requestId].requestStatus = RequestStatusEnumType.approved;
+                    success = connectionContract.createConnection(accountRequests[requestId].sentBy,accountRequests[requestId].updatedBy);
                 }
+                if(success) emit RequestUpdated(requestId);
+                else emit RequestNotUpdated(requestId);
             }
         }
         if(success){
             accountRequests[requestId].requestStatus = RequestStatusEnumType.approved;
+            accountRequests[requestId].updatedBy = msg.sender;
+            accountRequests[requestId].updatedAt = updatedAt;
             emit accountActivated(toBeVerifed);
         }
         return success;
@@ -217,11 +226,21 @@ contract Request{
         return true;
     }
 
-    function getMyAccountRequests(address senderAddress) public view returns(AccountRequestType[] memory){
+    function getMyRequests(address senderAddress,AccountRequestEnumType requestType) public view returns(AccountRequestType[] memory){
         string[] memory reportIds = addressToRequests[senderAddress];
-        AccountRequestType[] memory requests =  new AccountRequestType[](reportIds.length);
+        uint size = 0;
+        uint index = 0;
+
         for(uint i=0;i<reportIds.length;i++){
-            requests[i] = accountRequests[reportIds[i]];
+            if(accountRequests[reportIds[i]].requestType==requestType) size++;
+        }
+
+        AccountRequestType[] memory requests =  new AccountRequestType[](size);
+        for(uint i=0;i<reportIds.length;i++){
+            if(accountRequests[reportIds[i]].requestType==requestType){
+                requests[index] = accountRequests[reportIds[i]];
+                index++;
+            }
         }
         return requests;
     }

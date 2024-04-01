@@ -83,12 +83,12 @@ struct verficationRequestType {
     RequestStatus status;
 }
 
-struct CompleteReportInfo{
-    AccessRequest[] requests;
-    PatientType patientDetais;
-    DoctorType doctorDetails;
-    ReportType reportinfo;
-}
+// struct CompleteReportInfo{
+//     AccessRequest[] requests;
+//     PatientType patientDetais;
+//     DoctorType doctorDetails;
+//     ReportType reportinfo;
+// }
 
 struct ReportType{
     string reportId;
@@ -101,7 +101,7 @@ struct ReportType{
     string problem;
 }
 
-struct PatientType {
+struct UserType {
     string fname;
     string lname;
     string email;
@@ -123,7 +123,7 @@ struct PatientDeleteRequest{
     string reason;
 }
 
-struct workerType{
+struct WorkerType{
     string fname;
     string lname;
     string email;

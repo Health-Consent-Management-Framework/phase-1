@@ -7,6 +7,7 @@ const Doctor = artifacts.require("Doctor")
 const Report = artifacts.require("Report")
 const Worker = artifacts.require("Worker")
 const Request = artifacts.require("Request")
+const Connection = artifacts.require("Connection")
 
 module.exports = async function(deployer,network,accounts) {
   const deployerAddress = accounts[0]; 
@@ -15,11 +16,12 @@ module.exports = async function(deployer,network,accounts) {
   await deployer.deploy(Admin,User.address,{from:deployerAddress});
   await deployer.deploy(Doctor,{from:deployerAddress});
   await deployer.link(UtilsLibrary, Facility);
+  await deployer.deploy(Connection,{from:deployerAddress})
 
   await deployer.deploy(Worker,Admin.address,Request.address,{from:deployerAddress});
   await deployer.deploy(Facility,Admin.address,{from:deployerAddress});
   await deployer.deploy(Patient,User.address,{from:deployerAddress});
   await deployer.deploy(Report,User.address,{from:deployerAddress})
-  await deployer.deploy(Request,User.address,Admin.address,Worker.address,Doctor.address,Patient.address,{from:deployerAddress});
+  await deployer.deploy(Request,User.address,Admin.address,Worker.address,Doctor.address,Patient.address,Connection.address,{from:deployerAddress});
 
 };
