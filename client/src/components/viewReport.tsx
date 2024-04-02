@@ -10,11 +10,20 @@ import { useTransaction } from "../hooks/useTransaction";
 import { useCallback, useEffect } from "react";
 import { BeatLoader } from "react-spinners";
 import DoctorCard from "./ui/DoctorCardElement";
+import AccessDoctors from "./ui/AccessDoctors";
+import {
+  abi as DoctorsAbi,
+  networks as DoctorsNetworks,
+} from "../contracts/Doctor.json";
+import { useState } from "react";
 
 const ViewReport = ()=>{
     const params = useParams();
     const reportContract = useContract(ReportAbi,ReportNetworks)
-    const {selectedWallet} = useCombinedContext()
+    const doctorContract = useContract(DoctorsAbi, DoctorsNetworks);
+    const {selectedWallet} = useCombinedContext();
+    // const [doctorsContract, setDoctorsContract] = useState(null);
+    const [doctorsData, setDoctorsData] = useState([]);
 
     const getReport = useCallback(async()=>{
         return reportContract?.methods.getCompleteReport(params.id).call({from:selectedWallet})
@@ -30,6 +39,30 @@ const ViewReport = ()=>{
     if(error){
         return <p>Something went wrong</p>
     }
+
+    const getDoctors = useCallback(async (doctorAddress) => {
+      const doctorData = await doctorContract.methods.getDoctorInfo(doctorAddress).call({ from: selectedWallet });
+      return doctorData;
+    }, [doctorContract, selectedWallet]);
+  
+    
+    const fetchDoctorsData = useCallback(async () => {
+        let mergedData = [];
+        for (const ele of report?.doctorAddress) {
+            // console.log(ele);
+            const doctorData = await getDoctors(ele);
+            // console.log(doctorData);
+            if (doctorData) {
+              mergedData.push(doctorData);
+            }
+          }
+        console.log(mergedData);
+        setDoctorsData(mergedData);
+    }, [report, getDoctors]);
+  
+    useEffect(() => {
+      fetchDoctorsData();
+    }, [fetchDoctorsData]);
 
     return(
         <section className="flex h-full flex-col ">
@@ -104,9 +137,12 @@ const ViewReport = ()=>{
                                     <article className="border-2 w-full h-full rounded-md shadow-md bg-[#F5F7FB]">
                                         <h1 className="font-medium ps-5 pb-2 pt-4 text-xl">Doctors with access</h1>
                                         <Divider></Divider>
-                                        {report?.doctorAddress.map(ele=>(
-                                            <p>{ele}</p>
+                                        {doctorsData.map((doctor, index) => (
+                                          <AccessDoctors key={index} doctorData={doctor} />
                                         ))}
+                                        {/* {report?.doctorAddress.map(ele=>(
+                                            <p>{ele}</p>
+                                        ))} */}
                                         <p className="ps-5">No thing to worry</p>
                                     </article>
                                 </div>
