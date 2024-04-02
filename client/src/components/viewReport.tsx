@@ -22,7 +22,7 @@ const ViewReport = ()=>{
     const reportContract = useContract(ReportAbi,ReportNetworks)
     const doctorContract = useContract(DoctorsAbi, DoctorsNetworks);
     const {selectedWallet} = useCombinedContext();
-    const [doctorsContract, setDoctorsContract] = useState(null);
+    // const [doctorsContract, setDoctorsContract] = useState(null);
     const [doctorsData, setDoctorsData] = useState([]);
 
     const getReport = useCallback(async()=>{
@@ -41,15 +41,23 @@ const ViewReport = ()=>{
     }
 
     const getDoctors = useCallback(async (doctorAddress) => {
-      if (!doctorsContract) return null;
-      const doctorData = await doctorsContract.methods.getDoctor(doctorAddress).call({ from: selectedWallet });
+      const doctorData = await doctorContract.methods.getDoctorInfo(doctorAddress).call({ from: selectedWallet });
       return doctorData;
-    }, [doctorsContract, selectedWallet]);
+    }, [doctorContract, selectedWallet]);
   
+    
     const fetchDoctorsData = useCallback(async () => {
-      const data = await Promise.all(report?.doctorAddress.map(ele => getDoctors(ele)));
-    //   console.log(data);
-      setDoctorsData(data);
+        let mergedData = [];
+        for (const ele of report?.doctorAddress) {
+            // console.log(ele);
+            const doctorData = await getDoctors(ele);
+            // console.log(doctorData);
+            if (doctorData) {
+              mergedData.push(doctorData);
+            }
+          }
+        console.log(mergedData);
+        setDoctorsData(mergedData);
     }, [report, getDoctors]);
   
     useEffect(() => {
