@@ -27,13 +27,20 @@ contract Report {
         RequestTypeEnum requestType;
     }
 
+    struct Diagnosis{
+        string text;
+        uint date;
+        string doctorFname;
+        string doctorLname;
+        address walletAddress;
+    }
+
 
     struct ReportType{
         string reportId;
         address patientAddress;
         address[] doctorAddress;
         string[] attachements;
-        string[] diagnosis;
         string[] tags;
         bool isVerified;
         string problem;
@@ -43,10 +50,14 @@ contract Report {
 
     uint256 private nonce;
     mapping(address => string[]) private userToReportMapping;
+    mapping(address => string[]) doctorToReportMapping;
     mapping(string => RequestType[]) public accessRequests;
+    mapping(string=>string[]) reportToDiagnosis; 
+    mapping(string=> Diagnosis) reportDiagnosis; // reportId->diagnosis
     // mapping(uint=>RequestType) public accessRequestsMapping;
     string[] reportKeys; // fetch all reports
     string[] requestKeys;
+    Diagnosis[] testDiagnosis;
     mapping(string => ReportType) public reports;
 
     modifier onlyOwner(address userAddress,string memory reportId) {
@@ -123,6 +134,7 @@ contract Report {
             if(reports[reportId].doctorAddress[i]==doctorAddress) return false;
         }
         reports[reportId].doctorAddress.push(doctorAddress);
+        doctorToReportMapping[doctorAddress].push(reportId);
         return true;
     }
 
@@ -156,6 +168,7 @@ contract Report {
         request.status = RequestStatus.approved;
         accessRequests[reportId][requestId] = request;
         reports[reportId].doctorAddress.push(request.receivedBy);
+        doctorToReportMapping[msg.sender].push(reportId);
         emit AccessRequestApproved(request.receivedBy, reportId,requestId);
         return true;
     }
@@ -265,7 +278,7 @@ contract Report {
         if(userContract.getVerificationStatus(msg.sender, 1)||userContract.getVerificationStatus(msg.sender, 2)){
             verified = true;
         }
-        ReportType memory report = ReportType(reportId,owner,new address[](0),attachement,new string[](0),tags,verified,problem,createdAt,0);
+        ReportType memory report = ReportType(reportId,owner,new address[](0),attachement,tags,verified,problem,createdAt,0);
         reports[reportId] = report;
         reportKeys.push(reportId);
         userToReportMapping[owner].push(reportId);
@@ -274,13 +287,13 @@ contract Report {
         return true;
     }
 
-    function updateReport(string memory reportId,string[] memory newDiagnosis) public onlyDoctorWithAccess(msg.sender,reportId) returns (bool) {
-        ReportType memory report = reports[reportId];
-        report.diagnosis = newDiagnosis;
-        reports[reportId] = report;
-        emit reportUpdate(reportId);
-        return true;
-    }
+    // function updateReport(string memory reportId,string[] memory newDiagnosis) public onlyDoctorWithAccess(msg.sender,reportId) returns (bool) {
+    //     ReportType memory report = reports[reportId];
+    //     report.diagnosis = newDiagnosis;
+    //     reports[reportId] = report;
+    //     emit reportUpdate(reportId);
+    //     return true;
+    // }
 
     function getPatientReports(address patientAddress) public view returns (ReportType[] memory) {
         ReportType[] memory foundReports = new ReportType[](userToReportMapping[patientAddress].length);
@@ -290,6 +303,15 @@ contract Report {
         return foundReports;
     }
 
+    function getDoctorReports(address doctorAddress) public view returns (ReportType[] memory){
+        string[] memory otherReports = doctorToReportMapping[doctorAddress]; 
+        ReportType[] memory r = new ReportType[](otherReports.length);
+        for(uint i=0;i<otherReports.length;i++){
+            r[i] = reports[otherReports[i]];
+        }
+        return r;
+    }
+
     function updateTags(string memory reportId,string[] memory tags) public onlyOwner(msg.sender,reportId) returns(bool) {
         ReportType memory report = reports[reportId];
         if(report.patientAddress != msg.sender) revert("user doesnot owne the resource to signin");
@@ -297,6 +319,28 @@ contract Report {
         reports[reportId] = report;
         emit reportUpdate(reportId);
         return true;
+    }
+
+    function addDiagnosis(string memory reportId,string memory text,string memory fname,string memory lname,uint created_at) public returns(bool){
+        string memory id = randomString(8);
+        Diagnosis memory d = Diagnosis(text,created_at,fname,lname,msg.sender);
+        reportToDiagnosis[reportId].push(id);
+        reportDiagnosis[id] = d;
+        testDiagnosis.push(d);
+        return true;
+    }
+
+    function getDiagnosis(string memory reportId) public view returns(Diagnosis[] memory){
+        Diagnosis[] memory d = new Diagnosis[](reportToDiagnosis[reportId].length);
+        for(uint i=0;i<reportToDiagnosis[reportId].length;i++){
+            d[i] = reportDiagnosis[reportToDiagnosis[reportId][i]];
+        }
+        return d;
+    }
+
+    function updateDiagnosis(string memory diagnosisId,string memory text,uint date) public returns(bool){
+        reportDiagnosis[diagnosisId].text = text;
+        reportDiagnosis[diagnosisId].date = date;
     }
 
     function getMyRequests(address userAddress) public view returns(RequestType[] memory){

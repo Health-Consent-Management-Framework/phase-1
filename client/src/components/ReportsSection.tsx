@@ -16,7 +16,8 @@ const PatientReports:React.FC = ()=>{
   const reportContract = useContract(ReportAbi,ReportNetwork);
   const [reports,setReports] = useState([])
   const {selectedWallet,role,updateNotification,user} = useCombinedContext()
-  const [searchParams,setSearchPrams] = useSearchParams()
+  const [searchParams] = useSearchParams()
+  const [isVerfied,setIsVerfied] = useState(false)
   const [loading,setLoading] = useState(false)
   const [reportPopUp,setReportPopUp] = useState(false)
   const [anchorEl,setAnchorEl] = useState<HTMLElement|null>(null); 
@@ -24,9 +25,10 @@ const PatientReports:React.FC = ()=>{
 
   const navigate = useNavigate();
   
-  function updateMenuOpen(ele:HTMLElement,id:string){
+  function updateMenuOpen(ele:HTMLElement,id:string,verfied:boolean){
     setAnchorEl(ele)
     setId(id)
+    setIsVerfied(verfied)
   }
 
   function viewReport(id){
@@ -38,13 +40,22 @@ const PatientReports:React.FC = ()=>{
   }
 
   async function fetchReports(){
-    setLoading(true)
-    const data = await reportContract?.methods.getPatientReports(selectedWallet).call({from:selectedWallet})
-    console.log(data)
-    if(data){
-      setReports(data)
-    }else {
-      updateNotification({type:"success",message:"Failed to fetch reports"})
+    try{
+      setLoading(true)
+      let data;
+      if(searchParams.get('mode')=='doctor'){
+        data = await reportContract?.methods.getDoctorReports(selectedWallet).call({from:selectedWallet})
+      }else{
+        data = await reportContract?.methods.getPatientReports(selectedWallet).call({from:selectedWallet})
+      }
+      console.log(data)
+      if(data){
+        setReports(data)
+      }else {
+        updateNotification({type:"success",message:"Failed to fetch reports"})
+      }
+    }catch(err){
+      setLoading(false)
     }
     setLoading(false)
   }
@@ -78,6 +89,7 @@ const PatientReports:React.FC = ()=>{
     setId('')
   }
 
+
   return(
     <div className="w-full relative flex-col gap-4">
         <div className="w-full flex items-center px-10 py-3 border-b-2  mb-2 justify-between">
@@ -101,13 +113,12 @@ const PatientReports:React.FC = ()=>{
             id="Doctor Menu"
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
-            // onClick={}
             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
           >
-          <MenuItem >Give Access</MenuItem>
+          {isVerfied&&<MenuItem>Give Access</MenuItem>}
           <MenuItem onClick={()=>{navigate(routeConfig.viewReport(id))}}>View Report</MenuItem>
-          <MenuItem onClick={()=>{requestVerification(id)}}>Request Verification</MenuItem>
+          {!isVerfied&&<MenuItem onClick={()=>{requestVerification(id)}}>Request Verification</MenuItem>}
           <MenuItem>Delete Report</MenuItem>
       </Menu>
 

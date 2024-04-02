@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import useContract from "../../hooks/useContract";
 import React, { useEffect, useState } from "react";
 import { useCombinedContext } from "../../store";
@@ -8,6 +8,7 @@ import { BeatLoader } from "react-spinners";
 import { IconButton } from "@mui/material";
 import { ThumbDownOffAlt,ThumbUpOffAlt,AddTask } from "@mui/icons-material";
 import { reportRequestTypeEnum, roleEnum } from "../utils/enums";
+import { routeConfig } from "../../router";
 
 
 const ReportRequest:React.FC = ()=>{
@@ -16,6 +17,7 @@ const ReportRequest:React.FC = ()=>{
     const [requests,setRequests] = useState([])
     const [loading,setLoading] = useState(false)
     const [searchParams] = useSearchParams()
+    const navigate = useNavigate()
     
     function getDate(number){
         console.log(number)
@@ -110,7 +112,9 @@ const ReportRequest:React.FC = ()=>{
                         <tr key={index}>
                             <td className="px-4 py-2 text-center">{ele.requestId}</td>
                             <td className="px-4 py-2 text-center">
-                                {ele.reportId}
+                                <button className="bg-transparent text-blue-900 hover:opacity-85 underline" onClick={()=>{navigate(routeConfig.viewReport(ele.reportId))}}>
+                                    {ele.reportId}
+                                </button>
                             </td>
                             <td  className="px-4 py-2 text-center">
                                 <p className="inline-block w-20 text-ellipsis overflow-hidden">

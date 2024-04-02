@@ -7,9 +7,7 @@ import { IconButton } from '@mui/material';
 
 
 
-const ReportCard = ({disease,reportId,verified,viewRequests,expand, updateMenuOpen, link,tags,requestVerification,deleteReport,viewReport}) => {
-    const popUpRef = useRef<HTMLDivElement>(null)
-    const {role} = useCombinedContext()
+const ReportCard = ({disease,reportId,verified,updateMenuOpen, link,tags}) => {
     return (
     <div className='h-[250px] w-[250px] relative flex flex-col border-2 border-[#a8f7f7] bg-[#edfafa] rounded-2xl hover:shadow-lg duration-300 shadow-sm'>
         <div className='flex items-center justify-between py-1 pt-2'>
@@ -20,26 +18,10 @@ const ReportCard = ({disease,reportId,verified,viewRequests,expand, updateMenuOp
             )}
             </article>
             <div className='relative px-2'>
-                <IconButton className='' onClick={(e)=>{updateMenuOpen(e.currentTarget,reportId)}}>
+                <IconButton className='' onClick={(e)=>{updateMenuOpen(e.currentTarget,reportId,verified)}}>
                     <MoreVertIcon/>
                 </IconButton>
-                <article ref={popUpRef} className={`absolute flex gap-1 z-10 w-32 ${expand?"h-fit":"h-0"} overflow-hidden flex-col bg-blue-300 rounded-md shadow-sm`}>
-                    {/* <a href={link} target='_blank' className='w-full inline-block'> */}
-                        <button onClick={()=>{viewReport(reportId)}} className='text-sm duration-300 hover:bg-blue-600 w-full rounded-md p-1 text-white'>
-                            View Report
-                        </button>
-                    {/* </a> */}
-                    {!verified&&<button 
-                                    onClick={()=>requestVerification(reportId)}
-                                    className='text-sm duration-300 hover:bg-blue-600 rounded-md p-1 text-white'>
-                        Request Verification    
-                    </button>}
-                    <button onClick={()=>viewRequests(reportId)} className='text-sm duration-300 hover:bg-blue-600 w-full rounded-md p-1 text-white'>
-                        View Requests
-                    </button>
-                    {role==2&&<button className='text-sm duration-300 hover:bg-blue-600 rounded-md p-1 text-white'>Edit Report</button>}
-                    <button className='text-sm duration-300 hover:bg-blue-600 rounded-md p-1 text-white' onClick={()=>deleteReport(reportId)}>Delete Report</button>
-                </article>
+                
             </div>
         </div>
         <div className='p-2 grow h-px'>

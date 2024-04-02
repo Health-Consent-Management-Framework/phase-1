@@ -1,7 +1,9 @@
+import { MoreVert } from "@mui/icons-material";
+import { IconButton } from "@mui/material";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import React, { useState } from "react";
-import { HiDotsVertical } from "react-icons/hi";
+import avatar from '../../assets/avatar.png'
 
 const AccessDoctors = (props) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null); 
@@ -18,19 +20,20 @@ const AccessDoctors = (props) => {
   };
 
   return (
-    <div className="max-w-lg bg-white rounded-lg overflow-hidden shadow-lg my-1 mx-auto">
+    <div className="w-full bg-white rounded-lg overflow-hidden shadow-sm my-1 mx-auto">
       <div className="px-6 py-4 flex flex-row items-center justify-between">
+        <img src={avatar} className="rounded-full w-10 h-10"/>
         <p className="font-bold text-xl">{props.doctorData.fname}</p>
         <p className="text-gray-700 text-base">{props.doctorData.designation}</p>
         <p className="text-gray-700 text-base">{props.doctorData.email}</p>
-        <button
+        <IconButton
           aria-controls="doctor-menu"
           aria-haspopup="true"
           onClick={(e) => updateMenuOpen(e, id)}
         >
           {/* You can use any icon or text for the button */}
-          <HiDotsVertical />
-        </button>
+          <MoreVert />
+        </IconButton>
         <Menu
           anchorEl={anchorEl}
           id="doctor-menu"
@@ -39,6 +42,7 @@ const AccessDoctors = (props) => {
           transformOrigin={{ horizontal: "right", vertical: "top" }}
           anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         >
+          <MenuItem onClick={()=>{}}>Visit Profie</MenuItem>
           <MenuItem onClick={handleMenuClose}>Revoke access</MenuItem>
         </Menu>
       </div>

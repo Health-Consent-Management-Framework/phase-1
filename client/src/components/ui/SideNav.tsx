@@ -33,31 +33,31 @@ const SideNav:React.FC<propType> = (props) => {
       {icon:<Link/>,name:'Connections',onClick:()=>navigate(routeConfig.viewConnections)},
     ],
     doctor:[
-      {img:'/reportIcon.png',name:'My Reports',onClick:()=>navigate(routeConfig.reports)},
-      {verification:true,icon:<NoteAddIcon/>,name:'Other Reports',onClick:()=>{navigate(routeConfig.reports);setQueryParams({type:'report',mode:'patient'})}},
-      {img:'/doctorIcon.png',name:'View Doctors',onClick:()=>navigate(routeConfig.doctors)},
-      {img:'/facilityIcon.png',name:'View Facilites', onClick:()=>navigate(routeConfig.facility)},
-      {img:'/viewRequests.png',name:'View Requests',onClick:()=>navigate(routeConfig.viewRequests)},
+      {icon:<Dashboard/>,name:"Home",onClick:()=>navigate(routeConfig.home)},
+      {icon:<DocumentScanner/>,name:'My Reports',onClick:()=>navigate(routeConfig.reports)},
+      {verification:true,icon:<NoteAddIcon/>,name:'Other Reports',onClick:()=>{navigate(routeConfig.reports);setQueryParams({mode:'doctor'})}},
+      {icon:<FaUserDoctor/>,name:'View Doctors',onClick:()=>navigate(routeConfig.doctors)},
+      {icon:<LocationCity/>,name:'View Facilites', onClick:()=>navigate(routeConfig.facility)},
+      {icon:<VscRequestChanges/>,name:'View Requests',onClick:()=>navigate(routeConfig.viewRequests)},
+      {icon:<Link/>,name:'Connections',onClick:()=>navigate(routeConfig.viewConnections)},
     ],
     worker:[
-      {img:'/reportIcon.png',name:'My Reports',onClick:()=>navigate(routeConfig.reports)},
-      {verification:true,icon:<NoteAddIcon/>,name:'Other Reports',onClick:()=>{navigate(routeConfig.reports);setQueryParams({type:'report',mode:'patient'})}},
-      {img:'/doctorIcon.png',name:'View Doctors',onClick:()=>navigate(routeConfig.doctors)},
+      {icon:<Dashboard/>,name:"Home",onClick:()=>navigate(routeConfig.home)},
+      {icon:<DocumentScanner/>,name:'My Reports',onClick:()=>navigate(routeConfig.reports)},
+      {verification:true,icon:<NoteAddIcon/>,name:'Other Reports',onClick:()=>{navigate(routeConfig.reports);setQueryParams({mode:'worker'})}},
+      {icon:<FaUserDoctor/>,name:'View Doctors',onClick:()=>navigate(routeConfig.doctors)},
       {img:'/facilityIcon.png',name:'View Facilites', onClick:()=>navigate(routeConfig.facility)},
-      {img:'/me.png',
-        name:'My Requests',
-        onClick:()=>navigate(routeConfig.viewRequests),
-      },
-      {verification:true,img:'/viewRequests.png',name:'Others Requests',onClick:()=>{
+      {icon:<VscRequestChanges/>,name:'View Requests',onClick:()=>navigate(routeConfig.viewRequests)},
+      {verification:true,icon:<Info/>,name:'Other Requests',onClick:()=>{
         navigate(routeConfig.viewRequests)
         setQueryParams({'user':'other'})
       }},
     ],
     admin:[
+      {icon:<Dashboard/>,name:"Home",onClick:()=>navigate(routeConfig.home)},
       {img:'/reportIcon.png',name:'Reports',onClick:()=>navigate(routeConfig.reports)},
       {img:'/facilityIcon.png', name:'Facilites', onClick:()=>navigate(routeConfig.facility)},
       {img:'/doctorIcon.png', name:'Doctors', onClick:()=>navigate(routeConfig.doctors)},
-      // {icon:<PersonAddAltIcon/>, name:'Add User',onClick:()=>navigate(routeConfig.addUser)},
       {img:"/me.png",name:'My Requests',onClick:()=>navigate(routeConfig.viewRequests)},
       {verification:true,icon:<Info/>,name:'Other Requests',onClick:()=>{
         navigate(routeConfig.viewRequests)

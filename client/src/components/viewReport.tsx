@@ -9,13 +9,13 @@ import { useCombinedContext } from "../store";
 import { useTransaction } from "../hooks/useTransaction";
 import { useCallback, useEffect } from "react";
 import { BeatLoader } from "react-spinners";
-import DoctorCard from "./ui/DoctorCardElement";
 import AccessDoctors from "./ui/AccessDoctors";
 import {
   abi as DoctorsAbi,
   networks as DoctorsNetworks,
 } from "../contracts/Doctor.json";
 import { useState } from "react";
+import DiagnosisSection from "./report/diagnosisSection";
 
 const ViewReport = ()=>{
     const params = useParams();
@@ -29,23 +29,25 @@ const ViewReport = ()=>{
         return reportContract?.methods.getCompleteReport(params.id).call({from:selectedWallet})
     },[reportContract])
 
+    async function requestVerification(){
+        const date = new Date();
+        const seconds = date.getTime();
+        console.log(seconds)
+        const data = await reportContract?.methods.createVerificationRequest(params.id,seconds).send({from:selectedWallet});
+        console.log(data)
+    }
 
+    const getDoctors = useCallback(async (doctorAddress) => {
+        const doctorData = await doctorContract.methods.getDoctorInfo(doctorAddress).call({ from: selectedWallet });
+        return doctorData;
+    }, [doctorContract, selectedWallet]);
+    
     const {loading,error,data:report} = useTransaction(getReport)
 
     useEffect(()=>{
         console.log(report)
     },[report])
 
-    if(error){
-        return <p>Something went wrong</p>
-    }
-
-    const getDoctors = useCallback(async (doctorAddress) => {
-      const doctorData = await doctorContract.methods.getDoctorInfo(doctorAddress).call({ from: selectedWallet });
-      return doctorData;
-    }, [doctorContract, selectedWallet]);
-  
-    
     const fetchDoctorsData = useCallback(async () => {
         let mergedData = [];
         for (const ele of report?.doctorAddress) {
@@ -63,6 +65,17 @@ const ViewReport = ()=>{
     useEffect(() => {
       fetchDoctorsData();
     }, [fetchDoctorsData]);
+
+    if(error){
+        return <p>Something went wrong</p>
+    }
+
+    function printReport(url:string){    
+        const W = window.open(url);
+        if(W) W.window.print();
+    }
+    
+
 
     return(
         <section className="flex h-full flex-col ">
@@ -96,29 +109,28 @@ const ViewReport = ()=>{
                                             </article>
                                         </article>
                                     </div>
-                                    <article className="max-w-[500px] flex gap-4 justify-center items-center flex-wrap">
-                                        <Button className="border-gray-200 gap-2 font-medium flex items-center text-gray-500 hover:text-red-400">
-                                            <DownloadSharp/>
-                                            Download
-                                        </Button>
-                                        <Button className="border-gray-200 flex items-center gap-2 font-medium text-gray-500 hover:text-red-400">
-                                            <RemoveRedEye/>
-                                            View
-                                        </Button>
-                                        <Button className="border-gray-200 flex items-center gap-2 font-medium text-gray-500 hover:text-red-400">
+                                    <article className="max-w-[400px] flex gap-4 justify-center items-center flex-wrap">
+                                        {/* <a href={report?.attachements[0]} download={report?.problem}>
+                                            <Button className="border-gray-200 gap-2 font-medium flex items-center text-gray-500 hover:text-red-400">
+                                                <DownloadSharp/>
+                                                Download
+                                            </Button>
+                                        </a> */}
+                                        <a href={report?.attachements[0]} target = "_blank">
+                                            <Button className="border-gray-200 flex items-center gap-2 font-medium text-gray-500 hover:text-red-400">
+                                                <RemoveRedEye/>
+                                                View
+                                            </Button>
+                                        </a>
+                                        <Button onClick={()=>printReport()} className="border-gray-200 flex items-center gap-2 font-medium text-gray-500 hover:text-red-400">
                                             <Print/>
                                             Print
                                         </Button>
                                         {report&&!report.isVerified&&(
-                                            <Button className="border-gray-200 flex items-center gap-2 font-medium text-gray-500 hover:text-red-400">
+                                            <Button onClick={requestVerification} className="border-gray-200 flex items-center gap-2 font-medium text-gray-500 hover:text-red-400">
                                                 <Done/>
                                                 Request Verification
                                             </Button>                                        
-                                        )}
-                                        {report&&(
-                                            <Button className="border-gray-200 flex items-center gap-2 font-medium text-gray-500 hover:text-red-400">
-                                                View Requests
-                                            </Button>
                                         )}
                                     </article>
                                 </div>
@@ -127,24 +139,21 @@ const ViewReport = ()=>{
                         <div className="px-5 mb-4 flex flex-col grow">
                             <div className="flex h-full items-center">
                                 <div className="w-1/2 rounded-md h-full p-2">
-                                    <article className="border-2 w-full h-full rounded-md shadow-md bg-[#F5F7FB]">
-                                        <h1 className=" font-medium pt-4 ps-5 text-xl pb-2">Diagnosis</h1>
-                                        <Divider></Divider>
-                                        <p className="ps-5">No thing to worry</p>
-                                    </article>
+                                    <DiagnosisSection />
                                 </div>
                                 <div className="w-1/2 rounded-md h-full p-2">
-                                    <article className="border-2 w-full h-full rounded-md shadow-md bg-[#F5F7FB]">
+                                    <div className="border-2 w-full h-full rounded-md shadow-md bg-[#F5F7FB]">
                                         <h1 className="font-medium ps-5 pb-2 pt-4 text-xl">Doctors with access</h1>
                                         <Divider></Divider>
-                                        {doctorsData.map((doctor, index) => (
-                                          <AccessDoctors key={index} doctorData={doctor} />
-                                        ))}
+                                        <article className="p-2">
+                                            {doctorsData.map((doctor, index) => (
+                                            <AccessDoctors key={index} doctorData={doctor} />
+                                            ))}
+                                        </article>
                                         {/* {report?.doctorAddress.map(ele=>(
                                             <p>{ele}</p>
                                         ))} */}
-                                        <p className="ps-5">No thing to worry</p>
-                                    </article>
+                                    </div>
                                 </div>
                             </div>
                         </div>
