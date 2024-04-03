@@ -221,6 +221,7 @@ contract Report {
             if(accessRequests[reportId][requestId].status == RequestStatus.pending){
                 accessRequests[reportId][requestId].status = RequestStatus.approved;
                 reports[reportId].isVerified = true;
+                reports[reportId].updatedAt  = updated_at;
            }
         }
     }   
@@ -311,6 +312,23 @@ contract Report {
         }
         return r;
     }
+
+    function getCurrentPatientDoctorAccessReport(address patientAddress, address doctorAddress) public view returns (ReportType[] memory) {
+    string[] storage ReportIds = doctorToReportMapping[doctorAddress];
+    string[] memory RelatedReportIds = new string[](ReportIds.length);
+    uint count = 0;
+    for (uint i = 0; i < ReportIds.length; i++) {
+        if (reports[ReportIds[i]].patientAddress == patientAddress) {
+            RelatedReportIds[count] = ReportIds[i];
+            count++;
+        }
+    }
+    ReportType[] memory trimmedRelatedReportIds = new ReportType[](count);
+    for (uint j = 0; j < count; j++) {
+        trimmedRelatedReportIds[j] = reports[RelatedReportIds[j]];
+    }
+    return trimmedRelatedReportIds;
+}
 
     function updateTags(string memory reportId,string[] memory tags) public onlyOwner(msg.sender,reportId) returns(bool) {
         ReportType memory report = reports[reportId];

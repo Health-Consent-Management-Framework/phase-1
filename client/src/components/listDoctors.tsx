@@ -49,6 +49,8 @@ const ListDoctors:React.FC = ()=>{
         const createdAt = new Date().getTime()
         const data = await requestContract?.methods.createAccountRequest(selectedWallet,`${selectedWallet} request for its account to be verified`,doctorId,createdAt,0,requestTypeEnum.connection).send({from:selectedWallet});
         // const data1 = await connectionContract?.methods.createConnection(doctorId,selectedWallet).send({from:selectedWallet});
+        console.log("hello" + data1);
+        
     }
 
     return(
@@ -72,7 +74,8 @@ const ListDoctors:React.FC = ()=>{
                     transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                     anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                 >
-                    <MenuItem onClick={()=>{setAccessPopup(true)}}>Give Access</MenuItem>
+                    
+                    {/* <MenuItem onClick={()=>{setAccessPopup(true)}}>Give Access</MenuItem> */}
                     <MenuItem onClick={()=>{createConnectionRequest()}}>Connect</MenuItem>
                     {/* <MenuItem></MenuItem> */}
                 </Menu>
