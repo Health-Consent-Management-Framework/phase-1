@@ -8,13 +8,14 @@ import {abi as RequestAbi,networks as RequestNetworks} from '../contracts/Reques
 import { useCombinedContext } from "../store"
 import { requestTypeEnum } from "./utils/enums"
 import ViewAccessReports from "./accessListReport"
-
+import {abi as ConnectionAbi,networks as ConnectionNetworks} from '../contracts/Connection.json'
 
 const ListDoctors:React.FC = ()=>{
-    const doctorContract = useContract(DoctorAbi,DoctorNetworks)
-    const requestContract = useContract(RequestAbi,RequestNetworks)
-    const {selectedWallet} = useCombinedContext()
-    const [loading,setLoading] = useState(false)    
+    const doctorContract = useContract(DoctorAbi,DoctorNetworks);
+    const requestContract = useContract(RequestAbi,RequestNetworks);
+    const connectionContract = useContract(ConnectionAbi,ConnectionNetworks);
+    const {selectedWallet} = useCombinedContext();
+    const [loading,setLoading] = useState(false);  
     const [doctors,setDoctors] = useState([])
     const [accessPopup,setAccessPopup] = useState(false)
     const [anchorEl,setAnchorEl] = useState<HTMLElement | null>(null)
@@ -36,6 +37,7 @@ const ListDoctors:React.FC = ()=>{
         console.log(ele,id)
         setAnchorEl(ele);
         setDoctorId(id);
+        console.log(id);
     }
     
     function handleMenuClose(){
@@ -45,7 +47,8 @@ const ListDoctors:React.FC = ()=>{
 
     async function createConnectionRequest(){
         const createdAt = new Date().getTime()
-        const data = await requestContract?.methods.createAccountRequest(selectedWallet,`${selectedWallet} request for its account to be verified`,doctorId,createdAt,0,requestTypeEnum.connection).send({from:selectedWallet})
+        // const data = await requestContract?.methods.createAccountRequest(selectedWallet,`${selectedWallet} request for its account to be verified`,doctorId,createdAt,0,requestTypeEnum.connection).send({from:selectedWallet});
+        const data1 = await connectionContract?.methods.createConnection(doctorId,selectedWallet).send({from:selectedWallet});
     }
 
     return(
