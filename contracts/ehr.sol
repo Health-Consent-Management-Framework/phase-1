@@ -101,19 +101,19 @@ contract Report {
         totalReports = 0;
     }
 
-    function revokeDoctorAccessToPatient(string memory reportId,address doctorAddress) public returns (bool){
+    function revokeDoctorAccessToPatient(string memory reportId, address doctorAddress) public returns (bool) {
         ReportType storage report = reports[reportId];
         bool success = false;
-        for(uint i=0;i<report.doctorAddress.length;i++){
-            if(report.doctorAddress[i]==doctorAddress){ 
+        for(uint i = 0; i < report.doctorAddress.length; i++) {
+            if(report.doctorAddress[i] == doctorAddress) { 
                 success = true;
-                (report.doctorAddress[i],report.doctorAddress[report.doctorAddress.length - 1]) = (report.doctorAddress[i],report.doctorAddress[report.doctorAddress.length - 1]);
+                report.doctorAddress[i] = report.doctorAddress[report.doctorAddress.length - 1];
                 report.doctorAddress.pop();
+                emit DoctorAccessRevoked(doctorAddress, reportId);
                 break; 
-            }
         }
-        if(success) emit DoctorAccessRevoked(doctorAddress, reportId);
-        else revert("given doctor doesn't have access to the file");
+    }
+        require(success, "Given doctor doesn't have access to the file");
         return success;
     }
 
