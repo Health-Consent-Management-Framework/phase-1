@@ -139,7 +139,7 @@ const ViewConnections: React.FC = () => {
         return patientData;
       })
     );
-    setpatientsData(patientsData);
+    setPatientsData(patientsData);
   }, [patientAddresses, patientContract, selectedWallet]);
 
   useEffect(() => {
@@ -177,7 +177,7 @@ const ViewConnections: React.FC = () => {
             fname={patient.fname}
             lname={patient.lname}
             email={patient.email}
-            designation={"Cardiologist"}
+            designation={"Patient"}
           />
         ))}
       </div>
@@ -198,7 +198,6 @@ const ViewConnections: React.FC = () => {
         >
           view my access
         </MenuItem>
-        <MenuItem>Create Direct Connection</MenuItem>
         <MenuItem>Delete Connection</MenuItem>
       </Menu>
       <Dialog

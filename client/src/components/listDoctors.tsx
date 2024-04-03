@@ -47,8 +47,8 @@ const ListDoctors:React.FC = ()=>{
 
     async function createConnectionRequest(){
         const createdAt = new Date().getTime()
-        // const data = await requestContract?.methods.createAccountRequest(selectedWallet,`${selectedWallet} request for its account to be verified`,doctorId,createdAt,0,requestTypeEnum.connection).send({from:selectedWallet});
-        const data1 = await connectionContract?.methods.createConnection(doctorId,selectedWallet).send({from:selectedWallet});
+        const data = await requestContract?.methods.createAccountRequest(selectedWallet,`${selectedWallet} request for its account to be verified`,doctorId,createdAt,0,requestTypeEnum.connection).send({from:selectedWallet});
+        // const data1 = await connectionContract?.methods.createConnection(doctorId,selectedWallet).send({from:selectedWallet});
     }
 
     return(
@@ -69,7 +69,6 @@ const ListDoctors:React.FC = ()=>{
                     id="Doctor Menu"
                     open={Boolean(anchorEl)}
                     onClose={handleMenuClose}
-                    // onClick={}
                     transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                     anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                 >

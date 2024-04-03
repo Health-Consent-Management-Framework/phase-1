@@ -64,7 +64,7 @@ const PatientReports:React.FC = ()=>{
     if(reportContract&&selectedWallet) {
       fetchReports()
     }
-  },[reportContract, selectedWallet, updateNotification])
+  },[reportContract, selectedWallet, updateNotification,searchParams])
 
   async function requestVerification(reportId){
     const date = new Date();
