@@ -71,8 +71,11 @@ const ReportRequest:React.FC<{type:string}> = (props)=>{
 
     async function rejectRequest(requestId,reportId){
         const updatedAt = new Date().getTime()
-        const data = await reportContract?.methods.rejectVerificationRequest(requestId,reportId,updatedAt).send({from:selectedWallet})
-        console.log(data)
+        let data;
+        if(props.type=='access'){
+            data = await reportContract?.methods.rejectAccessRequest(requestId,reportId,updatedAt).send({from:selectedWallet})
+        } else data = await reportContract?.methods.rejectVerificationRequest(requestId,reportId,updatedAt).send({from:selectedWallet})
+        console.log(data);
     }
 
     async function getAllRequests(){
@@ -141,7 +144,7 @@ const ReportRequest:React.FC<{type:string}> = (props)=>{
                                     </article>
                                 </td>
                             )}
-                            {reportRequestTypeEnum[Number(ele.requestType)]=='access'&&(
+                            {reportRequestTypeEnum[Number(ele.requestType)]=="access"&&(
                                 <td>
                                 <article className="flex justify-center items-center">
                                     <IconButton onClick={()=>approveRequest(ele.requestId,ele.reportId)}>
