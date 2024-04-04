@@ -26,7 +26,7 @@ const DiagnosisSection:React.FC<propType> = ()=>{
     const params = useParams()
     const [loading,setLoading] = useState(false)
     const reportContract = useContract(ReportAbi,ReportNetworks)
-    const {selectedWallet,updateNotification,role} = useCombinedContext()
+    const {selectedWallet,user,updateNotification,role} = useCombinedContext()
     const [diagnosis,setDiagnosis] = useState([])
 
     const submitDiagnosis = async(e)=>{
@@ -35,8 +35,8 @@ const DiagnosisSection:React.FC<propType> = ()=>{
             const {diagnosis} = e.target;
             const date = new Date().getTime()
             console.log(date,diagnosis.value)
-            const fname = "doctor"
-            const lname = "one"
+            const fname = user.fname
+            const lname = user.lname
             const data = await reportContract?.methods.addDiagnosis(params.id,diagnosis.value,fname,lname,date).send({from:selectedWallet})
             console.log(data)
         }catch(err){

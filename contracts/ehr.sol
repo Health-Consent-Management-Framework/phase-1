@@ -17,7 +17,7 @@ contract Report {
     ReportType[] testReports;
 
     struct RequestType {
-        uint id;
+        string id;
         string reportId;
         address sentBy;
         address receivedBy;
@@ -51,13 +51,16 @@ contract Report {
     uint256 private nonce;
     mapping(address => string[]) private userToReportMapping;
     mapping(address => string[]) doctorToReportMapping;
-    mapping(string => RequestType[]) public accessRequests;
-    mapping(string=>string[]) reportToDiagnosis; 
-    mapping(string=> Diagnosis) reportDiagnosis; // reportId->diagnosis
-    // mapping(uint=>RequestType) public accessRequestsMapping;
+
+    mapping(string => string[]) public reportToRequests;
+    mapping(string => RequestType) public accessRequests;
+    mapping(string => string[]) reportToDiagnosis; 
+    mapping(string => Diagnosis) reportDiagnosis; 
+    
     string[] reportKeys; // fetch all reports
     string[] requestKeys;
     Diagnosis[] testDiagnosis;
+    RequestType[] testRequests;
     mapping(string => ReportType) public reports;
 
     modifier onlyOwner(address userAddress,string memory reportId) {
@@ -99,8 +102,8 @@ contract Report {
     event DoctorAccessRevoked(address doctorAddress, string reportId);
 
     event AccessRequestSent(address doctorAddress, string reportId,uint index);
-    event AccessRequestApproved(address doctorAddress, string reportId,uint index);
-    event AccessRequestRejected(address doctorAddress, string reportId,uint index);
+    event AccessRequestApproved(address doctorAddress, string reportId,string requestId);
+    event AccessRequestRejected(address doctorAddress, string reportId,string index);
 
     event VerificationRequestCreated(address patientAddress,string reportId);
     event VerificationRequestUpdated(address workerAddress,string reportId,RequestStatus r);
@@ -122,8 +125,11 @@ contract Report {
                 report.doctorAddress.pop();
                 emit DoctorAccessRevoked(doctorAddress, reportId);
                 break; 
+            }   
         }
-    }
+        if(success){
+            emit NoAccessToReport(msg.sender, reportId);
+        }else emit DoctorAccessRevoked(msg.sender,reportId);
         require(success, "Given doctor doesn't have access to the file");
         return success;
     }
@@ -147,15 +153,17 @@ contract Report {
             }
         }
         if(hasAccess) revert("Doctor already has access to the file");        
-        uint index = accessRequests[reportId].length;
-        RequestType memory request = RequestType(index,reportId,msg.sender,reciever,createdAt,0,RequestStatus.pending,RequestTypeEnum.access);
-        accessRequests[reportId].push(request);
+        uint index = reportToRequests[reportId].length;
+        string memory requestId = randomString(10);
+        RequestType memory request = RequestType(requestId,reportId,msg.sender,reciever,createdAt,0,RequestStatus.pending,RequestTypeEnum.access);
+        accessRequests[requestId] = request;
+        reportToRequests[reportId].push(requestId);
         emit AccessRequestSent(msg.sender, reportId,index);
         return hasAccess;
     }
 
-    function approveAccessRequest(uint256 requestId,string memory reportId) public onlyOwner(msg.sender,reportId) returns (bool){
-        RequestType storage request = accessRequests[reportId][requestId];
+    function approveAccessRequest(string memory requestId,string memory reportId,uint updatedAt) public onlyOwner(msg.sender,reportId) returns (bool){
+        RequestType storage request = accessRequests[requestId];
         require(request.status != RequestStatus.pending, "Access request is not pending");
         bool alreadyHasAccess = false;
         for(uint i=0;i<reports[reportId].doctorAddress.length;i++){
@@ -166,33 +174,31 @@ contract Report {
         }
         if(alreadyHasAccess) revert("user already has access to the report");
         request.status = RequestStatus.approved;
-        accessRequests[reportId][requestId] = request;
+        accessRequests[requestId] = request;
+        accessRequests[requestId].updatedAt = updatedAt;
         reports[reportId].doctorAddress.push(request.receivedBy);
         doctorToReportMapping[msg.sender].push(reportId);
         emit AccessRequestApproved(request.receivedBy, reportId,requestId);
         return true;
     }
 
-    function rejectAccessRequest(uint256 requestId,string memory reportId) public onlyOwner(msg.sender,reportId) returns(bool) {
-        RequestType storage request = accessRequests[reportId][requestId];
+    function rejectAccessRequest(string memory requestId,string memory reportId,uint updatedAt) public onlyOwner(msg.sender,reportId) returns(bool) {
+        RequestType storage request = accessRequests[requestId];
         require(request.status != RequestStatus.pending, "Access request is not pending");
         request.status = RequestStatus.rejected;
-        accessRequests[reportId][requestId] = request;
-        reports[reportId].doctorAddress.push(request.receivedBy);
+        accessRequests[requestId] = request;
+        accessRequests[requestId].updatedAt = updatedAt;
+        // reports[reportId].doctorAddress.push(request.receivedBy);
         emit AccessRequestRejected(request.receivedBy, reportId,requestId);
         return true;
     }
 
-    function getAccessRequestStatus(string memory reportId,uint requestId) external view returns (RequestStatus) {
-        return accessRequests[reportId][requestId].status;
+    function getAccessRequestStatus(string memory reportId,string memory requestId) external view returns (RequestStatus) {
+        return accessRequests[requestId].status;
     }
 
-    function getAccessRequestStatusForReport(string memory reportId) public view returns(RequestType[] memory){
-        return accessRequests[reportId];
-    }
-
-    function createVerificationRequest(string memory reportId,uint created_at) public returns(bool){
-        string[] memory patientReports = userToReportMapping[msg.sender];
+    function createVerificationRequest(string memory reportId,address senderAddress,uint created_at) public returns(bool){
+        string[] memory patientReports = userToReportMapping[senderAddress];
         bool owns = false;
         for(uint i=0;i<patientReports.length;i++){
             if(keccak256(abi.encodePacked(patientReports[i])) == keccak256(abi.encodePacked(reportId))){
@@ -205,30 +211,34 @@ contract Report {
                 emit ReportVerified(reportId);
                 return false;
             }
-            uint index = accessRequests[reportId].length;
-            RequestType memory v = RequestType(index,reportId,msg.sender,address(0),created_at,0,RequestStatus.pending,RequestTypeEnum.verification);
-            accessRequests[reportId].push(v);
-            emit VerificationRequestCreated(msg.sender,reportId);
+            string memory requestId = randomString(10);
+            RequestType memory v = RequestType(requestId,reportId,senderAddress,address(0),created_at,0,RequestStatus.pending,RequestTypeEnum.verification);
+            accessRequests[requestId] = v;
+            reportToRequests[reportId].push(requestId);
+            testRequests.push(v);
+            emit VerificationRequestCreated(senderAddress,reportId);
             return true;
         }else{
-            emit NotSelfResource(msg.sender,reportId);
+            emit NotSelfResource(senderAddress,reportId);
             return false;
         }
     }
 
-    function approveVerificationRequest(string memory reportId,uint requestId,uint updated_at) public returns(bool){
+    function approveVerificationRequest(string memory reportId,string memory requestId,uint updated_at) public returns(bool){
         if(userContract.getVerificationStatus(msg.sender, 1)||userContract.getVerificationStatus(msg.sender,2)){
-            if(accessRequests[reportId][requestId].status == RequestStatus.pending){
-                accessRequests[reportId][requestId].status = RequestStatus.approved;
+            if(accessRequests[requestId].status == RequestStatus.pending){
+                accessRequests[requestId].status = RequestStatus.approved;
                 reports[reportId].isVerified = true;
+                accessRequests[requestId].updatedAt = updated_at;
            }
         }
     }   
 
-    function rejectVerificationRequset(string memory reportId,uint requestId,uint updated_at) public returns(bool){
+    function rejectVerificationRequset(string memory reportId,string memory requestId,uint updated_at) public returns(bool){
         if(userContract.getVerificationStatus(msg.sender, 1)||userContract.getVerificationStatus(msg.sender,2)){
-            if(accessRequests[reportId][requestId].status == RequestStatus.pending){
-                accessRequests[reportId][requestId].status = RequestStatus.rejected;
+            if(accessRequests[requestId].status == RequestStatus.pending){
+                accessRequests[requestId].status = RequestStatus.rejected;
+                accessRequests[requestId].updatedAt = updated_at;
            }
         }
     }
@@ -343,18 +353,20 @@ contract Report {
         reportDiagnosis[diagnosisId].date = date;
     }
 
-    function getMyRequests(address userAddress) public view returns(RequestType[] memory){
+    function getMyRequests(address userAddress,RequestTypeEnum requestType) public view returns(RequestType[] memory){
         string[] memory userReports = userToReportMapping[userAddress];
         uint size = 0;
         for(uint i=0;i<userReports.length;i++){
-            size+= accessRequests[userReports[i]].length;
+            size += reportToRequests[userReports[i]].length;
         }
         RequestType[] memory r = new RequestType[](size);
 
         for(uint i=0;i<userReports.length;i++){
-            for(uint j=0;j<accessRequests[userReports[i]].length;j++){
+            for(uint j=0;j<reportToRequests[userReports[i]].length;j++){
                 uint index = i+j;
-                r[index] = accessRequests[userReports[i]][j];
+                string memory reportId = userReports[i];
+                string memory requestId = reportToRequests[reportId][j];
+                r[index] = accessRequests[requestId];
             }
         }
         return r;
@@ -364,15 +376,17 @@ contract Report {
 
         uint size = 0;
         for(uint i=0;i<reportKeys.length;i++){
-            size+= accessRequests[reportKeys[i]].length;
+            size+= reportToRequests[reportKeys[i]].length;
         }
 
         RequestType[] memory r = new RequestType[](size);
 
         for(uint i=0;i<reportKeys.length;i++){
-            for(uint j=0;j<accessRequests[reportKeys[i]].length;j++){
+            for(uint j=0;j<reportToRequests[reportKeys[i]].length;j++){
                 uint index = i+j;
-                r[index] = accessRequests[reportKeys[i]][j];
+                string memory reportId = reportKeys[i];
+                string memory requestId = reportToRequests[reportId][j];
+                r[index] = accessRequests[requestId];
             }
         }
         return r;

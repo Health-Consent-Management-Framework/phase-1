@@ -6,12 +6,13 @@ import { useCombinedContext } from "../../store";
 import {abi as ReportAbi,networks as ReportNetwork} from '../../contracts/Report.json'
 import { BeatLoader } from "react-spinners";
 import { IconButton } from "@mui/material";
-import { ThumbDownOffAlt,ThumbUpOffAlt,AddTask } from "@mui/icons-material";
-import { reportRequestTypeEnum, roleEnum } from "../utils/enums";
+import { ThumbDownOffAlt,ThumbUpOffAlt } from "@mui/icons-material";
+import { reportRequestTypeEnum, reportRequestRTypeEnum, roleEnum } from "../utils/enums";
 import { routeConfig } from "../../router";
 
 
-const ReportRequest:React.FC = ()=>{
+
+const ReportRequest:React.FC<{type:string}> = (props)=>{
     const {selectedWallet,role} = useCombinedContext()
     const reportContract = useContract(ReportAbi,ReportNetwork)
     const [requests,setRequests] = useState([])
@@ -38,7 +39,7 @@ const ReportRequest:React.FC = ()=>{
     }
 
     useEffect(()=>{
-        if(reportContract){ 
+        if(reportContract&&selectedWallet){ 
             if(searchParams.get('user')=='other'){
                 getAllRequests();
             }else getMyRequests();
@@ -47,47 +48,38 @@ const ReportRequest:React.FC = ()=>{
     },[reportContract])
 
     async function getMyRequests(){
-        console.log("called")
         if(reportContract){
-            console.log("inside")
-            const data = await reportContract.methods.getMyRequests(selectedWallet).call({from:selectedWallet})
+            console.log(props.type)
+            console.log(reportRequestTypeEnum[props.type])
+            const data = await reportContract.methods.getMyRequests(selectedWallet,reportRequestRTypeEnum[props.type]).call({from:selectedWallet})
             if(data) setRequests(data)
             console.log(data)
         }
     }
 
 
-    async function approveVerfifcationRequest(requestId,reportId){
+    async function approveRequest(requestId,reportId){
         const updatedAt = new Date().getTime()
-        const data = await reportContract?.methods.approveVerificationRequest(reportId,requestId,updatedAt).send({from:selectedWallet})
+        let data;
+        if(props.type=='access'){
+            data = await reportContract?.methods.approveAccessRequest(reportId,requestId,updatedAt).send({from:selectedWallet})
+        }else{
+            data = await reportContract?.methods.approveVerificationRequest(reportId,requestId,updatedAt).send({from:selectedWallet})
+        }
         console.log(data)
     }
 
-    async function rejectVerificationRequest(requestId,reportId){
+    async function rejectRequest(requestId,reportId){
         const updatedAt = new Date().getTime()
         const data = await reportContract?.methods.rejectVerificationRequest(requestId,reportId,updatedAt).send({from:selectedWallet})
         console.log(data)
     }
 
-    async function approveAccessRequest(){
-        const data = await reportContract?.methods.approveAccessRequest(requestId,reportId,updatedAt).send({from:selectedWallet})
-        console.log(data)
-    }
-
-    async function rejectAccessRequest() {
-        const data = await reportContract?.methods.rejectAccessRequest(requestId,reportId,updatedAt).send({from:selectedWallet})
-        console.log(data)
-    }
-
     async function getAllRequests(){
-        const data = await reportContract?.methods.getAllRequests(selectedWallet).call({from:selectedWallet});
+        const data = await reportContract?.methods.getAllRequests(selectedWallet,reportRequestRTypeEnum[props.type]).call({from:selectedWallet});
         console.log(data)
         if(data) setRequests(data)
     }
-
-    async function approveAccess(){}
-
-    async function rejectAccess(){}
 
     return(
         <section className="w-full">
@@ -140,10 +132,10 @@ const ReportRequest:React.FC = ()=>{
                             {(reportRequestTypeEnum[Number(ele.requestType)]=="verification"&&(roleEnum[Number(role)]=="admin"||roleEnum[Number(role)]=='worker'))&&(
                                 <td>
                                     <article className="flex justify-center items-center">
-                                        <IconButton onClick={()=>approveVerfifcationRequest(ele.id,ele.reportId)}>
+                                        <IconButton onClick={()=>approveRequest(ele.id,ele.reportId)}>
                                             <ThumbUpOffAlt color="success"/>
                                         </IconButton>
-                                        <IconButton  onClick={()=>rejectVerificationRequest(ele.requestId,ele.reportId)}>
+                                        <IconButton  onClick={()=>rejectRequest(ele.requestId,ele.reportId)}>
                                             <ThumbDownOffAlt color="error"/>
                                         </IconButton>
                                     </article>
@@ -152,10 +144,10 @@ const ReportRequest:React.FC = ()=>{
                             {reportRequestTypeEnum[Number(ele.requestType)]=='access'&&(
                                 <td>
                                 <article className="flex justify-center items-center">
-                                    <IconButton onClick={()=>approveAccess(ele.requestId,ele.reportId)}>
+                                    <IconButton onClick={()=>approveRequest(ele.requestId,ele.reportId)}>
                                         <ThumbUpOffAlt color="success"/>
                                     </IconButton>
-                                    <IconButton  onClick={()=>rejectAccess(ele.requestId)}>
+                                    <IconButton  onClick={()=>rejectRequest(ele.requestId,ele.reportId)}>
                                         <ThumbDownOffAlt color="error"/>
                                     </IconButton>
                                 </article>

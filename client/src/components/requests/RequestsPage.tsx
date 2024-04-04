@@ -32,7 +32,8 @@ const RequestsMiddleware = ()=>{
                 </select>
             </div>
         </div>
-            {searchParams.get('type')=='report'&&<ReportRequest/>}
+            {searchParams.get('type')=='report'&&<ReportRequest type={"verification"}/>}
+            {searchParams.get('type')=='access'&&<ReportRequest type={"access"}/>}
             {searchParams.get('type')=='account'&&<AccountRequest type={"verification"}/>}
             {searchParams.get('type')=='connection'&&<AccountRequest type={"connection"}/>}
         </section>    

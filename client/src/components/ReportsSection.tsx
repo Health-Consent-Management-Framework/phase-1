@@ -70,7 +70,7 @@ const PatientReports:React.FC = ()=>{
     const date = new Date();
     const seconds = date.getTime();
     console.log(seconds)
-    const data = await reportContract?.methods.createVerificationRequest(reportId,seconds).send({from:selectedWallet});
+    const data = await reportContract?.methods.createVerificationRequest(reportId,selectedWallet,seconds).send({from:selectedWallet});
     console.log(data)
   }
 
