@@ -116,7 +116,7 @@ const PatientReports:React.FC = ()=>{
             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
           >
-          {isVerfied&&<MenuItem>Give Access</MenuItem>}
+          {/* {isVerfied&&<MenuItem>Give Access</MenuItem>} */}
           <MenuItem onClick={()=>{navigate(routeConfig.viewReport(id))}}>View Report</MenuItem>
           {!isVerfied&&<MenuItem onClick={()=>{requestVerification(id)}}>Request Verification</MenuItem>}
           <MenuItem>Delete Report</MenuItem>

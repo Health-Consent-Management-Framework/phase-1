@@ -1,4 +1,3 @@
-import dummyReport from '../assets/dummyReport.jpg'
 import { Button } from "./ui"
 import useContract from '../hooks/useContract'
 import { abi as ReportAbi,networks as ReportNetworks } from '../contracts/Report.json'
@@ -18,6 +17,7 @@ const ViewAccessReports:React.FC<{doctorAddress:string}> = (props)=>{
     async function getReports(){
         try{
             setLoading(true)
+            // function to get non existing reports
             const data = await contract?.methods.getPatientReports(props.patientAddress).call({from:selectedWallet});
             // console.log(data)
             setReports(data)
@@ -32,7 +32,7 @@ const ViewAccessReports:React.FC<{doctorAddress:string}> = (props)=>{
         try {
             setLoading(true);
             const promises = selectedReports.map(async ele => {
-                console.log(ele);
+                console.log(ele,props.patientAddress);
                 const data = await contract?.methods.sendAccessRequest(ele, props.patientAddress,time).send({from:selectedWallet});  
                 return data;
             });

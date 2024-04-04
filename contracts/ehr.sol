@@ -162,27 +162,27 @@ contract Report {
         return hasAccess;
     }
 
-    function approveAccessRequest(string memory requestId,string memory reportId,uint updatedAt) public onlyOwner(msg.sender,reportId) returns (bool){
+    function approveAccessRequest(string memory requestId,string memory reportId,uint updatedAt) public returns (bool){
         RequestType storage request = accessRequests[requestId];
-        require(request.status != RequestStatus.pending, "Access request is not pending");
+        // require(request.status != RequestStatus.pending, "Access request is not pending");
         bool alreadyHasAccess = false;
         for(uint i=0;i<reports[reportId].doctorAddress.length;i++){
-            if(request.receivedBy==reports[reportId].doctorAddress[i]){
+            if(request.sentBy==reports[reportId].doctorAddress[i]){
                 alreadyHasAccess = true;
                 break;
             }
         }
-        if(alreadyHasAccess) revert("user already has access to the report");
+        // if(alreadyHasAccess) revert("user already has access to the report");
         request.status = RequestStatus.approved;
         accessRequests[requestId] = request;
         accessRequests[requestId].updatedAt = updatedAt;
-        reports[reportId].doctorAddress.push(request.receivedBy);
-        doctorToReportMapping[msg.sender].push(reportId);
-        emit AccessRequestApproved(request.receivedBy, reportId,requestId);
+        reports[reportId].doctorAddress.push(request.sentBy);
+        doctorToReportMapping[request.sentBy].push(reportId);
+        emit AccessRequestApproved(request.sentBy, reportId,requestId);
         return true;
     }
 
-    function rejectAccessRequest(string memory requestId,string memory reportId,uint updatedAt) public onlyOwner(msg.sender,reportId) returns(bool) {
+    function rejectAccessRequest(string memory requestId,string memory reportId,uint updatedAt) public returns(bool) {
         RequestType storage request = accessRequests[requestId];
         require(request.status != RequestStatus.pending, "Access request is not pending");
         request.status = RequestStatus.rejected;
@@ -191,10 +191,6 @@ contract Report {
         // reports[reportId].doctorAddress.push(request.receivedBy);
         emit AccessRequestRejected(request.receivedBy, reportId,requestId);
         return true;
-    }
-
-    function getAccessRequestStatus(string memory reportId,string memory requestId) external view returns (RequestStatus) {
-        return accessRequests[requestId].status;
     }
 
     function createVerificationRequest(string memory reportId,address senderAddress,uint created_at) public returns(bool){
@@ -229,6 +225,7 @@ contract Report {
             if(accessRequests[requestId].status == RequestStatus.pending){
                 accessRequests[requestId].status = RequestStatus.approved;
                 reports[reportId].isVerified = true;
+                accessRequests[requestId].receivedBy = msg.sender;
                 accessRequests[requestId].updatedAt = updated_at;
            }
         }
@@ -265,12 +262,10 @@ contract Report {
 
     function randomString(uint size) public  payable returns(string memory){
         bytes memory randomWord=new bytes(size);
-        // since we have 26 letters
         bytes memory chars = new bytes(26);
         chars="abcdefghijklmnopqrstuvwxyz";
         for (uint i=0;i<size;i++){
             uint randomNumber=random(26);
-            // Index access for string is not possible
             randomWord[i]=chars[randomNumber];
         }
         return string(randomWord);
@@ -297,13 +292,6 @@ contract Report {
         return true;
     }
 
-    // function updateReport(string memory reportId,string[] memory newDiagnosis) public onlyDoctorWithAccess(msg.sender,reportId) returns (bool) {
-    //     ReportType memory report = reports[reportId];
-    //     report.diagnosis = newDiagnosis;
-    //     reports[reportId] = report;
-    //     emit reportUpdate(reportId);
-    //     return true;
-    // }
 
     function getPatientReports(address patientAddress) public view returns (ReportType[] memory) {
         ReportType[] memory foundReports = new ReportType[](userToReportMapping[patientAddress].length);
@@ -365,11 +353,6 @@ contract Report {
         return d;
     }
 
-    function updateDiagnosis(string memory diagnosisId,string memory text,uint date) public returns(bool){
-        reportDiagnosis[diagnosisId].text = text;
-        reportDiagnosis[diagnosisId].date = date;
-    }
-
     function getMyRequests(address userAddress,RequestTypeEnum requestType) public view returns(RequestType[] memory){
         string[] memory userReports = userToReportMapping[userAddress];
         uint size = 0;
@@ -409,12 +392,9 @@ contract Report {
         return r;
     }
 
-    function getRequestKeys() private view returns(string[] memory){
-        return reportKeys;
+    function getReport(string memory reportId) public view returns(ReportType memory){
+        return reports[reportId];
     }
 
-    function getCompleteReport(string memory id) public view returns(ReportType memory){
-        return reports[id];
-    }
 }
 

@@ -50,7 +50,7 @@ const ReportRequest:React.FC<{type:string}> = (props)=>{
     async function getMyRequests(){
         if(reportContract){
             console.log(props.type)
-            console.log(reportRequestTypeEnum[props.type])
+            console.log(reportRequestRTypeEnum[props.type])
             const data = await reportContract.methods.getMyRequests(selectedWallet,reportRequestRTypeEnum[props.type]).call({from:selectedWallet})
             if(data) setRequests(data)
             console.log(data)
@@ -62,7 +62,7 @@ const ReportRequest:React.FC<{type:string}> = (props)=>{
         const updatedAt = new Date().getTime()
         let data;
         if(props.type=='access'){
-            data = await reportContract?.methods.approveAccessRequest(reportId,requestId,updatedAt).send({from:selectedWallet})
+            data = await reportContract?.methods.approveAccessRequest(requestId,reportId,updatedAt).send({from:selectedWallet})
         }else{
             data = await reportContract?.methods.approveVerificationRequest(reportId,requestId,updatedAt).send({from:selectedWallet})
         }
@@ -90,7 +90,7 @@ const ReportRequest:React.FC<{type:string}> = (props)=>{
                 <table className="w-full rounded-lg shadow mx-auto">
                 <thead>
                     <tr className="border-2 border-black">
-                        <th className="px-4 py-2 bg-gray-200 text-center"></th>
+                        <th className="px-4 py-2 bg-gray-200 text-center">Request ID</th>
                         <th className="px-4 py-2 bg-gray-200 text-center">Report ID</th>
                         <th className="px-4 py-2 bg-gray-200 text-center">SentBy</th>
                         <th className="px-4 py-2 bg-gray-200 text-center">Created At</th>
@@ -105,7 +105,7 @@ const ReportRequest:React.FC<{type:string}> = (props)=>{
                     {loading&&<BeatLoader size={10} color="blue" loading={loading}></BeatLoader>}
                     {requests?.map((ele,index)=>(
                         <tr key={index}>
-                            <td className="px-4 py-2 text-center">{ele.requestId}</td>
+                            <td className="px-4 py-2 text-center">{ele.id}</td>
                             <td className="px-4 py-2 text-center">
                                 <button className="bg-transparent text-blue-900 hover:opacity-85 underline" onClick={()=>{navigate(routeConfig.viewReport(ele.reportId))}}>
                                     {ele.reportId}
@@ -138,7 +138,7 @@ const ReportRequest:React.FC<{type:string}> = (props)=>{
                                         <IconButton onClick={()=>approveRequest(ele.id,ele.reportId)}>
                                             <ThumbUpOffAlt color="success"/>
                                         </IconButton>
-                                        <IconButton  onClick={()=>rejectRequest(ele.requestId,ele.reportId)}>
+                                        <IconButton  onClick={()=>rejectRequest(ele.id,ele.reportId)}>
                                             <ThumbDownOffAlt color="error"/>
                                         </IconButton>
                                     </article>
@@ -147,10 +147,10 @@ const ReportRequest:React.FC<{type:string}> = (props)=>{
                             {reportRequestTypeEnum[Number(ele.requestType)]=="access"&&(
                                 <td>
                                 <article className="flex justify-center items-center">
-                                    <IconButton onClick={()=>approveRequest(ele.requestId,ele.reportId)}>
+                                    <IconButton onClick={()=>approveRequest(ele.id,ele.reportId)}>
                                         <ThumbUpOffAlt color="success"/>
                                     </IconButton>
-                                    <IconButton  onClick={()=>rejectRequest(ele.requestId,ele.reportId)}>
+                                    <IconButton  onClick={()=>rejectRequest(ele.id,ele.reportId)}>
                                         <ThumbDownOffAlt color="error"/>
                                     </IconButton>
                                 </article>

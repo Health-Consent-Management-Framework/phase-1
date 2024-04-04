@@ -70,7 +70,7 @@ export const Facilities:React.FC = ()=>{
         <section className="w-full">
             <div className="w-full flex items-center px-10 py-3 border-b-2  mb-2 justify-between">
                 <h1 className="text-xl font-medium p-0">Facilities</h1>
-                {role&&(
+                {role=='1'&&(
                 <Button onClick={()=>{setOpenPopUp(true)}} className="flex gap-2 items-center"  buttonType="dark" type="button">
                     <Add/>
                     Add Facility

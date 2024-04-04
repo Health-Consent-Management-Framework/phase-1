@@ -233,7 +233,7 @@ const ViewConnections: React.FC = () => {
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
         {role == 4 ? <MenuItem onClick={() => { setAccessPopup(true) }}>Grant Access</MenuItem> : <MenuItem onClick={() => {setRequestAccessPopup(true)}}>Request Access</MenuItem>}
-        <MenuItem onClick={() => {setDoctorAccessPopup(true)}}>Access reports</MenuItem>
+        {role == 4 && <MenuItem onClick={() => {setDoctorAccessPopup(true)}}>Access reports</MenuItem>}
         <MenuItem onClick={()=>{removeConnection()}}>Remove Connection</MenuItem>
       </Menu>
       <Dialog

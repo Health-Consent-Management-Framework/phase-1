@@ -53,9 +53,11 @@ const ViewReport = () => {
 }, [reportContract, params.id, id, selectedWallet]);
 
   const getReport = useCallback(async () => {
-    return reportContract?.methods
-      .getCompleteReport(params.id)
+    const data = await reportContract?.methods
+      .getReport(params.id)
       .call({ from: selectedWallet });
+    console.log(data)
+    return data;
   }, [reportContract]);
 
   const { loading, error, data: report } = useTransaction(getReport);
@@ -64,9 +66,6 @@ const ViewReport = () => {
     console.log(report);
   }, [report]);
 
-  if (error) {
-    return <p>Something went wrong</p>;
-  }
 
   const getDoctors = useCallback(
     async (doctorAddress) => {
@@ -79,17 +78,12 @@ const ViewReport = () => {
   );
 
   const fetchDoctorsData = useCallback(async () => {
-    let mergedData = [];
-    for (const ele of report?.doctorAddress) {
-      // console.log(ele);
-      const doctorData = await getDoctors(ele);
-      // console.log(doctorData);
-      if (doctorData) {
-        mergedData.push({...doctorData,walletAddress:ele});
-      }
+    if(report){
+      setDoctorsData(()=>report?.doctorAddress?.map(async(ele)=>{
+        const doctorData = await getDoctors(ele);
+        return doctorData
+      }))
     }
-    console.log(mergedData);
-    setDoctorsData(mergedData);
   }, [report, getDoctors]);
 
   useEffect(() => {
@@ -151,29 +145,23 @@ const ViewReport = () => {
                     </article>
                   </div>
                   <article className="max-w-[500px] flex gap-4 justify-center items-center flex-wrap">
-                    <Button className="border-gray-200 gap-2 font-medium flex items-center text-gray-500 hover:text-red-400">
-                      <DownloadSharp />
-                      Download
-                    </Button>
-                    <Button className="border-gray-200 flex items-center gap-2 font-medium text-gray-500 hover:text-red-400">
-                      <RemoveRedEye />
-                      View
-                    </Button>
-                    <Button className="border-gray-200 flex items-center gap-2 font-medium text-gray-500 hover:text-red-400">
-                      <Print />
-                      Print
-                    </Button>
+                    <a target="_blank" href={report&&report?.attachements[0]}>
+                      <Button className="border-gray-200 flex items-center gap-2 font-medium text-gray-500 hover:text-red-400">
+                        <RemoveRedEye />
+                        View
+                      </Button>
+                    </a>
                     {report && !report.isVerified && (
                       <Button className="border-gray-200 flex items-center gap-2 font-medium text-gray-500 hover:text-red-400">
                         <Done />
                         Request Verification
                       </Button>
                     )}
-                    {report && (
+                    {/* {report && (
                       <Button className="border-gray-200 flex items-center gap-2 font-medium text-gray-500 hover:text-red-400">
                         View Requests
                       </Button>
-                    )}
+                    )} */}
                   </article>
                 </div>
               </div>

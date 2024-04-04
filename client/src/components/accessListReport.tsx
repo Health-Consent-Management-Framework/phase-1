@@ -1,4 +1,3 @@
-import dummyReport from '../assets/dummyReport.jpg'
 import { Button } from "./ui"
 import useContract from '../hooks/useContract'
 import { abi as ReportAbi,networks as ReportNetworks } from '../contracts/Report.json'
