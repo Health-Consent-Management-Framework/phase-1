@@ -32,7 +32,10 @@ const ViewAccessReports:React.FC<{doctorAddress:string}> = (props)=>{
             console.log(props.doctorAddress)
             setLoading(true);
             const promises = selectedReports.map(async ele => {
-                const data = await contract?.methods.grantDoctorAccess(ele, props.doctorAddress).send({from:selectedWallet});
+                console.log(ele);
+                // while calling from listDoctors the below line worked but from viewConnections we are getting array
+                // const data = await contract?.methods.grantDoctorAccess(ele, props.doctorAddress).send({from:selectedWallet}); 
+                const data = await contract?.methods.grantDoctorAccess(ele, props.doctorAddress[0]).send({from:selectedWallet});  
                 return data;
             });
             console.log(promises)
@@ -70,9 +73,9 @@ const ViewAccessReports:React.FC<{doctorAddress:string}> = (props)=>{
             <div className="w-full flex flex-wrap grow p-5 overflow-y-auto gap-4">
                 {reports?.map(ele=><article className='bg-white flex relative flex-col p-2 shadow-md rounded-md w-[200px] h-[200px]'>
                     <input type='checkbox' 
-                    onChange={()=>updateSelectedReports(ele.reportId)} 
+                    onChange={()=>updateSelectedReports(ele.reportId)}
                     color="primary" className="absolute z-10 right-2"/>
-                    <img src={dummyReport} className="h-[100px] object-cover object-top"/>
+                    <img src={ele.attachements[0]} className="h-[100px] object-cover object-top"/>
                     <span className="text-center pt-5 font-medium text-blue-500">{ele.problem}</span>
                     <article className="pt-1 flex justify-center items-center flex-wrap gap-2">
                         {ele.tags.map((k,index)=>(

@@ -24,7 +24,14 @@ import {
   abi as PatientAbi,
   networks as PatientNetworks,
 } from "../contracts/Patient.json";
+import {
+  abi as ReportAbi,
+  networks as ReportNetworks,
+} from "../contracts/Report.json";
 import { useCalendarState } from "@mui/x-date-pickers/internals";
+import ViewAccessReports from "./accessListReport"
+import DoctorViewAccessReports from "./doctorAccessList";
+import DoctorRequestReports from "./doctorRequestList";
 
 interface cardProps {
   fname: string;
@@ -60,25 +67,29 @@ const ConnectionCard: React.FC<cardProps> = ({
 };
 
 const ViewConnections: React.FC = () => {
-  const { selectedWallet } = useCombinedContext();
+  const { selectedWallet, role } = useCombinedContext();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const contract = useContract(ConnectionAbi, ConnectionNetworks);
   const UserContract = useContract(UserAbi, UserNetworks);
+  const reportContract = useContract(ReportAbi, ReportNetworks);
   const patientContract = useContract(PatientAbi, PatientNetworks);
   const doctorContract = useContract(DoctorsAbi, DoctorsNetworks);
   const [params, setParams] = useSearchParams();
   const [accessPopup, setAccessPopup] = useState(false);
-  const [id, setId] = useState("");
+  const [accessDoctorPopup, setDoctorAccessPopup] = useState(false);
+  const [RequestAccessPopup, setRequestAccessPopup] = useState(false);
+  const [id, setId] = useState('');
   const navigate = useNavigate();
   const [doctorAddresses, setDoctorAddresses] = useState<string[]>([]);
   const [patientAddresses, setPatientAddresses] = useState<string[]>([]);
   // const [patientsData, setpatientsData] = useState([]);
   const [patientsData, setPatientsData] = useState([]);
   const [doctorsData, setDoctorsData] = useState([]);
+  const [userRole,setUserRole] = useState(null);
 
   function handleMenuClose() {
     setAnchorEl(null);
-    setId("");
+    setId('');
   }
 
   function updateMenu(ele, id) {
@@ -86,6 +97,22 @@ const ViewConnections: React.FC = () => {
     setId(id);
     console.log(id);
   }
+
+  function closeDialog() {
+    setDoctorAccessPopup(false);
+}
+
+  async function removeConnection(){
+    // const createdAt = new Date().getTime()
+    // const data = await requestContract?.methods.createAccountRequest(selectedWallet,`${selectedWallet} request for its account to be verified`,doctorId,createdAt,0,requestTypeEnum.connection).send({from:selectedWallet});
+    const data1 = await contract?.methods.deleteConnection(id[0]).send({from:selectedWallet});
+    // id is giving array
+  }
+
+  // async function getReports(){
+  //   const data = await reportContract?.methods.getCurrentPatientDoctorAccessReport(selectedWallet,id[0]).send({from:selectedWallet});
+  //   console.log(data);
+  // }
 
   async function getConnection() {
     const data = await contract?.methods
@@ -104,7 +131,6 @@ const ViewConnections: React.FC = () => {
 
       roles.forEach(({ address, role }) => {
         if (role == 3) {
-          console.log(1);
           setDoctorAddresses((prev) => [...prev, address]);
         } else if (role == 4) {
           setPatientAddresses((prev) => [...prev, address]);
@@ -112,6 +138,23 @@ const ViewConnections: React.FC = () => {
       });
     }
   }
+
+  async function getUserRole() {
+    try {
+      const data = await UserContract?.methods.getUserRole(selectedWallet).call({ from: selectedWallet });
+      setUserRole(data);
+      console.log(data);
+    } catch (error) {
+      console.error("Error fetching user role:", error);
+      setUserRole(null);
+    }
+  }
+
+  useEffect(() => {
+    if (selectedWallet) {
+      getUserRole();
+    }
+  }, []);
 
   const fetchDoctorsData = useCallback(async () => {
     const doctorsData = await Promise.all(
@@ -189,37 +232,49 @@ const ViewConnections: React.FC = () => {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem>Grant Access</MenuItem>
-        <MenuItem
-          onClick={() => {
-            navigate(routeConfig.reports);
-            setParams({ doctorId: id });
-          }}
-        >
-          view my access
-        </MenuItem>
-        <MenuItem>Delete Connection</MenuItem>
+        {role == 4 ? <MenuItem onClick={() => { setAccessPopup(true) }}>Grant Access</MenuItem> : <MenuItem onClick={() => {setRequestAccessPopup(true)}}>Request Access</MenuItem>}
+        <MenuItem onClick={() => {setDoctorAccessPopup(true)}}>Access reports</MenuItem>
+        <MenuItem onClick={()=>{removeConnection()}}>Remove Connection</MenuItem>
       </Menu>
       <Dialog
-        PaperProps={{
-          style: {
-            backgroundColor: "transparent",
-            boxShadow: "none",
-          },
-        }}
-        open={accessPopup}
-        onClose={() => setAccessPopup(false)}
-      >
-        <DialogContent>
-          <section className="max-w-md relative overflow-y-auto flex flex-wrap gap-4 max-h-[500px] h-[95vh] bg-emerald-200">
-            <article className="bg-white shadow-md rounded-md w-[200px] h-[200px]">
-              {/* <img src='' className=''/> */}
-              <span>Report Name</span>
-              <span>Report Tags</span>
-            </article>
-          </section>
-        </DialogContent>
-      </Dialog>
+            PaperProps={{
+                style: {
+                  backgroundColor: 'transparent',
+                  boxShadow: 'none',
+                },
+              }}  
+              maxWidth="lg"
+            open={RequestAccessPopup} onClose={()=>setRequestAccessPopup(false)}>
+                <DialogContent>
+                    <DoctorRequestReports patientAddress={id}/>
+                </DialogContent>
+        </Dialog>
+      <Dialog
+            PaperProps={{
+                style: {
+                  backgroundColor: 'transparent',
+                  boxShadow: 'none',
+                },
+              }}  
+              maxWidth="lg"
+            open={accessDoctorPopup} onClose={()=>setDoctorAccessPopup(false)}>
+                <DialogContent>
+                    <DoctorViewAccessReports doctorAddress={id} onClose={closeDialog}/>
+                </DialogContent>
+        </Dialog>
+      <Dialog
+            PaperProps={{
+                style: {
+                  backgroundColor: 'transparent',
+                  boxShadow: 'none',
+                },
+              }}  
+              maxWidth="lg"
+            open={accessPopup} onClose={()=>setAccessPopup(false)}>
+                <DialogContent>
+                    <ViewAccessReports doctorAddress={id}/>
+                </DialogContent>
+        </Dialog>
     </section>
   );
 };

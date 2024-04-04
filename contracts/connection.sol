@@ -42,11 +42,11 @@ contract Connection{
                 break;    
             }
         }
-
         if(connectionIndex == recieverConnections.length) return false;
         for(uint i=connectionIndex+1;i<recieverConnections.length;i++){
             connections[from][i-1] = connections[from][i];
         }
+        connections[from].pop();
         return true;
     }
 
