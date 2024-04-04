@@ -35,6 +35,7 @@ const RequestsMiddleware = ()=>{
             {searchParams.get('type')=='report'&&<ReportRequest/>}
             {searchParams.get('type')=='account'&&<AccountRequest type={"verification"}/>}
             {searchParams.get('type')=='connection'&&<AccountRequest type={"connection"}/>}
+            {searchParams.get('type')=='access'&&<ReportRequest/>}
         </section>    
     )
 }

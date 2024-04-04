@@ -69,13 +69,15 @@ const ReportRequest:React.FC = ()=>{
         console.log(data)
     }
 
-    async function approveAccessRequest(){
-        const data = await reportContract?.methods.approveAccessRequest(requestId,reportId,updatedAt).send({from:selectedWallet})
+    async function approveAccessRequest(requestId,reportId){
+        console.log(requestId, reportId);
+        
+        const data = await reportContract?.methods.approveAccessRequest(requestId,reportId).send({from:selectedWallet})
         console.log(data)
     }
 
-    async function rejectAccessRequest() {
-        const data = await reportContract?.methods.rejectAccessRequest(requestId,reportId,updatedAt).send({from:selectedWallet})
+    async function rejectAccessRequest(requestId,reportId) {
+        const data = await reportContract?.methods.rejectAccessRequest(requestId,reportId).send({from:selectedWallet})
         console.log(data)
     }
 
@@ -84,10 +86,6 @@ const ReportRequest:React.FC = ()=>{
         console.log(data)
         if(data) setRequests(data)
     }
-
-    async function approveAccess(){}
-
-    async function rejectAccess(){}
 
     return(
         <section className="w-full">
@@ -143,19 +141,19 @@ const ReportRequest:React.FC = ()=>{
                                         <IconButton onClick={()=>approveVerfifcationRequest(ele.id,ele.reportId)}>
                                             <ThumbUpOffAlt color="success"/>
                                         </IconButton>
-                                        <IconButton  onClick={()=>rejectVerificationRequest(ele.requestId,ele.reportId)}>
+                                        <IconButton  onClick={()=>rejectVerificationRequest(ele.id,ele.reportId)}>
                                             <ThumbDownOffAlt color="error"/>
                                         </IconButton>
                                     </article>
                                 </td>
                             )}
-                            {reportRequestTypeEnum[Number(ele.requestType)]=='access'&&(
+                            {reportRequestTypeEnum[Number(ele.requestType)]=="access"&&(
                                 <td>
                                 <article className="flex justify-center items-center">
-                                    <IconButton onClick={()=>approveAccess(ele.requestId,ele.reportId)}>
+                                    <IconButton onClick={()=>approveAccessRequest(ele.id,ele.reportId)}>
                                         <ThumbUpOffAlt color="success"/>
                                     </IconButton>
-                                    <IconButton  onClick={()=>rejectAccess(ele.requestId)}>
+                                    <IconButton  onClick={()=>rejectAccessRequest(ele.id,ele.reportId)}>
                                         <ThumbDownOffAlt color="error"/>
                                     </IconButton>
                                 </article>

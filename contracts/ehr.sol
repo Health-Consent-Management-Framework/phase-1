@@ -156,7 +156,7 @@ contract Report {
 
     function approveAccessRequest(uint256 requestId,string memory reportId) public onlyOwner(msg.sender,reportId) returns (bool){
         RequestType storage request = accessRequests[reportId][requestId];
-        require(request.status != RequestStatus.pending, "Access request is not pending");
+        // require(request.status != RequestStatus.pending, "Access request is not pending");
         bool alreadyHasAccess = false;
         for(uint i=0;i<reports[reportId].doctorAddress.length;i++){
             if(request.receivedBy==reports[reportId].doctorAddress[i]){
