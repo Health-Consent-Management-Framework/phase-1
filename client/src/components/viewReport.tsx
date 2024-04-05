@@ -78,12 +78,17 @@ const ViewReport = () => {
   );
 
   const fetchDoctorsData = useCallback(async () => {
-    if(report){
-      setDoctorsData(()=>report?.doctorAddress?.map(async(ele)=>{
-        const doctorData = await getDoctors(ele);
-        return doctorData
-      }))
+    let mergedData = [];
+    for (const ele of report?.doctorAddress) {
+      // console.log(ele);
+      const doctorData = await getDoctors(ele);
+      // console.log(doctorData);
+      if (doctorData) {
+        mergedData.push({...doctorData,walletAddress:ele});
+      }
     }
+    console.log(mergedData);
+    setDoctorsData(mergedData);
   }, [report, getDoctors]);
 
   useEffect(() => {

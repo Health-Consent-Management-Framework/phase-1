@@ -18,7 +18,7 @@ const ViewAccessReports:React.FC<{doctorAddress:string}> = (props)=>{
         try{
             setLoading(true)
             // function to get non existing reports
-            const data = await contract?.methods.getPatientReports(props.patientAddress).call({from:selectedWallet});
+            const data = await contract?.methods.getReportsWithoutAccess(props.patientAddress, selectedWallet).call({from:selectedWallet});
             // console.log(data)
             setReports(data)
             setLoading(false)

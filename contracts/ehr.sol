@@ -1,21 +1,14 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity ^0.8.0;
-
 import "./user.sol";
-
 contract Report {
-
     User userContract;
-    
     uint totalReports;
     uint counter = 1;
     enum RequestStatus { pending, approved, rejected }
     enum RequestTypeEnum { verification, access}
     enum UploadStatus { pending, uploaded, rejected }
-
     ReportType[] testReports;
-
     struct RequestType {
         string id;
         string reportId;
@@ -26,7 +19,6 @@ contract Report {
         RequestStatus status;
         RequestTypeEnum requestType;
     }
-
     struct Diagnosis{
         string text;
         uint date;
@@ -34,8 +26,6 @@ contract Report {
         string doctorLname;
         address walletAddress;
     }
-
-
     struct ReportType{
         string reportId;
         address patientAddress;
@@ -47,17 +37,14 @@ contract Report {
         uint createdAt;
         uint updatedAt;
     }
-
     uint256 private nonce;
     mapping(address => string[]) private userToReportMapping;
     mapping(address => string[]) doctorToReportMapping;
-
     mapping(string => string[]) public reportToRequests;
     mapping(string => RequestType) public accessRequests;
     mapping(string => string[]) reportToDiagnosis; 
     mapping(string => Diagnosis) reportDiagnosis; 
-    
-    string[] reportKeys; // fetch all reports
+    string[] reportKeys;
     string[] requestKeys;
     Diagnosis[] testDiagnosis;
     RequestType[] testRequests;
@@ -94,21 +81,16 @@ contract Report {
     event ReportAlreadyVerified(string reportId);
     event NotSelfResource(address id,string reportId);
     event NoAccessToReport(address id,string reportId);
-
     event NotDoctor(address id);
     event NotWorkerOrAdmin(address id);
-
     event DoctorAssignedToReport(address doctorAddress, string reportId);
     event DoctorAccessRevoked(address doctorAddress, string reportId);
-
     event AccessRequestSent(address doctorAddress, string reportId,uint index);
     event AccessRequestApproved(address doctorAddress, string reportId,string requestId);
     event AccessRequestRejected(address doctorAddress, string reportId,string index);
-
     event VerificationRequestCreated(address patientAddress,string reportId);
     event VerificationRequestUpdated(address workerAddress,string reportId,RequestStatus r);
     event VerificationRequestDeleted(address workerAddress,string reportId);
-
 
     constructor(address _userAddress) {
         userContract = User(_userAddress); 
@@ -117,7 +99,16 @@ contract Report {
 
     function revokeDoctorAccessToPatient(string memory reportId, address doctorAddress) public returns (bool) {
         ReportType storage report = reports[reportId];
+        string[] storage doctorReports = doctorToReportMapping[doctorAddress]; // Use storage instead of memory
         bool success = false;
+        for(uint i = 0; i < doctorReports.length; i++) {
+        if(keccak256(abi.encodePacked(reportId)) == keccak256(abi.encodePacked(doctorReports[i]))) {
+                doctorReports[i] = doctorReports[doctorReports.length - 1];
+                doctorReports.pop();
+                success = true;
+                break;
+            }
+        }
         for(uint i = 0; i < report.doctorAddress.length; i++) {
             if(report.doctorAddress[i] == doctorAddress) { 
                 success = true;
@@ -311,21 +302,46 @@ contract Report {
     }
 
     function getCurrentPatientDoctorAccessReport(address patientAddress, address doctorAddress) public view returns (ReportType[] memory) {
-    string[] storage ReportIds = doctorToReportMapping[doctorAddress];
-    string[] memory RelatedReportIds = new string[](ReportIds.length);
-    uint count = 0;
-    for (uint i = 0; i < ReportIds.length; i++) {
-        if (reports[ReportIds[i]].patientAddress == patientAddress) {
-            RelatedReportIds[count] = ReportIds[i];
-            count++;
+        string[] storage ReportIds = doctorToReportMapping[doctorAddress];
+        string[] memory RelatedReportIds = new string[](ReportIds.length);
+        uint count = 0;
+        for (uint i = 0; i < ReportIds.length; i++) {
+            if (reports[ReportIds[i]].patientAddress == patientAddress) {
+                RelatedReportIds[count] = ReportIds[i];
+                count++;
+            }
         }
+        ReportType[] memory trimmedRelatedReportIds = new ReportType[](count);
+        for (uint j = 0; j < count; j++) {
+            trimmedRelatedReportIds[j] = reports[RelatedReportIds[j]];
+        }
+        return trimmedRelatedReportIds;
     }
-    ReportType[] memory trimmedRelatedReportIds = new ReportType[](count);
-    for (uint j = 0; j < count; j++) {
-        trimmedRelatedReportIds[j] = reports[RelatedReportIds[j]];
+
+    function getReportsWithoutAccess(address patientAddress, address doctorAddress) public view returns (ReportType[] memory){
+        string[] storage PatientReportIds = userToReportMapping[patientAddress];
+        string[] memory unrelatedReportIds = new string[](PatientReportIds.length);
+        ReportType[] memory reportsWithAccess = getCurrentPatientDoctorAccessReport(patientAddress, doctorAddress);
+        uint count = 0;
+        for(uint i=0;i<PatientReportIds.length;i++){
+        bool available = false;
+            for(uint j=0;j<reportsWithAccess.length;j++){
+                if (keccak256(abi.encodePacked(PatientReportIds[i])) == keccak256(abi.encodePacked(reportsWithAccess[j].reportId))) {
+                    available = true;
+                    break;
+                }
+            }
+            if(!available){
+                unrelatedReportIds[count] = PatientReportIds[i];
+                count++;
+            }
+        }
+        ReportType[] memory reportsWithoutAccess = new ReportType[](count);
+        for (uint j = 0; j < count; j++) {
+            reportsWithoutAccess[j] = reports[unrelatedReportIds[j]];
+        }
+        return reportsWithoutAccess;
     }
-    return trimmedRelatedReportIds;
-}
 
     function updateTags(string memory reportId,string[] memory tags) public onlyOwner(msg.sender,reportId) returns(bool) {
         ReportType memory report = reports[reportId];
@@ -397,4 +413,3 @@ contract Report {
     }
 
 }
-
